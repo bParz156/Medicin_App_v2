@@ -2,7 +2,7 @@ package com.example.medicin_app_v2.data.firstAidKit
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflineFirstaidkitRepository(private val firstAidKitDao: FirstAidKitDao) : firstaidkitRepository {
+class OfflineFirstaidkitRepository(private val firstAidKitDao: FirstAidKitDao) : FirstaidkitRepository {
     override fun getAllFirstAidKitsStream(patientId: Int): Flow<List<FirstAidKit>> {
         return firstAidKitDao.getpatientsfirstAidKit(patientId)
     }

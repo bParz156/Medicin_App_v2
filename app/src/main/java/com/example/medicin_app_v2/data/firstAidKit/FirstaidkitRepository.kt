@@ -2,7 +2,7 @@ package com.example.medicin_app_v2.data.firstAidKit
 
 import kotlinx.coroutines.flow.Flow
 
-interface firstaidkitRepository {
+interface FirstaidkitRepository {
 
     /**
      * Retrieve all the FirstAidKits from the the given patient with [id].
