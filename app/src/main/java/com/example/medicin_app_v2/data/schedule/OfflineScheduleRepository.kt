@@ -1,0 +1,33 @@
+package com.example.medicin_app_v2.data.schedule
+
+import kotlinx.coroutines.flow.Flow
+
+class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : ScheduleRepository {
+
+    override fun getAllPatientsSchedules(patient_id: Int): Flow<List<Schedule>> {
+        return scheduleDao.getAllPatientsSchedules(patient_id)
+    }
+
+    override fun getPatientMedicineSchedule(
+        patient_id: Int,
+        medicine_id: Int
+    ): Flow<List<Schedule>> {
+        return scheduleDao.getPatientMedcicineSchedule(patient_id, medicine_id)
+    }
+
+    override fun getScheduleById(id: Int): Flow<Schedule> {
+        return scheduleDao.getScheduleById(id)
+    }
+
+    override suspend fun insertSchedule(schedule: Schedule) {
+        scheduleDao.insert(schedule)
+    }
+
+    override suspend fun deleteSchedule(schedule: Schedule) {
+        scheduleDao.delete(schedule)
+    }
+
+    override suspend fun updateSchedule(schedule: Schedule) {
+        scheduleDao.update(schedule)
+    }
+}

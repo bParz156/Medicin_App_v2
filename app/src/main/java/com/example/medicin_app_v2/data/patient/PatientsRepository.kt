@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface PatientsRepository {
 
-    fun getAllPatientsStresm(): Flow<List<Patient>>
+    fun getAllPatientsStream(): Flow<List<Patient>>
 
 
     fun getPatientStream(id: Int): Flow<Patient?>

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKitDao
 import com.example.medicin_app_v2.data.medicine.Medicine
@@ -21,7 +22,7 @@ import com.example.medicin_app_v2.data.usage.UsageDao
 
 @Database(entities= [Patient::class, Medicine::class, Storage::class, FirstAidKit::class, Schedule::class, Usage::class, Notification::class],
     version=1, exportSchema = false)
-//@TypeConverters(Converters::class)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun patientDao(): PatientDao

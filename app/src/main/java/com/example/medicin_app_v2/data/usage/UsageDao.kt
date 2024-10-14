@@ -24,9 +24,9 @@ interface UsageDao {
     suspend fun delete(usage: Usage)
 
     @Query("SELECT * from usage WHERE id = :usage_id")
-    fun getPatientMedcicineSchedule(usage_id: Int): Flow<Schedule>
+    fun getPatientMedcicineSchedule(usage_id: Int): Flow<Usage>
 
     @Query("SELECT * from usage WHERE Schedule_id = :schedule_id")
-    fun getAllPatientsSchedules(schedule_id: Int): Flow<List<Patient>>
+    fun getAllPatientsSchedules(schedule_id: Int): Flow<List<Usage>>
 
 }

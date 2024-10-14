@@ -23,6 +23,7 @@ interface StorageDao {
     @Query("SELECT * from storage WHERE id = :id")
     fun getStorage(id: Int): Flow<Storage>
 
+
     @Query("SELECT * from storage ORDER BY Medicineid ASC")
     fun getAllStorages(): Flow<List<Storage>>
 }

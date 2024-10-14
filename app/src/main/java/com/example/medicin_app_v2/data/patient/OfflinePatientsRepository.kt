@@ -3,7 +3,7 @@ package com.example.medicin_app_v2.data.patient
 import kotlinx.coroutines.flow.Flow
 
 class OfflinePatientsRepository(private val patientDao: PatientDao) : PatientsRepository {
-    override fun getAllPatientsStresm(): Flow<List<Patient>> {
+    override fun getAllPatientsStream(): Flow<List<Patient>> {
         return patientDao.getAllpatients()
     }
 

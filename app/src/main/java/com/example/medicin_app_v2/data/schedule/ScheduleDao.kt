@@ -27,9 +27,9 @@ interface ScheduleDao {
 
 
     @Query("SELECT * from schedule WHERE Patient_id = :patient_id and Medicine_id = :medicine_id")
-    fun getPatientMedcicineSchedule(patient_id: Int, medicine_id: Int): Flow<Schedule>
+    fun getPatientMedcicineSchedule(patient_id: Int, medicine_id: Int): Flow<List<Schedule>>
 
     @Query("SELECT * from schedule WHERE Patient_id = :patient_id")
-    fun getAllPatientsSchedules(patient_id: Int): Flow<List<Patient>>
+    fun getAllPatientsSchedules(patient_id: Int): Flow<List<Schedule>>
 
 }
