@@ -7,6 +7,7 @@ import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.Patient
 import java.sql.Timestamp
+import java.util.Date
 
 @Entity(
     tableName = "Schedule",
@@ -33,7 +34,7 @@ data class Schedule(
     val day: Int,
     val hour: Float,
     val dose: Int,
-    val startDate: Timestamp,
-    val endDate: Timestamp?,
+    val startDate: Date,
+    val endDate: Date?,
     val mealReltion : MealRelation
 )

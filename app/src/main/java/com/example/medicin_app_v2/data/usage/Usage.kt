@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.medicin_app_v2.data.schedule.Schedule
-import java.sql.Date
+import java.util.Date
 
 @Entity(
     tableName = "Usage",
