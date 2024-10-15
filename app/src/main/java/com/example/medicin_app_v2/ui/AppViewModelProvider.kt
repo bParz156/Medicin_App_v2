@@ -6,7 +6,6 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.medicin_app_v2.MedicinApplication
-import com.example.medicin_app_v2.ui.home.HomeViewModel
 
 object AppViewModelProvider {
 
@@ -14,7 +13,9 @@ object AppViewModelProvider {
 
         // Initializer for HomeViewModel
         initializer {
-            HomeViewModel(medicinApplication().container.patientsRepository)
+            PatientViewModel(
+            this.createSavedStateHandle()
+            )
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.home.HomeScreen
 import com.example.medicin_app_v2.ui.magazyn.MagazynScreen
+import com.example.medicin_app_v2.ui.patients.PatientsListScreen
 import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaScreen
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaScreen
@@ -35,7 +36,7 @@ fun MedicinNavHost(
                     onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                     onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                     onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                    onButtonPatientClicked = {}
+                    onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
                 )
         }
 
@@ -46,7 +47,7 @@ fun MedicinNavHost(
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {}
+                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
             )
         }
 
@@ -57,7 +58,7 @@ fun MedicinNavHost(
                 onButtonZaleceniaClicked = { },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {}
+                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
             )
         }
 
@@ -68,7 +69,7 @@ fun MedicinNavHost(
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = {  },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {}
+                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
             )
         }
 
@@ -79,7 +80,17 @@ fun MedicinNavHost(
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = {  navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { },
-                onButtonPatientClicked = {}
+                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
+            )
+        }
+        composable(route=Location.PACJENCI.name) {
+            PatientsListScreen(
+                onAdd={},
+                onBack={ navController.popBackStack() },
+                onPatientClick={},
+                onDeleteClicked={},
+                currentPatientIdx=-1,
+                patientsList = listOf(),
             )
         }
 

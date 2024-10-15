@@ -33,6 +33,7 @@
     <string name="zalecenia">Zalecenia</string>
     <string name="Ustawienia">Ustawienia</string>
     <string name="Powiadomienia">Powiadomienia</string>
+    <string name="Pacjenci">Pacjenci</string>
 
     <string name="PatientsListDialog">Wszyscy pacjenci</string>
     <string name="PatientsListDialogText">Wybierz pacjenta, którego opieką chcesz się zająć klikając w jego imię</string>
