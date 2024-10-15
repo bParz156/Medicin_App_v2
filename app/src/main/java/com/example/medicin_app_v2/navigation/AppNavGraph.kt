@@ -34,7 +34,8 @@ fun MedicinNavHost(
                     onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
                     onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                     onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                    onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) }
+                    onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                    onButtonPatientClicked = {}
                 )
         }
 
@@ -44,7 +45,8 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = { },
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) }
+                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonPatientClicked = {}
             )
         }
 
@@ -54,7 +56,8 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
                 onButtonZaleceniaClicked = { },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) }
+                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonPatientClicked = {}
             )
         }
 
@@ -64,7 +67,8 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = {  },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) }
+                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonPatientClicked = {}
             )
         }
 
@@ -74,7 +78,8 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
                 onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
                 onButtonPowiadomieniaClicked = {  navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { }
+                onButtonUstawieniaClicked = { },
+                onButtonPatientClicked = {}
             )
         }
 

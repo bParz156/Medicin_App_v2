@@ -22,10 +22,11 @@ import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaBody
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UstawieniaScreen(onButtonHomeClick: () -> Unit ,
-                        onButtonMagazynClicked: () ->Unit,
-                        onButtonZaleceniaClicked: () ->Unit,
-                        onButtonPowiadomieniaClicked: () ->Unit,
-                        onButtonUstawieniaClicked: () ->Unit,
+                    onButtonMagazynClicked: () ->Unit,
+                    onButtonZaleceniaClicked: () ->Unit,
+                    onButtonPowiadomieniaClicked: () ->Unit,
+                    onButtonUstawieniaClicked: () ->Unit,
+                     onButtonPatientClicked: () ->Unit,
                      modifier: Modifier = Modifier)
 {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -37,7 +38,8 @@ fun UstawieniaScreen(onButtonHomeClick: () -> Unit ,
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked
+            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPatientClicked = onButtonPatientClicked
         )}
     ) {  innerPadding ->
         UstawieniaBody(

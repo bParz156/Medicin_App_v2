@@ -25,6 +25,7 @@ fun MagazynScreen(onButtonHomeClick: () -> Unit ,
                   onButtonZaleceniaClicked: () ->Unit,
                   onButtonPowiadomieniaClicked: () ->Unit,
                   onButtonUstawieniaClicked: () ->Unit,
+                  onButtonPatientClicked: () ->Unit,
                   modifier: Modifier= Modifier)
 {
 
@@ -37,7 +38,8 @@ fun MagazynScreen(onButtonHomeClick: () -> Unit ,
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked
+            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPatientClicked = onButtonPatientClicked
         )}
     ) {  innerPadding ->
         MagazynBody(

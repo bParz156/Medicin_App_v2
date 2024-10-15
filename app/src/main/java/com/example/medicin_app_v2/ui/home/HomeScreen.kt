@@ -47,6 +47,7 @@ fun HomeScreen(
     onButtonZaleceniaClicked: () ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
     onButtonUstawieniaClicked: () ->Unit,
+    onButtonPatientClicked: () ->Unit
     ) {
 
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -59,7 +60,8 @@ fun HomeScreen(
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked
+            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPatientClicked = onButtonPatientClicked
         )}
     ) {  innerPadding ->
                 HomeBody(

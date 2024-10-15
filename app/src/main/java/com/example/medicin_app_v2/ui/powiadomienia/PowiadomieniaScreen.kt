@@ -25,7 +25,8 @@ fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
                     onButtonZaleceniaClicked: () ->Unit,
                     onButtonPowiadomieniaClicked: () ->Unit,
                     onButtonUstawieniaClicked: () ->Unit,
-                        modifier: Modifier = Modifier)
+                    onButtonPatientClicked: () ->Unit,
+                    modifier: Modifier = Modifier)
 {
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -37,7 +38,8 @@ fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked
+            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPatientClicked = onButtonPatientClicked
         )}
     ) {  innerPadding ->
         PowiadomieniaBody(

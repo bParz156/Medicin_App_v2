@@ -34,5 +34,12 @@
     <string name="Ustawienia">Ustawienia</string>
     <string name="Powiadomienia">Powiadomienia</string>
 
+    <string name="PatientsListDialog">Wszyscy pacjenci</string>
+    <string name="PatientsListDialogText">Wybierz pacjenta, którego opieką chcesz się zająć klikając w jego imię</string>
+    <string name="new_patient">Dodaj pacjenta</string>
+    <string name="back">"Wróć"</string>
+    <string name="no_patient">Wygląda na to, że nie dodano jeszcze żadnego pacjenta, aby móc zacząć korzystać z aplikaci należy dodać pacjenta</string>
+    <string name="delete_patient">Usuń pacjenta</string>
+
 
 </resources>

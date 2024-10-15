@@ -217,11 +217,11 @@ fun CommunUIPreviw()
     CommunUI(
         location= location,
         modifier= Modifier,
-    onButtonHomeClick = {},
-    onButtonMagazynClicked={},
-    onButtonZaleceniaClicked={},
-    onButtonPowiadomieniaClicked={},
-    onButtonUstawieniaClicked={},
+        onButtonHomeClick = {},
+        onButtonMagazynClicked={},
+        onButtonZaleceniaClicked={},
+        onButtonPowiadomieniaClicked={},
+        onButtonUstawieniaClicked={},
         onButtonPatientClicked = {}
     )
 }
