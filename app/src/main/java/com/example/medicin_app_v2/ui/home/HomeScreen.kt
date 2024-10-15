@@ -34,54 +34,43 @@ import com.example.medicin_app_v2.R
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.ui.AppViewModelProvider
+import com.example.medicin_app_v2.ui.CommunUI
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel =viewModel(factory = AppViewModelProvider.Factory),
-    modifier : Modifier = Modifier
+    modifier : Modifier = Modifier,
+    onButtonHomeClick: () -> Unit ,
+    onButtonMagazynClicked: () ->Unit,
+    onButtonZaleceniaClicked: () ->Unit,
+    onButtonPowiadomieniaClicked: () ->Unit,
+    onButtonUstawieniaClicked: () ->Unit,
     ) {
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val homeUiState by viewModel.homeUiState.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            MedicinTopAppBar(
-                location = Location.HOME,
-                scrollBehavior = scrollBehavior
-            )
-        },
-        /*
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = navigateToItemEntry,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.item_entry_title)
+    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {CommunUI(
+            location = Location.HOME,
+            onButtonHomeClick = onButtonHomeClick,
+            onButtonMagazynClicked = onButtonMagazynClicked,
+            onButtonZaleceniaClicked = onButtonZaleceniaClicked,
+            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
+            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked
+        )}
+    ) {  innerPadding ->
+                HomeBody(
+                    patientList = homeUiState.patientsList,
+                    onItemClick = { },
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding
                 )
-            }
-        },
-
-         */
-    ) { innerPadding ->
-        HomeBody(
-            patientList = homeUiState.patientsList,
-            onItemClick = { },
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding,
-        )
     }
-
-
-
 }
+
 
 @Composable
 private fun HomeBody(

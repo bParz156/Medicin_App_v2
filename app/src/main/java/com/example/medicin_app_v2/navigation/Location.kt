@@ -10,6 +10,6 @@ enum class Location(@StringRes val title: Int) {
     HOME(title = R.string.home ),
     MAGAZYN(title = R.string.magazyn),
     ZALECENIA(title = R.string.zalecenia),
-    ALERTY(title = R.string.Powiadomienia),
+    POWIADOMIENIA(title = R.string.Powiadomienia),
     USTAWIENIA(title = R.string.Ustawienia)
 }
