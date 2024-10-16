@@ -161,6 +161,9 @@ private fun PatientsList(
     contentPadding: PaddingValues = PaddingValues(dimensionResource(R.dimen.padding_small)),
     modifier: Modifier = Modifier
 ) {
+
+    var openDialog  = remember { mutableStateOf(false)}
+    var patientToDelete : Patient? = null
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding
@@ -184,13 +187,19 @@ private fun PatientsList(
                 Icon(imageVector = Icons.Filled.Delete,
                     modifier = Modifier
                         .padding(end=dimensionResource(R.dimen.padding_small))
-                        .clickable {onDeleteClicked(patient) } ,
+                        .clickable { patientToDelete = patient } ,
                     contentDescription = stringResource(R.string.delete_patient)
                 )
             }
 
         }
     }
+
+    if(openDialog.value)
+    {
+        patientToDelete?.let { DeletePatientDialog(it, onDeleteClicked = onDeleteClicked , onDismiss = {openDialog.value=false}) }
+    }
+
 
 }
 
@@ -282,6 +291,68 @@ private fun PatientAddDialog(onAdd: (String) ->  Unit, onDismiss: () -> Unit)
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DeletePatientDialog(patient: Patient, onDeleteClicked: (Patient) -> Unit, onDismiss: () -> Unit)
+{
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_small))
+    )
+    {
+        Column(modifier = Modifier
+            .wrapContentSize()
+            .padding(dimensionResource(R.dimen.padding_small))
+            .background(color = Color.Cyan)
+        ) {
+            Text(text = stringResource(R.string.delete_patient_title),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_large)))
+
+            Text(text = stringResource(R.string.are_you_sure),
+                textAlign = TextAlign.Justify,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium)))
+
+
+            NavigationBar(modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_small))
+            ) {
+                NavigationBarItem(selected = false, onClick = onDismiss,
+                    icon = {Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )},
+                    label = {Text(text =stringResource(R.string.back),
+                        modifier =Modifier
+                            .wrapContentSize()
+                    )}
+                )
+
+                NavigationBarItem(selected = false, onClick =
+                {
+                    onDeleteClicked(patient)
+                    onDismiss()
+                },
+                    icon = {Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.delete_patient)
+                    )},
+                    label = {Text(text =stringResource(R.string.delete_patient),
+                        modifier =Modifier
+                            .wrapContentSize()
+                    )}
+                )
+            }
+        }
+    }
+}
+
 
 
 

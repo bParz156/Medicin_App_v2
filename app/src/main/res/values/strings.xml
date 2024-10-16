@@ -46,5 +46,8 @@
     <string name="requiered_to_add">Podaj imię i nazwisko pacjenta</string>
     <string name="confirm">Potwierdź</string>
 
+    <string name="delete_patient_title">Usuwanie pacjenta</string>
+    <string name="are_you_sure">Czy na pewno chcesz usunąć pacjenta %s? Spowoduje to usunięcie wszystkich informacji na temat jego zażywań leków</string>
+
 
 </resources>
