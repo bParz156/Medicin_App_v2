@@ -42,5 +42,9 @@
     <string name="no_patient">Wygląda na to, że nie dodano jeszcze żadnego pacjenta, aby móc zacząć korzystać z aplikaci należy dodać pacjenta</string>
     <string name="delete_patient">Usuń pacjenta</string>
 
+    <string name="add_pateint_title">Dodawanie nowego pacjenta</string>
+    <string name="requiered_to_add">Podaj imię i nazwisko pacjenta</string>
+    <string name="confirm">Potwierdź</string>
+
 
 </resources>

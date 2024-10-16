@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.ui.patients
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,14 +29,24 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -43,7 +54,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientsListScreen(
-    onAdd: () -> Unit,
+    onAddPatient: (String) -> Unit,
     onBack: () -> Unit,
     onPatientClick: (Patient) -> Unit,
     onDeleteClicked: (Patient) -> Unit,
@@ -52,17 +63,20 @@ fun PatientsListScreen(
     modifier: Modifier = Modifier)
 {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var openDialog  = remember { mutableStateOf(false)}
 
     Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            DialogTopBar(onBack = onBack , onAdd = onAdd)
+            DialogTopBar(onBack = onBack , onAdd = {
+                openDialog.value=true
+            })
         }
     ) {  innerPadding ->
-        if (patientsList.isEmpty()) {
-            Text(stringResource(R.string.no_patient),
-                modifier= modifier.padding(innerPadding)
-            )
-        }
+            if (patientsList.isEmpty()) {
+                Text(stringResource(R.string.no_patient),
+                    modifier= modifier.padding(innerPadding)
+                )
+            }
             else
             {
                 PatientsList(
@@ -72,9 +86,15 @@ fun PatientsListScreen(
                     currentPatientIdx= currentPatientIdx,
                     contentPadding = innerPadding)
             }
+
+            if(openDialog.value)
+            {
+                PatientAddDialog(onAdd = onAddPatient, onDismiss = {openDialog.value = false})
+            }
         }
 
 }
+
 
 
 @Composable
@@ -194,12 +214,83 @@ private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PatientAddDialog(onAdd: (String) ->  Unit, onDismiss: () -> Unit)
+{
+    var patientName by remember { mutableStateOf("") }
+
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_small))
+    )
+    {
+        Column(modifier = Modifier
+            .wrapContentSize()
+            .padding(dimensionResource(R.dimen.padding_small))
+            .background(color = Color.Cyan)
+        ) {
+            Text(text = stringResource(R.string.add_pateint_title),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_large)))
+
+            Text(text = stringResource(R.string.requiered_to_add),
+                textAlign = TextAlign.Justify,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium)))
+
+            TextField( value = patientName,
+                onValueChange = {patientName = it},
+                placeholder = { Text("Podaj imię i nazwisko")})
+
+            NavigationBar(modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_small))
+            ) {
+                NavigationBarItem(selected = false, onClick = onDismiss,
+                    icon = {Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )},
+                    label = {Text(text =stringResource(R.string.back),
+                        modifier =Modifier
+                            .wrapContentSize()
+                    )}
+                )
+
+                NavigationBarItem(selected = false, onClick =
+                {
+                    if(patientName.isNotEmpty())
+                    {
+                        onAdd(patientName)
+                        onDismiss()
+                    }
+                },
+                    icon = {Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = stringResource(R.string.confirm)
+                    )},
+                    label = {Text(text =stringResource(R.string.confirm),
+                        modifier =Modifier
+                            .wrapContentSize()
+                    )}
+                )
+            }
+        }
+    }
+}
+
+
+
 @Composable
 @Preview
 fun PatientEmptyListPreview()
 {
     PatientsListScreen(
-        onAdd = {},
+        onAddPatient = {},
         onBack = {},
         onPatientClick = {} ,
         onDeleteClicked = {},
@@ -213,7 +304,7 @@ fun PatientEmptyListPreview()
 fun PatientListPreview()
 {
     PatientsListScreen(
-        onAdd = {},
+        onAddPatient = {},
         onBack = {},
         onPatientClick = {} ,
         onDeleteClicked = {},

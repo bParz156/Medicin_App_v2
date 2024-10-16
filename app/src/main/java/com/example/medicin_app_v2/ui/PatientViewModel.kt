@@ -16,3 +16,5 @@ class PatientViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
         savedStateHandle["selectedPatient"] = patient
     }
 }
+
+

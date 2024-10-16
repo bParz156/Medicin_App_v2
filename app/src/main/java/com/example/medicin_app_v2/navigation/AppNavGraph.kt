@@ -85,7 +85,7 @@ fun MedicinNavHost(
         }
         composable(route=Location.PACJENCI.name) {
             PatientsListScreen(
-                onAdd={},
+                onAddPatient = {},
                 onBack={ navController.popBackStack() },
                 onPatientClick={},
                 onDeleteClicked={},
