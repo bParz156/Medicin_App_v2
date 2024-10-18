@@ -1,15 +1,15 @@
 package com.example.medicin_app_v2.ui.patients
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,39 +31,59 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medicin_app_v2.navigation.NavigationDestination
+import com.example.medicin_app_v2.ui.AppViewModelProvider
+import com.example.medicin_app_v2.ui.PatientDetails
+import com.example.medicin_app_v2.ui.PatientUiState
+import com.example.medicin_app_v2.ui.PatientViewModel
+import com.example.medicin_app_v2.ui.toPatient
+import kotlinx.coroutines.launch
 
 
+object PatientsDestination : NavigationDestination{
+    override val route = "patients_settings"
+    override val titleRes = R.string.Pacjenci
+    const val patientIdArg = "patientId"
+    val routeWithArgs = "$route/{$patientIdArg}"
+
+}
+
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientsListScreen(
-    onAddPatient: (String) -> Unit,
     onBack: () -> Unit,
     onPatientClick: (Patient) -> Unit,
-    onDeleteClicked: (Patient) -> Unit,
-    currentPatientIdx: Int,
-    patientsList: List<Patient>,
-    modifier: Modifier = Modifier)
+    modifier: Modifier = Modifier,
+    viewModel: PatientViewModel = viewModel(factory = AppViewModelProvider.Factory)
+)
 {
+    Log.i("startOFScreen", "Przed czymkowliek")
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var openDialog  = remember { mutableStateOf(false)}
+    val patientsListviewModel = viewModel.patientslistUiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Log.i("startOFScreen", "86")
 
     Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -72,27 +92,32 @@ fun PatientsListScreen(
             })
         }
     ) {  innerPadding ->
-            if (patientsList.isEmpty()) {
-                Text(stringResource(R.string.no_patient),
-                    modifier= modifier.padding(innerPadding)
-                )
-            }
-            else
-            {
-                PatientsList(
-                    patientsList = patientsList,
-                    onDeleteClicked = onDeleteClicked,
-                    onPatientClick = onPatientClick,
-                    currentPatientIdx= currentPatientIdx,
-                    contentPadding = innerPadding)
-            }
+
+            PatientsList(
+                patientsList = patientsListviewModel.value.patientList,
+                onDeleteClicked =
+                {
+                    coroutineScope.launch {
+                        viewModel.deletePatient()
+                    }
+                },
+                onPatientClick = onPatientClick,
+                currentPatient= viewModel.uiState.value.patientDetails.toPatient(),
+                contentPadding = innerPadding)
 
             if(openDialog.value)
             {
-                PatientAddDialog(onAdd = onAddPatient, onDismiss = {openDialog.value = false})
+                PatientAddDialog(onAdd =
+                {
+                    coroutineScope.launch {
+                        viewModel.createPatient()
+                    }
+                }, onDismiss = {openDialog.value = false},
+                patientsDetails = viewModel.uiState.value.patientDetails,
+                    onValueChange = viewModel::updatePatientUiState
+                )
             }
         }
-
 }
 
 
@@ -157,49 +182,65 @@ private fun PatientsList(
     patientsList: List<Patient>,
     onPatientClick : (Patient) -> Unit,
     onDeleteClicked : (Patient) -> Unit,
-    currentPatientIdx: Int,
+    currentPatient: Patient,
     contentPadding: PaddingValues = PaddingValues(dimensionResource(R.dimen.padding_small)),
     modifier: Modifier = Modifier
 ) {
 
     var openDialog  = remember { mutableStateOf(false)}
     var patientToDelete : Patient? = null
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding
-    ) {
-        items(items = patientsList, key = {it.name} ){
-            patient ->
-
-            Row(modifier = Modifier
-                .wrapContentSize().fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_small)),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically)
-            {
-                PatientCard(patient = patient,
+    if (patientsList.isEmpty()) {
+        Text(stringResource(R.string.no_patient),
+            modifier= modifier.padding(contentPadding)
+        )
+    }
+    else {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = contentPadding
+        ) {
+            items(items = patientsList, key = { it.name }) { patient ->
+                Row(
                     modifier = Modifier
-                        .padding(start=dimensionResource(R.dimen.padding_medium),
-                            end= dimensionResource(R.dimen.padding_small))
-                        .weight(1f)
-                        .clickable { onPatientClick(patient)})
-
-                Icon(imageVector = Icons.Filled.Delete,
-                    modifier = Modifier
-                        .padding(end=dimensionResource(R.dimen.padding_small))
-                        .clickable { patientToDelete = patient } ,
-                    contentDescription = stringResource(R.string.delete_patient)
+                        .wrapContentSize().fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.padding_small))
+                        .background(if (patient == currentPatient) Color.DarkGray else Color.Transparent),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 )
-            }
+                {
+                    PatientCard(patient = patient,
+                        modifier = Modifier
+                            .padding(
+                                start = dimensionResource(R.dimen.padding_medium),
+                                end = dimensionResource(R.dimen.padding_small)
+                            )
+                            .weight(1f)
+                            .clickable { onPatientClick(patient) })
 
+                    Icon(imageVector = Icons.Filled.Delete,
+                        modifier = Modifier
+                            .padding(end = dimensionResource(R.dimen.padding_small))
+                            .clickable {
+                                patientToDelete = patient
+                                openDialog.value = true
+                            },
+                        contentDescription = stringResource(R.string.delete_patient)
+                    )
+                }
+
+            }
+        }
+
+        if (openDialog.value) {
+            patientToDelete?.let {
+                DeletePatientDialog(
+                    it,
+                    onDeleteClicked = onDeleteClicked,
+                    onDismiss = { openDialog.value = false })
+            }
         }
     }
-
-    if(openDialog.value)
-    {
-        patientToDelete?.let { DeletePatientDialog(it, onDeleteClicked = onDeleteClicked , onDismiss = {openDialog.value=false}) }
-    }
-
 
 }
 
@@ -225,7 +266,7 @@ private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PatientAddDialog(onAdd: (String) ->  Unit, onDismiss: () -> Unit)
+private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patientsDetails: PatientDetails, onValueChange: (PatientDetails)-> Unit)
 {
     var patientName by remember { mutableStateOf("") }
 
@@ -253,7 +294,8 @@ private fun PatientAddDialog(onAdd: (String) ->  Unit, onDismiss: () -> Unit)
                     .padding(dimensionResource(R.dimen.padding_medium)))
 
             TextField( value = patientName,
-                onValueChange = {patientName = it},
+                onValueChange = {patientName = it
+                                onValueChange(patientsDetails.copy(name=it))},
                 placeholder = { Text("Podaj imię i nazwisko")})
 
             NavigationBar(modifier = Modifier
@@ -272,9 +314,14 @@ private fun PatientAddDialog(onAdd: (String) ->  Unit, onDismiss: () -> Unit)
 
                 NavigationBarItem(selected = false, onClick =
                 {
-                    if(patientName.isNotEmpty())
+                    Log.i("in Add","imie to $patientName")
+                    patientsDetails.name=patientName
+                    //onValueChange(patientsDetails.copy(name=patientName))
+                    Log.i("in Add","imie to ${patientsDetails.name} : ${patientsDetails.name.isNotBlank()}")
+                    if(patientsDetails.name.isNotBlank())
                     {
-                        onAdd(patientName)
+                        onAdd()
+                        Log.i("in Add, after ADD","patinetDetails ${patientsDetails.name}")
                         onDismiss()
                     }
                 },
@@ -354,7 +401,7 @@ private fun DeletePatientDialog(patient: Patient, onDeleteClicked: (Patient) -> 
 }
 
 
-
+/*
 
 @Composable
 @Preview
@@ -383,3 +430,5 @@ fun PatientListPreview()
         patientsList = listOf(Patient(1, "Ania"), Patient(2,"Jan")),
         )
 }
+
+ */

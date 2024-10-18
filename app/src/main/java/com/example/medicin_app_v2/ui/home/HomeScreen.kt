@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.ui.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,16 +35,28 @@ import com.example.medicin_app_v2.ui.MedicinTopAppBar
 import com.example.medicin_app_v2.R
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.navigation.Location
+import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.PatientViewModel
+import com.example.medicin_app_v2.ui.toPatient
 
 
+object HomeDestination : NavigationDestination {
+    override val route = "home"
+    override val titleRes = R.string.home
+    const val patientIdArg = "patientId"
+    val routeWithArgs = "$route/{$patientIdArg}"
+
+}
+
+
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-  //  viewModel: HomeViewModel =viewModel(factory = AppViewModelProvider.Factory),
-    patientViewModel: PatientViewModel = viewModel(),
+    viewModel: HomeViewModel =viewModel(factory = AppViewModelProvider.Factory),
+  //  patientViewModel: PatientViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier : Modifier = Modifier,
     onButtonHomeClick: () -> Unit,
     onButtonMagazynClicked: () ->Unit,
@@ -54,7 +67,8 @@ fun HomeScreen(
     ) {
 
  //   val homeUiState by viewModel.homeUiState.collectAsState()
-    val selectedPatient by patientViewModel.selectedPatient.observeAsState()
+ //   val selectedPatient by patientViewModel.uiState.value.patientDetails.toPatient()
+    val selectedPatient = viewModel.uiState.value.patientDetails.toPatient()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
