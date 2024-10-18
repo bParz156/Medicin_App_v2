@@ -74,7 +74,7 @@ object PatientsDestination : NavigationDestination{
 @Composable
 fun PatientsListScreen(
     onBack: () -> Unit,
-    onPatientClick: () -> Unit,
+    navigateToPatientHome: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PatientViewModel = viewModel(factory = AppViewModelProvider.Factory)
 )
@@ -104,7 +104,8 @@ fun PatientsListScreen(
                         viewModel.deletePatient()
                     }
                 },
-                onPatientClick = onPatientClick,
+                onPatientClick = {Log.i("przekierowanie", "ListScreen do ${it.id}")
+                    navigateToPatientHome(it.id)},
                 currentPatient= viewModel.uiState.value.patientDetails.toPatient(),
                 viewModel = viewModel,
                 contentPadding = innerPadding)
@@ -184,7 +185,7 @@ private fun DialogTopBar(
 @Composable
 private fun PatientsList(
     patientsList: List<Patient>,
-    onPatientClick : () -> Unit,
+    onPatientClick : (Patient) -> Unit,
     onDeleteClicked : () -> Unit,
     currentPatient: Patient,
     viewModel: PatientViewModel,
@@ -222,7 +223,8 @@ private fun PatientsList(
                             )
                             .weight(1f)
                             .clickable {viewModel.updatePatientUiState(patientDetails = patient.toPatientDetails())
-                                onPatientClick()
+                                viewModel.updatetUiState(patientDetails = patient.toPatientDetails())
+                                onPatientClick(patient)
                             }
                     )
 

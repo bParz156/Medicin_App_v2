@@ -1,5 +1,8 @@
 package com.example.medicin_app_v2.ui.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,14 +11,17 @@ import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.patients.PatientsDestination
 import com.example.medicin_app_v2.ui.toPatientDetails
+import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class HomeViewModel (savedStateHandle: SavedStateHandle,
@@ -23,23 +29,30 @@ class HomeViewModel (savedStateHandle: SavedStateHandle,
 
 ) : ViewModel()
 {
+
+    var homeUiState by mutableStateOf(PatientUiState())
+        private set
+
     private val patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
     catch (e:IllegalStateException)
     {
         -1
     }
 
-    val uiState: StateFlow<PatientUiState> = patientsRepository.getPatientStream(patientId)
-        .filterNotNull()
-        .map {  PatientUiState(patientDetails = it.toPatientDetails()) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = PatientUiState()
-        )
+    init {
+        viewModelScope.launch {
+            homeUiState = patientsRepository.getPatientStream(patientId)
+                .filterNotNull()
+                .first()
+                .toPatientUiState()
+        }
+    }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+
+
+
+    fun getPatientsName(): String{
+        return homeUiState.patientDetails.name
     }
 
 

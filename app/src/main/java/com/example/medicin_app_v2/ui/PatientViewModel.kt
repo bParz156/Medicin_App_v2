@@ -47,6 +47,11 @@ class PatientViewModel(
             initialValue = PatientUiState()
         )
 
+    fun updatetUiState(patientDetails: PatientDetails)
+    {
+        patientUiState =  PatientUiState(patientDetails=patientDetails)
+    }
+
 
 
     val patientslistUiState : StateFlow<PatientListUiState> =

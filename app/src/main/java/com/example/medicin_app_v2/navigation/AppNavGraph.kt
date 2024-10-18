@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.navigation
 
+import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -25,14 +26,16 @@ fun MedicinNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val id=-1
 
     NavHost(
         navController = navController,
-        startDestination = HomeDestination.route,
+        startDestination = "${HomeDestination.route}/$id",
         modifier = modifier
     ) {
-
+    /*
         composable(route = HomeDestination.route ) {
+            Log.i("przekierowanie", "zly home")
             HomeScreen(
                 onButtonHomeClick = {},
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
@@ -42,12 +45,13 @@ fun MedicinNavHost(
                 onButtonPatientClicked = {navController.navigate(PatientsDestination.route)}
             )
         }
-
+*/
 
 
         composable(route = HomeDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
             type = NavType.IntType
         })) {
+            Log.i("przekierowanie", "dobry home")
             HomeScreen(
                 onButtonHomeClick = {},
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
@@ -107,14 +111,14 @@ fun MedicinNavHost(
         })) {
             PatientsListScreen(
                 onBack={ navController.popBackStack() },
-                onPatientClick={navController.navigate("${HomeDestination.route}/${it.id}")},
+                navigateToPatientHome={navController.navigate("${HomeDestination.route}/${it}")},
             )
         }
 
         composable(route=PatientsDestination.route) {
             PatientsListScreen(
                 onBack={ navController.popBackStack() },
-                onPatientClick={navController.navigate("${HomeDestination.route}/${it.id}")},
+                navigateToPatientHome={navController.navigate("${HomeDestination.route}/${it}")},
             )
         }
 

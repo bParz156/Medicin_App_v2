@@ -1,6 +1,7 @@
 package com.example.medicin_app_v2.ui.home
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
+import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.PatientViewModel
 import com.example.medicin_app_v2.ui.toPatient
 
@@ -63,13 +65,11 @@ fun HomeScreen(
     onButtonZaleceniaClicked: () ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
     onButtonUstawieniaClicked: () ->Unit,
-    onButtonPatientClicked: () ->Unit
+    onButtonPatientClicked: (Int) ->Unit
     ) {
 
- //   val homeUiState by viewModel.homeUiState.collectAsState()
- //   val selectedPatient by patientViewModel.uiState.value.patientDetails.toPatient()
-    val selectedPatient = viewModel.uiState.value.patientDetails.toPatient()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
 
     Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {CommunUI(
@@ -79,11 +79,12 @@ fun HomeScreen(
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
-            onButtonPatientClicked = onButtonPatientClicked
+            onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientDetails.id)},
+            patientsName = viewModel.getPatientsName()
         )}
     ) {  innerPadding ->
                 HomeBody(
-                    patient = selectedPatient ,
+                    homeViewModel = viewModel,
                     modifier = modifier.fillMaxSize(),
                     contentPadding = innerPadding
                 )
@@ -93,7 +94,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeBody(
-    patient : Patient?,
+    homeViewModel: HomeViewModel,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -102,7 +103,7 @@ private fun HomeBody(
         modifier = modifier,
     ) {
 
-        if (patient ==null) {
+        if (homeViewModel.getPatientsName().isEmpty()) {
             Text(
                 text = stringResource(R.string.no_patient),
                 textAlign = TextAlign.Center,
@@ -110,12 +111,22 @@ private fun HomeBody(
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            Text(
-                text = patient.name,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            medicinRemainders(homeViewModel = homeViewModel,
+                contentPadding = contentPadding)
         }
     }
+}
+
+@Composable
+fun medicinRemainders(
+    homeViewModel: HomeViewModel,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+)
+{
+    Text(
+        text = homeViewModel.getPatientsName(),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(contentPadding),
+    )
 }
