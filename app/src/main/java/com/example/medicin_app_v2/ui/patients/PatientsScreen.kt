@@ -43,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -54,6 +55,8 @@ import com.example.medicin_app_v2.ui.PatientDetails
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.PatientViewModel
 import com.example.medicin_app_v2.ui.toPatient
+import com.example.medicin_app_v2.ui.toPatientDetails
+import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.launch
 
 
@@ -71,7 +74,7 @@ object PatientsDestination : NavigationDestination{
 @Composable
 fun PatientsListScreen(
     onBack: () -> Unit,
-    onPatientClick: (Patient) -> Unit,
+    onPatientClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PatientViewModel = viewModel(factory = AppViewModelProvider.Factory)
 )
@@ -103,6 +106,7 @@ fun PatientsListScreen(
                 },
                 onPatientClick = onPatientClick,
                 currentPatient= viewModel.uiState.value.patientDetails.toPatient(),
+                viewModel = viewModel,
                 contentPadding = innerPadding)
 
             if(openDialog.value)
@@ -180,15 +184,16 @@ private fun DialogTopBar(
 @Composable
 private fun PatientsList(
     patientsList: List<Patient>,
-    onPatientClick : (Patient) -> Unit,
-    onDeleteClicked : (Patient) -> Unit,
+    onPatientClick : () -> Unit,
+    onDeleteClicked : () -> Unit,
     currentPatient: Patient,
+    viewModel: PatientViewModel,
     contentPadding: PaddingValues = PaddingValues(dimensionResource(R.dimen.padding_small)),
     modifier: Modifier = Modifier
 ) {
+    Log.i("delete", "NA poczatku list pacjent do usuniecia ${viewModel.patientUiState.patientDetails.name}")
 
     var openDialog  = remember { mutableStateOf(false)}
-    var patientToDelete : Patient? = null
     if (patientsList.isEmpty()) {
         Text(stringResource(R.string.no_patient),
             modifier= modifier.padding(contentPadding)
@@ -216,13 +221,17 @@ private fun PatientsList(
                                 end = dimensionResource(R.dimen.padding_small)
                             )
                             .weight(1f)
-                            .clickable { onPatientClick(patient) })
+                            .clickable {viewModel.updatePatientUiState(patientDetails = patient.toPatientDetails())
+                                onPatientClick()
+                            }
+                    )
 
                     Icon(imageVector = Icons.Filled.Delete,
                         modifier = Modifier
                             .padding(end = dimensionResource(R.dimen.padding_small))
                             .clickable {
-                                patientToDelete = patient
+                                viewModel.updatePatientUiState(patientDetails = patient.toPatientDetails())
+                                Log.i("delete", "pacjent do usuniecia ${viewModel.patientUiState.patientDetails.name}")
                                 openDialog.value = true
                             },
                         contentDescription = stringResource(R.string.delete_patient)
@@ -231,15 +240,18 @@ private fun PatientsList(
 
             }
         }
+    }
 
-        if (openDialog.value) {
-            patientToDelete?.let {
-                DeletePatientDialog(
-                    it,
-                    onDeleteClicked = onDeleteClicked,
-                    onDismiss = { openDialog.value = false })
-            }
-        }
+    if (openDialog.value ) {
+        Log.i("delete", "Wywolanie open.dialog.value pacjent do usuniecia ${viewModel.patientUiState.patientDetails.name}")
+        DeletePatientDialog(
+            patient = viewModel.patientUiState.patientDetails.toPatient(),
+            onDeleteClicked = {
+                onDeleteClicked() // Wywołaj akcję usunięcia pacjenta
+                openDialog.value = false // Zamknij dialog po usunięciu
+            },
+            onDismiss = { openDialog.value = false } // Zamknij dialog, jeśli anulowano
+        )
     }
 
 }
@@ -339,10 +351,13 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
     }
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DeletePatientDialog(patient: Patient, onDeleteClicked: (Patient) -> Unit, onDismiss: () -> Unit)
+private fun DeletePatientDialog(patient: Patient, onDeleteClicked: () -> Unit, onDismiss: () -> Unit)
 {
+    Log.i("delete", "Z dialogu pacjent do usuniecia ${patient.name}")
     BasicAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier
@@ -360,7 +375,7 @@ private fun DeletePatientDialog(patient: Patient, onDeleteClicked: (Patient) -> 
                 modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_large)))
 
-            Text(text = stringResource(R.string.are_you_sure),
+            Text(text = stringResource(R.string.are_you_sure, patient.name),
                 textAlign = TextAlign.Justify,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
@@ -383,7 +398,8 @@ private fun DeletePatientDialog(patient: Patient, onDeleteClicked: (Patient) -> 
 
                 NavigationBarItem(selected = false, onClick =
                 {
-                    onDeleteClicked(patient)
+                    Log.i("delete", "pacjent do usuniecia ${patient.name}")
+                    onDeleteClicked()
                     onDismiss()
                 },
                     icon = {Icon(
