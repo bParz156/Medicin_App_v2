@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -34,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.ui.MedicinTopAppBar
 import com.example.medicin_app_v2.R
+import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.patient.Patient
+import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
@@ -62,7 +65,7 @@ fun HomeScreen(
     modifier : Modifier = Modifier,
     onButtonHomeClick: () -> Unit,
     onButtonMagazynClicked: () ->Unit,
-    onButtonZaleceniaClicked: () ->Unit,
+    onButtonZaleceniaClicked: (Int) ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
     onButtonUstawieniaClicked: () ->Unit,
     onButtonPatientClicked: (Int) ->Unit
@@ -76,7 +79,7 @@ fun HomeScreen(
             location = Location.HOME,
             onButtonHomeClick = onButtonHomeClick,
             onButtonMagazynClicked = onButtonMagazynClicked,
-            onButtonZaleceniaClicked = onButtonZaleceniaClicked,
+            onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.homeUiState.patientDetails.id)},
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientDetails.id)},
@@ -111,22 +114,86 @@ private fun HomeBody(
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            medicinRemainders(homeViewModel = homeViewModel,
-                contentPadding = contentPadding)
+            //medicinRemainders(scheduleList =homeViewModel.patientsSchedule.scheduleDetailsList ,
+             //   contentPadding = contentPadding)
+        }
+    }
+}
+/*
+@Composable
+fun medicinRemainders(
+    scheduleList: List<ScheduleDetails>,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+)
+{
+
+    if(scheduleList.isEmpty())
+    {
+        Text(
+            text = stringResource(R.string.no_medicin),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(contentPadding),
+        )
+
+    }
+    else {
+        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+
+            items(items = scheduleList, key = { it.day })
+            { schedule ->
+                medicinCard(
+                    schedule.medicinDetails.name,
+                    schedule.day, schedule.hour,
+                    schedule.dose, schedule.medicinDetails.form
+                )
+            }
+
+        }
+    }
+
+}
+
+
+@Composable
+fun medicinCard(
+    medicinName: String,
+    day: Int,
+    hour: Int,
+    dose: Int,
+    medicinForm: MedicinForm
+)
+{
+    Card(
+        modifier = Modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row()
+        {
+            Column()
+            {
+
+                Text(
+                    text = medicinName,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.wrapContentSize().fillMaxWidth()
+                )
+
+                Text(
+                    text = "dawka: $dose  ${medicinForm.name}",
+                    style = MaterialTheme.typography.labelMedium,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            Text(
+                text = "Dzien przyjecia: $day godzina: $hour",
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
 
-@Composable
-fun medicinRemainders(
-    homeViewModel: HomeViewModel,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
-)
-{
-    Text(
-        text = homeViewModel.getPatientsName(),
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.padding(contentPadding),
-    )
-}
+ */

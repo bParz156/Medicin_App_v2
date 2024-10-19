@@ -3,6 +3,7 @@ package com.example.medicin_app_v2.data.schedule
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.Patient
@@ -31,10 +32,11 @@ data class Schedule(
     val id: Int = 0, // Auto-generowane ID
     val Patient_id: Int,  // Odniesienie do Patient
     val Medicine_id: Int, // Odniesienie do Medicine
-    val day: Int,
-    val hour: Float,
+    val day: DayWeek,
+    val hour: Int,
+    val minute: Int,
     val dose: Int,
     val startDate: Date,
     val endDate: Date?,
-    val mealReltion : MealRelation
+    val mealRelation : MealRelation
 )

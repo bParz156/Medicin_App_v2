@@ -78,7 +78,7 @@ class PatientViewModel(
 
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+        const val TIMEOUT_MILLIS = 5_000L
     }
 
 }
@@ -112,3 +112,5 @@ fun Patient.toPatientDetails() :PatientDetails = PatientDetails(
 fun Patient.toPatientUiState(): PatientUiState = PatientUiState(
     patientDetails = this.toPatientDetails(),
 )
+
+

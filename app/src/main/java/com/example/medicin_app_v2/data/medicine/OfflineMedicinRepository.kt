@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.data.medicine
 
+import com.example.medicin_app_v2.data.MedicinForm
 import kotlinx.coroutines.flow.Flow
 
 class OfflineMedicinRepository(private val medicineDao: MedicineDao) : MedicinRepository {
@@ -9,6 +10,10 @@ class OfflineMedicinRepository(private val medicineDao: MedicineDao) : MedicinRe
 
     override fun getMedicineStream(id: Int): Flow<Medicine?> {
         return medicineDao.getmedicine(id)
+    }
+
+    override fun getMedicineStream(name: String, form: MedicinForm): Flow<Medicine?> {
+       return medicineDao.getmedicine(name, form)
     }
 
     override suspend fun insertMedicine(medicine: Medicine) {

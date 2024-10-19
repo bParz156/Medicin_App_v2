@@ -35,5 +35,15 @@ class Converters {
         return date?.time
     }
 
+    @TypeConverter
+    fun fromDayWeek(value: DayWeek): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toDayWeek(value:String): DayWeek {
+        return DayWeek.valueOf(value)
+    }
+
 
 }

@@ -5,10 +5,10 @@
     Poniżej przed enterem są z innnego projektu, wywal niepotrzebne
     -->
 
-    <string name="attention">Attention</string>
-    <string name="back_button">Back</string>
-    <string name="delete">Delete</string>
-    <string name="delete_question">Are you sure you want to delete?</string>
+    <string name="add">Dodaj</string>
+    <string name="back_button">Wróc</string>
+    <string name="delete">Usuń</string>
+    <string name="delete_question">Czy na pewno chcesz usunąć?</string>
     <string name="no_item_description">Oops!\nNo items in the inventory.\nTap + to add.</string>
     <string name="edit_item_title">Edit Item</string>
     <string name="item">Item</string>
@@ -48,6 +48,20 @@
 
     <string name="delete_patient_title">Usuwanie pacjenta</string>
     <string name="are_you_sure">Czy na pewno chcesz usunąć pacjenta %s? Spowoduje to usunięcie wszystkich informacji na temat jego zażywań leków</string>
+
+    <string name="no_medicin">Wygląda na to, że nie dodano jeszcze żadnych lekarstw. Kiknij przycisk, aby dodać leki</string>
+
+    <string name="add_medicin_title">Dodawanie nowego leku</string>
+    <string name="requiered_to_add_medicin">Podaj informacje na temat nowego leku</string>
+
+
+    <string name="pon">Poniedziałek</string>
+    <string name="wt">Wtorek</string>
+    <string name="sr">Środa</string>
+    <string name="cz">Czwartek</string>
+    <string name="pt">Piątek</string>
+    <string name="sb">Sobota</string>
+    <string name="nd">Niedziela</string>
 
 
 </resources>

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.medicin_app_v2.MedicinApplication
 import com.example.medicin_app_v2.ui.home.HomeViewModel
+import com.example.medicin_app_v2.ui.zalecenia.ZalecenieViewModel
 
 object AppViewModelProvider {
 
@@ -15,15 +16,27 @@ object AppViewModelProvider {
         // Initializer for HomeViewModel
         initializer {
             PatientViewModel(
-            this.createSavedStateHandle(),
-                medicinApplication().container.patientsRepository
+                savedStateHandle =  this.createSavedStateHandle(),
+                patientsRepository =  medicinApplication().container.patientsRepository,
             )
         }
 
         initializer {
             HomeViewModel(
-                this.createSavedStateHandle(),
-                medicinApplication().container.patientsRepository
+                savedStateHandle =  this.createSavedStateHandle(),
+                patientsRepository =  medicinApplication().container.patientsRepository,
+                medicinRepository = medicinApplication().container.medicinRepository,
+                scheduleRepository = medicinApplication().container.scheduleRepository
+            )
+        }
+
+        initializer {
+            ZalecenieViewModel(
+                savedStateHandle =  this.createSavedStateHandle(),
+                medicinRepository = medicinApplication().container.medicinRepository,
+                storageRepository = medicinApplication().container.storageRepository,
+                scheduleRepository = medicinApplication().container.scheduleRepository,
+                patientsRepository = medicinApplication().container.patientsRepository
             )
         }
     }

@@ -18,6 +18,7 @@ import com.example.medicin_app_v2.ui.patients.PatientsDestination
 import com.example.medicin_app_v2.ui.patients.PatientsListScreen
 import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaScreen
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
+import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaDestination
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +56,7 @@ fun MedicinNavHost(
             HomeScreen(
                 onButtonHomeClick = {},
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
+                onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
@@ -73,16 +74,20 @@ fun MedicinNavHost(
             )
         }
 
-        composable(route = Location.ZALECENIA.name) {
+
+        composable(route = ZaleceniaDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
+            type = NavType.IntType
+        })) {
             ZaleceniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
+                onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
                 onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
                 onButtonZaleceniaClicked = { },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
+                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
+
 
         composable(route = Location.POWIADOMIENIA.name) {
             PowiadomieniaScreen(

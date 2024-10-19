@@ -210,7 +210,7 @@ private fun PatientsList(
                     modifier = Modifier
                         .wrapContentSize().fillMaxWidth()
                         .padding(dimensionResource(R.dimen.padding_small))
-                        .background(if (patient == currentPatient) Color.DarkGray else Color.Transparent),
+                        .background(if (patient == currentPatient) Color.Yellow else Color.Transparent),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 )

@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.data.medicine
 
+import com.example.medicin_app_v2.data.MedicinForm
 import kotlinx.coroutines.flow.Flow
 
 interface MedicinRepository {
@@ -13,6 +14,9 @@ interface MedicinRepository {
      * Retrieve an Medicine from the given data source that matches with the [id].
      */
     fun getMedicineStream(id: Int): Flow<Medicine?>
+
+
+    fun getMedicineStream(name: String, form: MedicinForm): Flow<Medicine?>
 
     /**
      * Insert Medicine in the data source
