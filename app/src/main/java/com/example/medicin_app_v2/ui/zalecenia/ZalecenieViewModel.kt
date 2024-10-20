@@ -8,6 +8,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medicin_app_v2.data.DayWeek
+import com.example.medicin_app_v2.data.MealRelation
+import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
@@ -30,6 +33,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class ZalecenieViewModel(
     savedStateHandle: SavedStateHandle,
@@ -212,6 +216,77 @@ class ZalecenieViewModel(
     }
 
 }
+
+
+fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<MedicinScheduleInfo>
+{
+    Log.i("listManipulation: ", "start conversion")
+    Log.i("listManipulation: ", "size list details=  ${this.scheduleDetailsList.size}")
+
+    var medicinScheduleInfoList : List<MedicinScheduleInfo> =listOf()
+   // return medicinScheduleInfoList
+    if(this.scheduleDetailsList.isNotEmpty()) {
+        Log.i("listManipulation: ", "nie jest empty ale jakos dalej nie widzie")
+        for (scheduleDetail in this.scheduleDetailsList) {
+            Log.i("listManipulation: ", "wywala przez fora")
+            var medicinScheduleInfo =
+                medicinScheduleInfoList.find { it.medId == scheduleDetail.medicinDetails.id }
+            if (medicinScheduleInfo == null) {
+
+                medicinScheduleInfo = MedicinScheduleInfo(
+                    medId = scheduleDetail.medicinDetails.id,
+                    name = scheduleDetail.medicinDetails.name,
+                    medicinForm = scheduleDetail.medicinDetails.form,
+                    dose = scheduleDetail.dose,
+                    mealRelation = scheduleDetail.mealRelation,
+                    startDate = scheduleDetail.startDate,
+                    endDate = scheduleDetail.endDate,
+                    scheduleList = listOf(
+                        ScheduleInfo(
+                            hour = scheduleDetail.hour,
+                            minute = scheduleDetail.minute,
+                            day = scheduleDetail.day
+                        )
+                    )
+                )
+
+                medicinScheduleInfoList =medicinScheduleInfoList+ medicinScheduleInfo
+            } else {
+
+                medicinScheduleInfo.scheduleList += ScheduleInfo(
+                    hour = scheduleDetail.hour,
+                    minute = scheduleDetail.minute,
+                    day = scheduleDetail.day
+                )
+            }
+
+        }
+    }
+
+    Log.i("listManipulation: ", "wielkosc nowego ${medicinScheduleInfoList.size}")
+
+    return medicinScheduleInfoList
+}
+
+
+data class MedicinScheduleInfo(
+    val medId: Int,
+    val name: String,
+    val medicinForm: MedicinForm,
+    val dose: Int,
+    val mealRelation: MealRelation,
+    var scheduleList: List<ScheduleInfo> =listOf(),
+    val startDate: Date,
+    val endDate : Date?,
+)
+
+data class ScheduleInfo(
+    val hour: Int,
+    val minute: Int,
+    val day: DayWeek
+)
+
+
 
 
 

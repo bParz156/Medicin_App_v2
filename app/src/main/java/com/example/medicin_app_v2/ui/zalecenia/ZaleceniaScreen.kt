@@ -151,7 +151,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
                     )
-                medicinRemainders(scheduleList =viewModel.patientsSchedule.scheduleDetailsList,
+                medicinRemainders(scheduleList =viewModel.patientsSchedule.toMedicinScheduleInfoList(),
                     onScheduleClick = {//TODO}
                     })
 
@@ -173,7 +173,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                         }
                     },
                     onDismiss = {openDialog.value=false},
-                    scheduleDetailsList = viewModel.scheduleUiState.scheduleDetailsList,
+                    scheduleDetailsList =  viewModel.scheduleUiState.scheduleDetailsList,
                     storageDetails = viewModel.storageUiState.storageDetails,
                     onValueStorageChange = viewModel::updatestorageState,
                     onScheduleListChange = viewModel::updatetUiState,
@@ -484,12 +484,11 @@ onTimesSelected: (List<Pair<Int, Int>>) -> Unit
 
 @Composable
 fun medicinRemainders(
-    scheduleList: List<ScheduleDetails>,
-    onScheduleClick: (ScheduleDetails) -> Unit,
+    scheduleList: List<MedicinScheduleInfo>,
+    onScheduleClick: (MedicinScheduleInfo) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
 {
-
     if(scheduleList.isEmpty())
     {
         Text(
@@ -504,15 +503,18 @@ fun medicinRemainders(
 
         LazyColumn(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))) {
 
-            items(items = scheduleList, key = { it.day })
+            items(items = scheduleList, key = { it.medId })
             { schedule ->
+                var expanded by remember { mutableStateOf(false) }
+
                 medicinCard(
-                    schedule.medicinDetails.name,
-                    schedule.day, schedule.hour, schedule.minute,
-                    schedule.dose, schedule.medicinDetails.form,
+                    medicinScheduleInfo= schedule,
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
-                        .clickable { onScheduleClick(schedule) }
+                        .clickable { onScheduleClick(schedule)
+                            expanded = !expanded},
+                    expanded = expanded
+                    //expanded =false
                 )
             }
 
@@ -524,50 +526,51 @@ fun medicinRemainders(
 
 @Composable
 fun medicinCard(
-    medicinName: String,
-    day: DayWeek,
-    hour: Int,
-    minute: Int,
-    dose: Int,
-    medicinForm: MedicinForm,
-    modifier: Modifier = Modifier
+    medicinScheduleInfo: MedicinScheduleInfo,
+    modifier: Modifier = Modifier,
+    expanded: Boolean
 )
 {
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
+        Column(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+        ) {
 
-        Row(modifier = Modifier.fillMaxWidth())
-        {
-            Column( modifier =Modifier.padding(dimensionResource(id = R.dimen.padding_large))) {
-                Icon(imageVector = ImageVector.vectorResource(R.drawable.schedule), contentDescription = null)
-                Spacer(Modifier.weight(1f))
-                Text(
-                    text = "${stringResource(day.title)} \n Godzina: $hour:$minute",
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center,
-                )
-            }
+            Text(
+                text = medicinScheduleInfo.name,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.wrapContentSize().fillMaxWidth()
+            )
+
+            Text(
+                text = "dawka: ${medicinScheduleInfo.dose}  ${stringResource(medicinScheduleInfo.medicinForm.dopelniacz)}",
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+            )
+
             Spacer(Modifier.weight(1f))
+            if (expanded) {
+                Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.schedule),
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Log.i(
+                        "listManipulation",
+                        "scheduleListSize = ${medicinScheduleInfo.scheduleList.size}"
+                    )
+                    for (scheduleInfo in medicinScheduleInfo.scheduleList) {
+                        Text("${stringResource(scheduleInfo.day.title)} ${scheduleInfo.hour}:${scheduleInfo.minute}")
+                    }
 
-            Column(
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
-            ) {
-
-                Text(
-                    text = medicinName,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.wrapContentSize().fillMaxWidth()
-                )
-
-                Text(
-                    text = "dawka: $dose  ${stringResource(medicinForm.dopelniacz)}",
-                    style = MaterialTheme.typography.labelMedium,
-                    textAlign = TextAlign.Center,
-                )
+                }
             }
         }
 

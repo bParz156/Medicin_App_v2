@@ -114,11 +114,7 @@ data class ScheduleDetails(
     var startDate: Date = Date(),
     var endDate: Date? = null,
     var mealRelation: MealRelation = MealRelation.Nie
-) {
-    fun isValid(): Boolean {
-        return medicinDetails.name.isNotBlank()
-    }
-}
+)
 
 
 fun ScheduleDetails.toSchedule(patiendId : Int): Schedule = Schedule(
