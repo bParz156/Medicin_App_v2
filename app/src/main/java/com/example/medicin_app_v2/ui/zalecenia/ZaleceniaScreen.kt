@@ -91,7 +91,7 @@ object ZaleceniaDestination : NavigationDestination {
 fun ZaleceniaScreen(
     viewModel: ZalecenieViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onButtonHomeClick: (Int) -> Unit,
-    onButtonMagazynClicked: () ->Unit,
+    onButtonMagazynClicked: (Int) ->Unit,
     onButtonZaleceniaClicked: () ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
     onButtonUstawieniaClicked: () ->Unit,
@@ -105,7 +105,7 @@ fun ZaleceniaScreen(
         topBar = {CommunUI(
             location = Location.ZALECENIA,
             onButtonHomeClick = {onButtonHomeClick(viewModel.patientUiState.patientDetails.id)},
-            onButtonMagazynClicked = onButtonMagazynClicked,
+            onButtonMagazynClicked = {onButtonMagazynClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,

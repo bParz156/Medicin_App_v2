@@ -64,7 +64,7 @@ fun HomeScreen(
   //  patientViewModel: PatientViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier : Modifier = Modifier,
     onButtonHomeClick: () -> Unit,
-    onButtonMagazynClicked: () ->Unit,
+    onButtonMagazynClicked: (Int) ->Unit,
     onButtonZaleceniaClicked: (Int) ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
     onButtonUstawieniaClicked: () ->Unit,
@@ -78,7 +78,7 @@ fun HomeScreen(
         topBar = {CommunUI(
             location = Location.HOME,
             onButtonHomeClick = onButtonHomeClick,
-            onButtonMagazynClicked = onButtonMagazynClicked,
+            onButtonMagazynClicked = { onButtonMagazynClicked(viewModel.homeUiState.patientDetails.id)},
             onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.homeUiState.patientDetails.id)},
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,

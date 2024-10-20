@@ -11,6 +11,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
+import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
+import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
@@ -40,7 +42,8 @@ class ZalecenieViewModel(
     private val medicinRepository: MedicinRepository,
     private val storageRepository: StorageRepository,
     private val patientsRepository: PatientsRepository,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val firstaidkitRepository: FirstaidkitRepository
 ) : ViewModel()
 {
 
@@ -158,6 +161,9 @@ class ZalecenieViewModel(
         storageUiState.storageDetails.MedicinId = medicinId
         storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
         Log.i("createSchedule", "storageCreated:")
+        val idxStorage = storageRepository.getAllStoragesStream().filterNotNull().first().size
+
+        firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =idxStorage ))
 
 
         for(scheduleDetails in scheduleUiState.scheduleDetailsList)
