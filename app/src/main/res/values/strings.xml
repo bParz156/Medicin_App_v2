@@ -63,5 +63,8 @@
     <string name="sb">Sobota</string>
     <string name="nd">Niedziela</string>
 
+    <string name="tabletka_dop">Tabletek</string>
+    <string name="ciecz_dop">ml</string>
+
 
 </resources>

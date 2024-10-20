@@ -4,10 +4,13 @@ import android.app.TimePickerDialog
 import android.util.Log
 import android.widget.TimePicker
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -48,10 +51,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role.Companion.Checkbox
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -130,7 +136,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
     val coroutineScope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = modifier.padding(contentPadding),
     ) {
 
         if (viewModel.getPatientsName().isEmpty()) {
@@ -138,53 +144,42 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                 text = stringResource(R.string.no_patient),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
             )
         } else {
 
+                Text(text="przyjmowane leki",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge,
+                    )
+                medicinRemainders(scheduleList =viewModel.patientsSchedule.scheduleDetailsList,
+                    onScheduleClick = {//TODO}
+                    })
 
-            Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                topBar = {
-                    Text(text="Przyjmowane leki")
-                },
-                bottomBar = {
-                    Column() {
-
-                        Button(onClick = {openDialog.value=true})
-                        {
-                            Row() {
-                                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add))
-                                Text(stringResource(R.string.add))
-                            }
-                        }
-
-
-                        Text(text = "Aby dokonać zmian, przytrzymaj lek, którego dotyczy lek")
-                    }
-                }
-            ) {  innerPadding ->
-                medicinRemainders(scheduleList =viewModel.patientsSchedule.scheduleDetailsList ,
-                    contentPadding = innerPadding)
-
-                if(openDialog.value)
+                Button(onClick = {openDialog.value=true})
                 {
-                    addNewMedicin(
-                        onAdd ={
-                            coroutineScope.launch {
-                                viewModel.createSchedule()
-                            }
-                        },
-                        onDismiss = {openDialog.value=false},
-                        scheduleDetails = viewModel.scheduleUiState.scheduleDetails,
-                        storageDetails = viewModel.storageUiState.storageDetails,
-                        onValueStorageChange = viewModel::updatestorageState,
-                        onValueChange = viewModel::updatetUiState)
+                    Row() {
+                        Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add))
+                        Text(stringResource(R.string.add))
+                    }
                 }
             }
 
+            if(openDialog.value)
+            {
+                addNewMedicin(
+                    onAdd ={
+                        coroutineScope.launch {
+                            viewModel.createSchedule()
+                        }
+                    },
+                    onDismiss = {openDialog.value=false},
+                    scheduleDetailsList = viewModel.scheduleUiState.scheduleDetailsList,
+                    storageDetails = viewModel.storageUiState.storageDetails,
+                    onValueStorageChange = viewModel::updatestorageState,
+                    onScheduleListChange = viewModel::updatetUiState,
+                    )
+            }
 
-
-        }
     }
 }
 
@@ -193,10 +188,11 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
 fun addNewMedicin(
     onAdd: () -> Unit,
     onDismiss: () -> Unit,
-    scheduleDetails: ScheduleDetails,
+    scheduleDetailsList: List<ScheduleDetails>,
     storageDetails: StorageDetails,
     onValueStorageChange: (StorageDetails) -> Unit,
-    onValueChange: (ScheduleDetails)-> Unit) {
+    onScheduleListChange: (List<ScheduleDetails>) -> Unit
+   ) {
 
     var medicinName by remember { mutableStateOf("") }
     var medicinDose by remember { mutableStateOf("") }
@@ -212,6 +208,8 @@ fun addNewMedicin(
 
     var timeADay by remember { mutableStateOf("") }
 
+    var scheduleDetails by remember { mutableStateOf(ScheduleDetails()) }
+    val scheduleDetailsListPriv = mutableListOf<ScheduleDetails>()
 
 
     BasicAlertDialog(
@@ -238,7 +236,8 @@ fun addNewMedicin(
 
             TextField( value = medicinName,
                 onValueChange = {medicinName = it
-                                onValueChange(scheduleDetails.copy(medicinDetails= MedicinDetails(name =it)))},
+                        scheduleDetails = scheduleDetails.copy(medicinDetails= MedicinDetails(name =it))}
+                ,
                 placeholder = { Text("Podaj nazwę leku")})
 
             Row()
@@ -254,7 +253,7 @@ fun addNewMedicin(
                             text ={ Text(item.name)},
                             onClick = {
                                 selectedForm = item
-                                onValueChange(scheduleDetails.copy(medicinDetails = MedicinDetails( form = item)))
+                                scheduleDetails = scheduleDetails.copy(medicinDetails = MedicinDetails( form = item))
                                 expanded = false
                             }
                         )
@@ -271,7 +270,7 @@ fun addNewMedicin(
                     // Tylko liczby będą akceptowane
                     if (input.all { it.isDigit() }) {
                         medicinDose = input
-                        onValueChange(scheduleDetails.copy(dose = input.toInt()))
+                        scheduleDetails = scheduleDetails.copy(dose = input.toInt())
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -301,7 +300,7 @@ fun addNewMedicin(
                             text ={ Text(item.name)},
                             onClick = {
                                 selectedRelation = item
-                                onValueChange(scheduleDetails.copy(mealRelation = item))
+                                scheduleDetails = scheduleDetails.copy(mealRelation = item)
                                 expandedR = false
                             }
                         )
@@ -315,6 +314,10 @@ fun addNewMedicin(
 
             Row()
             {
+                Button(onClick = {expandedDays=!expandedDays})
+                {
+                    Icon(imageVector = if(expandedDays) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
+                }
                 Text(text="Wybierz dni tygodnia" +
                         ":\n ${if (selectedDays.isEmpty()) "Żaden" else selectedDays.joinToString()}")
                 DropdownMenu(expanded = expandedDays,
@@ -326,7 +329,7 @@ fun addNewMedicin(
                         val isSelected = selectedDays.contains(option)
                         DropdownMenuItem(
                             text ={
-                                    Text(option.name)
+                                    Text(stringResource(option.title))
                             },
                             onClick = {
                                 selectedDays = if(isSelected)
@@ -341,10 +344,7 @@ fun addNewMedicin(
                         )
                     }
                 }
-                Button(onClick = {expandedDays=!expandedDays})
-                {
-                    Icon(imageVector = if(expandedDays) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
-                }
+
             }
 
             TextField( value = timeADay,
@@ -359,20 +359,7 @@ fun addNewMedicin(
 
 
 
-            var pickedHour by remember { mutableIntStateOf(0) }
-            var pickedMinute by remember { mutableIntStateOf(0) }
-            val context = LocalContext.current
-            val timePickerDialog = TimePickerDialog(
-                context,
-                { _: TimePicker, hour: Int, minute: Int ->
-                    pickedHour = hour
-                    pickedMinute = minute
-                    scheduleDetails.hour = pickedHour
-                    scheduleDetails.minute = pickedMinute
-                   // onValueChange(scheduleDetails.copy( minute = pickedMinute, hour = pickedHour))
-                    onAdd()
-                }, pickedHour, pickedMinute, true // true -> 24-hour format
-            )
+            var openDialog by remember { mutableStateOf(false) }
 
             NavigationBar(modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_small))
@@ -391,21 +378,19 @@ fun addNewMedicin(
                 NavigationBarItem(selected = false, onClick =
                 {
                     if(medicinName.isNotBlank() && medicinDose.isNotBlank() && medicinStore.isNotBlank() && selectedDays.isNotEmpty() && timeADay.toInt()>=1) {
-                        onValueChange(scheduleDetails.copy(medicinDetails = MedicinDetails(name  =medicinName, form = selectedForm)))
-                        scheduleDetails.medicinDetails = MedicinDetails(name = medicinName, form = selectedForm)
-                        scheduleDetails.dose = medicinDose.toInt()
-                        scheduleDetails.mealRelation  = selectedRelation
-                        scheduleDetails.startDate = Date()
 
-                        for(day in selectedDays)
-                        {
-                            for(i in 0 until timeADay.toInt()) {
-                                //onValueChange(scheduleDetails.copy(day = day))
-                                scheduleDetails.day = day
-                                timePickerDialog.show()
-                            }
-                        }
-                            onDismiss()
+                        scheduleDetails.medicinDetails =
+                            MedicinDetails(name = medicinName, form = selectedForm)
+                        scheduleDetails.dose = medicinDose.toInt()
+                        scheduleDetails.mealRelation = selectedRelation
+                        scheduleDetails.startDate = Date()
+                        scheduleDetails.endDate = null
+
+                        Log.i("scheduleDialog", "dni: $selectedDays")
+                        Log.i("scheduleDialog", "w ciagu dniua: $timeADay ")
+                        // Wywołanie funkcji
+                        openDialog = true
+
                     }
                 },
                     icon = {Icon(
@@ -419,13 +404,88 @@ fun addNewMedicin(
                 )
 
             }
+
+            if(openDialog)
+            {
+                showTimePickersForTimesADay(timeADay.toInt()) { selectedTimes ->
+                    // Kiedy wszystkie godziny zostaną wybrane, przypisz je do wybranych dni
+                    for (day in selectedDays) {
+                        for ((hour, minute) in selectedTimes) {
+
+                            // Tutaj możesz utworzyć Schedule dla każdego dnia i każdej godziny
+                            scheduleDetails = ScheduleDetails(
+                                medicinDetails = MedicinDetails(name = medicinName , form = selectedForm),
+                                day = day,
+                                hour = hour,
+                                minute = minute,
+                                dose = medicinDose.toInt(),
+                                startDate = Date(),
+                                endDate = null,
+                                mealRelation = selectedRelation
+                            )
+                            scheduleDetailsListPriv.add( scheduleDetails)
+                            //onScheduleListChange(scheduleDetailsList+scheduleDetails)
+                            Log.i(
+                                "createSchedule",
+                                "scheduleDetailsListPriv: ${scheduleDetailsListPriv.size}"
+                            )
+                        }
+                    }
+                    onScheduleListChange(scheduleDetailsListPriv)
+                    onAdd()
+                    openDialog = false
+                    onDismiss()
+                }
+            }
         }
     }
 }
 
+
+
+
+@Composable
+fun showTimePickersForTimesADay(
+timeADay: Int,
+onTimesSelected: (List<Pair<Int, Int>>) -> Unit
+) {
+    val selectedTimes = mutableListOf<Pair<Int, Int>>()
+    val context = LocalContext.current
+    var pickedHour by remember { mutableIntStateOf(0) }
+    var pickedMinute by remember { mutableIntStateOf(0) }
+
+    fun showTimePicker(index: Int) {
+        if (index >= timeADay) {
+            // Kiedy wszystkie czasy zostały wybrane, zwróć listę wybranych czasów
+            onTimesSelected(selectedTimes)
+            return
+        }
+
+        // Pokaż dialog dla wyboru godziny i minuty
+        val timePickerDialog = TimePickerDialog(
+            context,
+            { _: TimePicker, hour: Int, minute: Int ->
+                selectedTimes.add(Pair(hour, minute))
+                // Rekurencyjnie pokazuj kolejne dialogi
+                showTimePicker(index + 1)
+            },
+            pickedHour, pickedMinute, true // true -> 24-hour format
+        )
+
+        timePickerDialog.show()
+    }
+
+    // Rozpocznij proces pokazywania dialogów
+    showTimePicker(0)
+}
+
+
+
+
 @Composable
 fun medicinRemainders(
     scheduleList: List<ScheduleDetails>,
+    onScheduleClick: (ScheduleDetails) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
 {
@@ -441,14 +501,18 @@ fun medicinRemainders(
 
     }
     else {
-        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+
+        LazyColumn(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))) {
 
             items(items = scheduleList, key = { it.day })
             { schedule ->
                 medicinCard(
                     schedule.medicinDetails.name,
-                    schedule.day, schedule.hour,
-                    schedule.dose, schedule.medicinDetails.form
+                    schedule.day, schedule.hour, schedule.minute,
+                    schedule.dose, schedule.medicinDetails.form,
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_small))
+                        .clickable { onScheduleClick(schedule) }
                 )
             }
 
@@ -463,18 +527,34 @@ fun medicinCard(
     medicinName: String,
     day: DayWeek,
     hour: Int,
+    minute: Int,
     dose: Int,
-    medicinForm: MedicinForm
+    medicinForm: MedicinForm,
+    modifier: Modifier = Modifier
 )
 {
     Card(
-        modifier = Modifier,
+        modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row()
+
+        Row(modifier = Modifier.fillMaxWidth())
         {
-            Column()
-            {
+            Column( modifier =Modifier.padding(dimensionResource(id = R.dimen.padding_large))) {
+                Icon(imageVector = ImageVector.vectorResource(R.drawable.schedule), contentDescription = null)
+                Spacer(Modifier.weight(1f))
+                Text(
+                    text = "${stringResource(day.title)} \n Godzina: $hour:$minute",
+                    style = MaterialTheme.typography.labelMedium,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            Spacer(Modifier.weight(1f))
+
+            Column(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+            ) {
 
                 Text(
                     text = medicinName,
@@ -484,17 +564,13 @@ fun medicinCard(
                 )
 
                 Text(
-                    text = "dawka: $dose  ${medicinForm.name}",
+                    text = "dawka: $dose  ${stringResource(medicinForm.dopelniacz)}",
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center,
                 )
             }
-
-            Text(
-                text = "Dzien przyjecia: $day godzina: $hour",
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center,
-            )
         }
+
+
     }
 }

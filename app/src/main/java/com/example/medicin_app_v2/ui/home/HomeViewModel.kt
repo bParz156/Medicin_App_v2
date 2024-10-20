@@ -51,6 +51,8 @@ class HomeViewModel (savedStateHandle: SavedStateHandle,
     var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
+
+
     private val patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
     catch (e:IllegalStateException)
     {
@@ -95,7 +97,7 @@ class HomeViewModel (savedStateHandle: SavedStateHandle,
 }
 
 data class PatientScheduleDetailsInfo(
-    val scheduleDetailsList: List<ScheduleDetails> = listOf()
+    var scheduleDetailsList: List<ScheduleDetails> = listOf()
 )
 
 data class PatientScheduleInfo(
@@ -110,7 +112,7 @@ data class ScheduleDetails(
     var minute: Int = 0,
     var dose: Int =0,
     var startDate: Date = Date(),
-    val endDate: Date? = null,
+    var endDate: Date? = null,
     var mealRelation: MealRelation = MealRelation.Nie
 ) {
     fun isValid(): Boolean {
@@ -146,7 +148,7 @@ fun Schedule.toScheduleDetails(medicinDetails: MedicinDetails) : ScheduleDetails
 
 
 data class MedicinDetails(
-    val id: Int=0,
+    var id: Int=0,
     var name: String ="",
     val form: MedicinForm = MedicinForm.TABLETKA
 )

@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
@@ -47,11 +48,12 @@ class ZalecenieViewModel(
     var patientUiState by mutableStateOf(PatientUiState())
         private set
 
+    private var Schedules by mutableStateOf(PatientScheduleInfo())
 
     var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
-    var scheduleUiState by mutableStateOf(ScheduleUiState())
+    var scheduleUiState by mutableStateOf(PatientScheduleDetailsInfo())
         private  set
 
     var storageUiState by mutableStateOf(StorageUiState())
@@ -65,7 +67,7 @@ class ZalecenieViewModel(
                 .first()
                 .toPatientUiState()
 
-            val Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
+            Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
                 .first() // Poczekaj na pierwszy wynik z Flow
                 .let { PatientScheduleInfo(it) } // Zmapuj wynik na PatientScheduleInfo
 
@@ -81,6 +83,27 @@ class ZalecenieViewModel(
 
         }
     }
+
+    fun updateSchedulesInfo()
+    {
+        viewModelScope.launch {
+            Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
+                .first() // Poczekaj na pierwszy wynik z Flow
+                .let { PatientScheduleInfo(it) } // Zmapuj wynik na PatientScheduleInfo
+
+            patientsSchedule = PatientScheduleDetailsInfo(
+                Schedules.scheduleList.map {
+                    it.toScheduleDetails(
+                        medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
+                            .filterNotNull()
+                            .first()
+                            .toMedicinDetails()
+                    )
+                })
+        }
+
+    }
+
     fun updatestorageState(storageDetails: StorageDetails)
     {
         storageUiState = StorageUiState(storageDetails)
@@ -91,46 +114,97 @@ class ZalecenieViewModel(
         storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
     }
 
-    fun updatetUiState(scheduleDetails: ScheduleDetails)
+    fun updatetUiState(scheduleDetailsList: List<ScheduleDetails>)
     {
-        scheduleUiState = ScheduleUiState(scheduleDetails)
+        Log.i("createSchedule", "update przed, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+
+        scheduleUiState = PatientScheduleDetailsInfo( scheduleDetailsList)
+        Log.i("createSchedule", "update po, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+
     }
 
-    suspend fun deleteSchedule()
-    {
-        scheduleRepository.deleteSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
-    }
+//    suspend fun deleteSchedule()
+//    {
+//        scheduleRepository.deleteSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
+//    }
+
 
     suspend fun createSchedule()
     {
-        createMedicin()
-        scheduleRepository.insertSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
-    }
-
-    suspend fun createMedicin()
-    {
-        Log.i("zalecenia", "createMedicin")
+        Log.i("createSchedule", "start, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+       var medicinDetails = scheduleUiState.scheduleDetailsList.first().medicinDetails
+        Log.i("createSchedule", "medicinDetails: ${medicinDetails.name}")
 
         val medicineinDB = medicinRepository.getMedicineStream(
-            scheduleUiState.scheduleDetails.medicinDetails.name,
-            scheduleUiState.scheduleDetails.medicinDetails.form).first()
-        if(medicineinDB == null)
+            medicinDetails.name, medicinDetails.form).first()
+        Log.i("createSchedule", "medicininDB: ${medicineinDB?.id}")
+        var medicinId : Int
+        if(medicineinDB==null)
         {
-            val idx = medicinRepository.getAllMedicinesStream().first().size
-            medicinRepository.insertMedicine(scheduleUiState.scheduleDetails.medicinDetails.toMedicin())
-            storageUiState.storageDetails.MedicinId = if(idx==0) idx+1 else idx
-            storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+            Log.i("createSchedule", "medicininDB: puste")
+            medicinRepository.insertMedicine(medicinDetails.toMedicin())
+            medicinId = medicinRepository.getAllMedicinesStream().first().size
         }
         else
         {
-            storageUiState.storageDetails.MedicinId = medicineinDB.id
-            storageRepository.updateStorage(storageUiState.storageDetails.toStorage())
-
+            medicinId = medicineinDB.id
         }
+        Log.i("createSchedule", "medID: $medicinId")
+
+        storageUiState.storageDetails.MedicinId = medicinId
+        storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+        Log.i("createSchedule", "storageCreated:")
 
 
+        for(scheduleDetails in scheduleUiState.scheduleDetailsList)
+        {
+            scheduleDetails.medicinDetails.id= medicinId
+            scheduleRepository.insertSchedule(scheduleDetails.toSchedule(patientId))
+            Log.i("createSchedule", "inserted:")
+        }
+        updateSchedulesInfo()
+        //patientsSchedule.scheduleDetailsList + scheduleUiState.scheduleDetailsList
+        Log.i("createSchedule", "lista patienstSchedule zmieniona:")
+        scheduleUiState = PatientScheduleDetailsInfo()
+        Log.i("createSchedule", "czyszczenie")
 
     }
+//    suspend fun createSchedule()
+//    {
+//
+//        scheduleUiState.scheduleDetails.medicinDetails.id= createMedicin()
+//        scheduleRepository.insertSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
+//        updateSchedulesInfo()
+//    }
+
+
+
+//    suspend fun createMedicin() : Int
+//    {
+//        Log.i("zalecenia", "createMedicin")
+//
+//        val medicineinDB = medicinRepository.getMedicineStream(
+//            scheduleUiState.scheduleDetails.medicinDetails.name,
+//            scheduleUiState.scheduleDetails.medicinDetails.form).first()
+//        var idx : Int
+//        if(medicineinDB == null)
+//        {
+//            val idxm = medicinRepository.getAllMedicinesStream().first().size
+//            medicinRepository.insertMedicine(scheduleUiState.scheduleDetails.medicinDetails.toMedicin())
+//            storageUiState.storageDetails.MedicinId = idxm+1
+//          //  storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+//            idx = idxm+1
+//        }
+//        else
+//        {
+//            storageUiState.storageDetails.MedicinId = medicineinDB.id
+//          //  storageRepository.updateStorage(storageUiState.storageDetails.toStorage())
+//            idx= medicineinDB.id
+//        }
+//        createStorage()
+//        return idx
+//
+//    }
 
 
     fun getPatientsName(): String{
