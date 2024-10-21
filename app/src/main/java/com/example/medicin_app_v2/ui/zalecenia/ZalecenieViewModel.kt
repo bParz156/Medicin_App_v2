@@ -18,13 +18,16 @@ import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
 import com.example.medicin_app_v2.data.storage.Storage
 import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.ui.PatientDetails
 import com.example.medicin_app_v2.ui.PatientUiState
+import com.example.medicin_app_v2.ui.home.MedicinDetails
 import com.example.medicin_app_v2.ui.home.PatientScheduleDetailsInfo
 import com.example.medicin_app_v2.ui.home.PatientScheduleInfo
 import com.example.medicin_app_v2.ui.home.ScheduleDetails
+import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
 import com.example.medicin_app_v2.ui.home.toMedicin
 import com.example.medicin_app_v2.ui.home.toMedicinDetails
 import com.example.medicin_app_v2.ui.home.toSchedule
@@ -43,7 +46,8 @@ class ZalecenieViewModel(
     private val storageRepository: StorageRepository,
     private val patientsRepository: PatientsRepository,
     private val scheduleRepository: ScheduleRepository,
-    private val firstaidkitRepository: FirstaidkitRepository
+    private val firstaidkitRepository: FirstaidkitRepository,
+    private val scheduleTermRepository: ScheduleTermRepository
 ) : ViewModel()
 {
 
@@ -60,7 +64,7 @@ class ZalecenieViewModel(
     var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
-    var scheduleUiState by mutableStateOf(PatientScheduleDetailsInfo())
+    var scheduleUiState by mutableStateOf(ScheduleUiState())
         private  set
 
     var storageUiState by mutableStateOf(StorageUiState())
@@ -83,7 +87,8 @@ class ZalecenieViewModel(
                     medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
                         .filterNotNull()
                         .first()
-                        .toMedicinDetails()
+                        .toMedicinDetails(),
+                    scheduleTermList =  scheduleTermRepository.getAllsSchedulesTerms(it.id).filterNotNull().first()
                 )
                 })
 
@@ -104,7 +109,8 @@ class ZalecenieViewModel(
                         medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
                             .filterNotNull()
                             .first()
-                            .toMedicinDetails()
+                            .toMedicinDetails(),
+                        scheduleTermList =  scheduleTermRepository.getAllsSchedulesTerms(it.id).filterNotNull().first()
                     )
                 })
         }
@@ -121,12 +127,12 @@ class ZalecenieViewModel(
         storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
     }
 
-    fun updatetUiState(scheduleDetailsList: List<ScheduleDetails>)
+    fun updatetUiState(scheduleDetails: ScheduleDetails)
     {
-        Log.i("createSchedule", "update przed, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+       // Log.i("createSchedule", "update przed, listSize: ${scheduleUiState.scheduleDetailsList.size}")
 
-        scheduleUiState = PatientScheduleDetailsInfo( scheduleDetailsList)
-        Log.i("createSchedule", "update po, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+        scheduleUiState = ScheduleUiState(scheduleDetails)
+      //  Log.i("createSchedule", "update po, listSize: ${scheduleUiState.scheduleDetailsList.size}")
 
     }
 
@@ -138,8 +144,9 @@ class ZalecenieViewModel(
 
     suspend fun createSchedule()
     {
-        Log.i("createSchedule", "start, listSize: ${scheduleUiState.scheduleDetailsList.size}")
-       var medicinDetails = scheduleUiState.scheduleDetailsList.first().medicinDetails
+      //  Log.i("createSchedule", "start, listSize: ${scheduleUiState.scheduleDetailsList.size}")
+     //  var medicinDetails = scheduleUiState.scheduleDetailsList.first().medicinDetails
+        var medicinDetails = scheduleUiState.scheduleDetails.medicinDetails
         Log.i("createSchedule", "medicinDetails: ${medicinDetails.name}")
 
         val medicineinDB = medicinRepository.getMedicineStream(
@@ -165,17 +172,19 @@ class ZalecenieViewModel(
 
         firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =idxStorage ))
 
+        scheduleUiState.scheduleDetails.medicinDetails.id= medicinId
+        scheduleRepository.insertSchedule( scheduleUiState.scheduleDetails.toSchedule(patientId))
+        val scheduleId = scheduleRepository.getSizeId()
 
-        for(scheduleDetails in scheduleUiState.scheduleDetailsList)
+        for(scheduleTermDetail in scheduleUiState.scheduleDetails.scheduleTermDetailsList)
         {
-            scheduleDetails.medicinDetails.id= medicinId
-            scheduleRepository.insertSchedule(scheduleDetails.toSchedule(patientId))
-            Log.i("createSchedule", "inserted:")
+            scheduleTermRepository.insertScheduleTerm(scheduleTermDetail.toScheduleTerm(scheduleId))
         }
+
         updateSchedulesInfo()
         //patientsSchedule.scheduleDetailsList + scheduleUiState.scheduleDetailsList
         Log.i("createSchedule", "lista patienstSchedule zmieniona:")
-        scheduleUiState = PatientScheduleDetailsInfo()
+        scheduleUiState = ScheduleUiState()
         Log.i("createSchedule", "czyszczenie")
 
     }
@@ -236,34 +245,17 @@ fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<MedicinSchedul
         for (scheduleDetail in this.scheduleDetailsList) {
             Log.i("listManipulation: ", "wywala przez fora")
             var medicinScheduleInfo =
-                medicinScheduleInfoList.find { it.medId == scheduleDetail.medicinDetails.id }
+                medicinScheduleInfoList.find { it.medicinDetails.id == scheduleDetail.medicinDetails.id }
             if (medicinScheduleInfo == null) {
 
                 medicinScheduleInfo = MedicinScheduleInfo(
-                    medId = scheduleDetail.medicinDetails.id,
-                    name = scheduleDetail.medicinDetails.name,
-                    medicinForm = scheduleDetail.medicinDetails.form,
-                    dose = scheduleDetail.dose,
-                    mealRelation = scheduleDetail.mealRelation,
+                    medicinDetails = scheduleDetail.medicinDetails ,
                     startDate = scheduleDetail.startDate,
                     endDate = scheduleDetail.endDate,
-                    scheduleList = listOf(
-                        ScheduleInfo(
-                            hour = scheduleDetail.hour,
-                            minute = scheduleDetail.minute,
-                            day = scheduleDetail.day
-                        )
-                    )
+                    scheduleList = scheduleDetail.scheduleTermDetailsList
                 )
 
                 medicinScheduleInfoList =medicinScheduleInfoList+ medicinScheduleInfo
-            } else {
-
-                medicinScheduleInfo.scheduleList += ScheduleInfo(
-                    hour = scheduleDetail.hour,
-                    minute = scheduleDetail.minute,
-                    day = scheduleDetail.day
-                )
             }
 
         }
@@ -276,20 +268,10 @@ fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<MedicinSchedul
 
 
 data class MedicinScheduleInfo(
-    val medId: Int,
-    val name: String,
-    val medicinForm: MedicinForm,
-    val dose: Int,
-    val mealRelation: MealRelation,
-    var scheduleList: List<ScheduleInfo> =listOf(),
+    val medicinDetails: MedicinDetails,
+    var scheduleList: List<ScheduleTermDetails> =listOf(),
     val startDate: Date,
     val endDate : Date?,
-)
-
-data class ScheduleInfo(
-    val hour: Int,
-    val minute: Int,
-    val day: DayWeek
 )
 
 

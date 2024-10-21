@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -227,6 +229,9 @@ fun magazynDialog(
     )
 {
     var medQuantity by remember { mutableStateOf("0") }
+    var openDialog by remember { mutableStateOf(false) }
+    var confirmed by remember { mutableStateOf(false) }
+
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -273,16 +278,7 @@ fun magazynDialog(
 
                 NavigationBarItem(selected = false, onClick =
                 {
-                    Log.i("magazyn", "kliknieto w accept")
-                    //onValueChange(patientsDetails.copy(name=patientName))
-                    if(medQuantity.isNotBlank() && medQuantity.all {it.isDigit()} && medQuantity.toInt()>0)
-                    {
-                        Log.i("magazyn", "spelnia warunek: quant: ${storageDetails.quantity}  + ${medQuantity.toInt()}")
-                        onValueChange(storageDetails.copy(quantity = storageDetails.quantity + medQuantity.toInt()))
-                        Log.i("magazyn", "po valueChange new_quant : ${storageDetails.quantity}")
-                        onConfirm()
-                        onDismiss()
-                    }
+                        openDialog = true
                 },
                     icon = {Icon(
                         imageVector = Icons.Filled.Check,
@@ -296,4 +292,86 @@ fun magazynDialog(
             }
         }
     }
+
+    if(openDialog)
+    {
+        areYouSureDialog(
+            onDismiss = {openDialog = false},
+            onConfirm = {confirmed = true
+                            Log.i("magazyn", "kliknieto w accept")
+                            //onValueChange(patientsDetails.copy(name=patientName))
+                            if (medQuantity.isNotBlank() && medQuantity.all { it.isDigit() } && medQuantity.toInt() > 0) {
+                                Log.i(
+                                    "magazyn",
+                                    "spelnia warunek: quant: ${storageDetails.quantity}  + ${medQuantity.toInt()}"
+                                )
+                                onValueChange(storageDetails.copy(quantity = storageDetails.quantity + medQuantity.toInt()))
+                                Log.i(
+                                    "magazyn",
+                                    "po valueChange new_quant : ${storageDetails.quantity}"
+                                )
+                                onConfirm()
+                                onDismiss()
+                            }
+                        },
+            info = "Dokupiono ${medQuantity} ${stringResource(storageDetails.medicinForm.dopelniacz)} leku o nazwie ${storageDetails.medName}"
+        )
+    }
+
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun areYouSureDialog(
+    modifier: Modifier = Modifier,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    info: String
+)
+{
+    BasicAlertDialog(onDismissRequest = onDismiss,
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium)))
+    {
+        Column {
+            Text(text= "Sprawdź poprawność informacji",
+                style = MaterialTheme.typography.titleLarge)
+
+            Text(text= info,
+                style = MaterialTheme.typography.titleMedium)
+
+            Row(modifier = Modifier.fillMaxWidth())
+            {
+
+                Button(onClick = onDismiss)
+                {
+                    Row()
+                    {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+
+                        Text(text=stringResource(R.string.back))
+                    }
+                }
+
+                 Button(onClick = onConfirm)
+                {
+                    Row()
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = stringResource(R.string.confirm)
+                        )
+
+                        Text(text=stringResource(R.string.confirm))
+                    }
+                }
+
+            }
+        }
+
+    }
+}
+

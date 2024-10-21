@@ -11,6 +11,8 @@ import com.example.medicin_app_v2.data.patient.OfflinePatientsRepository
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.OfflineScheduleRepository
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
+import com.example.medicin_app_v2.data.scheduleTerms.OfflineScheduleTermRepository
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
 import com.example.medicin_app_v2.data.storage.OfflineStorageRepository
 import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.data.usage.OfflineUsageRepository
@@ -25,6 +27,7 @@ interface AppContainer {
     val scheduleRepository : ScheduleRepository
     val storageRepository : StorageRepository
     val usageRepository : UsageRepository
+    val scheduleTermRepository: ScheduleTermRepository
 }
 
 
@@ -58,6 +61,9 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val usageRepository: UsageRepository by lazy {
         OfflineUsageRepository(AppDatabase.getDatabase(context).usageDao())
     }
+    override val scheduleTermRepository: ScheduleTermRepository by lazy {
+        OfflineScheduleTermRepository(AppDatabase.getDatabase(context).scheduleTermDao())
+     }
 
 
 }

@@ -73,6 +73,7 @@ import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.home.MedicinDetails
 import com.example.medicin_app_v2.ui.home.ScheduleDetails
+import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -173,10 +174,10 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                         }
                     },
                     onDismiss = {openDialog.value=false},
-                    scheduleDetailsList =  viewModel.scheduleUiState.scheduleDetailsList,
+                    scheduleDetails =  viewModel.scheduleUiState.scheduleDetails,
                     storageDetails = viewModel.storageUiState.storageDetails,
                     onValueStorageChange = viewModel::updatestorageState,
-                    onScheduleListChange = viewModel::updatetUiState,
+                    onScheduleChange = viewModel::updatetUiState,
                     )
             }
 
@@ -188,10 +189,10 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
 fun addNewMedicin(
     onAdd: () -> Unit,
     onDismiss: () -> Unit,
-    scheduleDetailsList: List<ScheduleDetails>,
+    scheduleDetails: ScheduleDetails,
     storageDetails: StorageDetails,
     onValueStorageChange: (StorageDetails) -> Unit,
-    onScheduleListChange: (List<ScheduleDetails>) -> Unit
+    onScheduleChange: (ScheduleDetails) -> Unit
    ) {
 
     var medicinName by remember { mutableStateOf("") }
@@ -208,8 +209,7 @@ fun addNewMedicin(
 
     var timeADay by remember { mutableStateOf("") }
 
-    var scheduleDetails by remember { mutableStateOf(ScheduleDetails()) }
-    val scheduleDetailsListPriv = mutableListOf<ScheduleDetails>()
+    val scheduleTermDetailsListPriv = mutableListOf<ScheduleTermDetails>()
 
 
     BasicAlertDialog(
@@ -236,7 +236,7 @@ fun addNewMedicin(
 
             TextField( value = medicinName,
                 onValueChange = {medicinName = it
-                        scheduleDetails = scheduleDetails.copy(medicinDetails= MedicinDetails(name =it))}
+                    onScheduleChange(scheduleDetails.copy(medicinDetails= MedicinDetails(name =it)))}
                 ,
                 placeholder = { Text("Podaj nazwę leku")})
 
@@ -253,7 +253,7 @@ fun addNewMedicin(
                             text ={ Text(item.name)},
                             onClick = {
                                 selectedForm = item
-                                scheduleDetails = scheduleDetails.copy(medicinDetails = MedicinDetails( form = item))
+                                onScheduleChange(scheduleDetails.copy(medicinDetails = MedicinDetails( form = item)))
                                 expanded = false
                             }
                         )
@@ -270,7 +270,7 @@ fun addNewMedicin(
                     // Tylko liczby będą akceptowane
                     if (input.all { it.isDigit() }) {
                         medicinDose = input
-                        scheduleDetails = scheduleDetails.copy(dose = input.toInt())
+                       // scheduleDetails = scheduleDetails.copy(dose = input.toInt())
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -300,7 +300,7 @@ fun addNewMedicin(
                             text ={ Text(item.name)},
                             onClick = {
                                 selectedRelation = item
-                                scheduleDetails = scheduleDetails.copy(mealRelation = item)
+                                onScheduleChange(scheduleDetails.copy(medicinDetails = MedicinDetails( relation = item)))
                                 expandedR = false
                             }
                         )
@@ -380,9 +380,8 @@ fun addNewMedicin(
                     if(medicinName.isNotBlank() && medicinDose.isNotBlank() && medicinStore.isNotBlank() && selectedDays.isNotEmpty() && timeADay.toInt()>=1) {
 
                         scheduleDetails.medicinDetails =
-                            MedicinDetails(name = medicinName, form = selectedForm)
-                        scheduleDetails.dose = medicinDose.toInt()
-                        scheduleDetails.mealRelation = selectedRelation
+                            MedicinDetails(name = medicinName, form = selectedForm, relation =  selectedRelation)
+                       // scheduleDetails.dose = medicinDose.toInt()
                         scheduleDetails.startDate = Date()
                         scheduleDetails.endDate = null
 
@@ -402,7 +401,6 @@ fun addNewMedicin(
                             .wrapContentSize()
                     )}
                 )
-
             }
 
             if(openDialog)
@@ -413,25 +411,29 @@ fun addNewMedicin(
                         for ((hour, minute) in selectedTimes) {
 
                             // Tutaj możesz utworzyć Schedule dla każdego dnia i każdej godziny
-                            scheduleDetails = ScheduleDetails(
-                                medicinDetails = MedicinDetails(name = medicinName , form = selectedForm),
+                            val scheduleTermDetails = ScheduleTermDetails(
                                 day = day,
                                 hour = hour,
                                 minute = minute,
                                 dose = medicinDose.toInt(),
-                                startDate = Date(),
-                                endDate = null,
-                                mealRelation = selectedRelation
                             )
-                            scheduleDetailsListPriv.add( scheduleDetails)
+                            scheduleTermDetailsListPriv.add( scheduleTermDetails)
                             //onScheduleListChange(scheduleDetailsList+scheduleDetails)
                             Log.i(
                                 "createSchedule",
-                                "scheduleDetailsListPriv: ${scheduleDetailsListPriv.size}"
+                                "scheduleDetailsListPriv: ${scheduleTermDetailsListPriv.size}"
                             )
                         }
                     }
-                    onScheduleListChange(scheduleDetailsListPriv)
+                    onScheduleChange(
+                        scheduleDetails.copy(
+                            startDate = Date(),
+                            endDate = null,
+                            scheduleTermDetailsList =  scheduleTermDetailsListPriv,
+                            medicinDetails = MedicinDetails(name = medicinName , form = selectedForm, relation =  selectedRelation)
+                            )
+                        )
+                  //  onScheduleListChange(scheduleDetailsListPriv)
                     onAdd()
                     openDialog = false
                     onDismiss()
@@ -503,7 +505,7 @@ fun medicinRemainders(
 
         LazyColumn(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))) {
 
-            items(items = scheduleList, key = { it.medId })
+            items(items = scheduleList, key = { it.medicinDetails.id })
             { schedule ->
                 var expanded by remember { mutableStateOf(false) }
 
@@ -542,17 +544,13 @@ fun medicinCard(
         ) {
 
             Text(
-                text = medicinScheduleInfo.name,
+                text = medicinScheduleInfo.medicinDetails.name,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.wrapContentSize().fillMaxWidth()
             )
 
-            Text(
-                text = "dawka: ${medicinScheduleInfo.dose}  ${stringResource(medicinScheduleInfo.medicinForm.dopelniacz)}",
-                style = MaterialTheme.typography.labelMedium,
-                textAlign = TextAlign.Center,
-            )
+
 
             Spacer(Modifier.weight(1f))
             if (expanded) {
@@ -567,7 +565,7 @@ fun medicinCard(
                         "scheduleListSize = ${medicinScheduleInfo.scheduleList.size}"
                     )
                     for (scheduleInfo in medicinScheduleInfo.scheduleList) {
-                        Text("${stringResource(scheduleInfo.day.title)} ${scheduleInfo.hour}:${scheduleInfo.minute}")
+                        Text("${stringResource(scheduleInfo.day.title)} ${scheduleInfo.hour}:${scheduleInfo.minute}  - ${scheduleInfo.dose} ${medicinScheduleInfo.medicinDetails.form}")
                     }
 
                 }

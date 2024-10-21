@@ -1,6 +1,8 @@
 package com.example.medicin_app_v2.data.schedule
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 
 class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : ScheduleRepository {
 
@@ -11,7 +13,7 @@ class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : Schedule
     override fun getPatientMedicineSchedule(
         patient_id: Int,
         medicine_id: Int
-    ): Flow<List<Schedule>> {
+    ): Flow<Schedule> {
         return scheduleDao.getPatientMedcicineSchedule(patient_id, medicine_id)
     }
 
@@ -29,5 +31,9 @@ class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : Schedule
 
     override suspend fun updateSchedule(schedule: Schedule) {
         scheduleDao.update(schedule)
+    }
+
+    override suspend fun getSizeId(): Int {
+        return scheduleDao.getAllSchedules().filterNotNull().first().size
     }
 }

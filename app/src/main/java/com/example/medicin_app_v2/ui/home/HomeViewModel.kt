@@ -9,37 +9,26 @@ import androidx.lifecycle.viewModelScope
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTerm
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
-import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
-import com.example.medicin_app_v2.data.storage.StorageRepository
-import com.example.medicin_app_v2.ui.PatientDetails
-import com.example.medicin_app_v2.ui.PatientListUiState
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
 import com.example.medicin_app_v2.ui.PatientUiState
-import com.example.medicin_app_v2.ui.PatientViewModel
-import com.example.medicin_app_v2.ui.PatientViewModel.Companion
-import com.example.medicin_app_v2.ui.patients.PatientsDestination
-import com.example.medicin_app_v2.ui.toPatientDetails
 import com.example.medicin_app_v2.ui.toPatientUiState
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Date
 
 
-class HomeViewModel (savedStateHandle: SavedStateHandle,
-                     patientsRepository: PatientsRepository,
+class HomeViewModel (
+    savedStateHandle: SavedStateHandle,
+ patientsRepository: PatientsRepository,
     scheduleRepository: ScheduleRepository,
+ scheduleTermRepository: ScheduleTermRepository,
     medicinRepository: MedicinRepository
 
 ) : ViewModel()
@@ -77,7 +66,9 @@ class HomeViewModel (savedStateHandle: SavedStateHandle,
                     medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
                         .filterNotNull()
                         .first()
-                        .toMedicinDetails()
+                        .toMedicinDetails(),
+                    scheduleTermList =  scheduleTermRepository.getAllsSchedulesTerms(it.id).filterNotNull().first()
+
                 )
                 })
 
@@ -107,60 +98,74 @@ data class PatientScheduleInfo(
 data class ScheduleDetails(
     val id : Int = 0,
     var medicinDetails: MedicinDetails = MedicinDetails(),
-    var day: DayWeek = DayWeek.PON,
-    var hour: Int = 0,
-    var minute: Int = 0,
-    var dose: Int =0,
     var startDate: Date = Date(),
     var endDate: Date? = null,
-    var mealRelation: MealRelation = MealRelation.Nie
+    var scheduleTermDetailsList: List<ScheduleTermDetails> = listOf()
 )
+
+data class ScheduleTermDetails(
+    var day: DayWeek = DayWeek.PON,
+    var hour: Int =0,
+    var minute: Int =0,
+    var dose: Int =0
+) {
+    fun toScheduleTerm(scheduleId: Int) : ScheduleTerm = ScheduleTerm(
+        dose = dose,
+        day =day,
+        minute = minute,
+        hour = hour,
+        ScheduleId = scheduleId
+    )
+}
 
 
 fun ScheduleDetails.toSchedule(patiendId : Int): Schedule = Schedule(
     id=id,
     Patient_id = patiendId,
     Medicine_id = medicinDetails.id,
-    day = day,
-    hour= hour,
-    minute = minute,
-    dose= dose,
     startDate = startDate,
     endDate = endDate,
-    mealRelation = mealRelation
 )
 
-fun Schedule.toScheduleDetails(medicinDetails: MedicinDetails) : ScheduleDetails = ScheduleDetails(
+fun Schedule.toScheduleDetails(medicinDetails: MedicinDetails, scheduleTermList: List<ScheduleTerm>) : ScheduleDetails = ScheduleDetails(
     id=id,
     medicinDetails = medicinDetails,
-    day = day,
-    hour= hour,
-    minute = minute,
-    dose= dose,
     startDate = startDate,
     endDate = endDate,
-    mealRelation = mealRelation
+    scheduleTermDetailsList = scheduleTermList.map {
+        it.toScheduleTermDetails()
+    }
 )
 
 
 data class MedicinDetails(
     var id: Int=0,
     var name: String ="",
-    val form: MedicinForm = MedicinForm.TABLETKA
+    val form: MedicinForm = MedicinForm.TABLETKA,
+    val relation: MealRelation = MealRelation.Nie
 )
 
 fun MedicinDetails.toMedicin() : Medicine = Medicine(
     id=id,
     name=name,
-    form = form
+    form = form,
+    mealRelation = relation
 )
 
 fun Medicine.toMedicinDetails() : MedicinDetails = MedicinDetails(
     id=id,
     name=name,
-    form = form
+    form = form,
+    relation = mealRelation
 )
 
+
+fun ScheduleTerm.toScheduleTermDetails(): ScheduleTermDetails = ScheduleTermDetails(
+    minute = minute,
+    hour = hour,
+    day = day,
+    dose = dose
+)
 
 
 /*

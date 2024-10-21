@@ -6,7 +6,7 @@ interface ScheduleRepository {
 
     fun getAllPatientsSchedules(patient_id : Int): Flow<List<Schedule>>
 
-    fun getPatientMedicineSchedule(patient_id: Int, medicine_id: Int) : Flow<List<Schedule>>
+    fun getPatientMedicineSchedule(patient_id: Int, medicine_id: Int) : Flow<Schedule>
 
     fun getScheduleById(id: Int) : Flow<Schedule>
 
@@ -15,5 +15,7 @@ interface ScheduleRepository {
     suspend fun deleteSchedule(schedule: Schedule)
 
     suspend fun updateSchedule(schedule: Schedule)
+
+    suspend fun getSizeId(): Int
 
 }

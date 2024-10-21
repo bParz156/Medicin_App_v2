@@ -32,11 +32,6 @@ data class Schedule(
     val id: Int = 0, // Auto-generowane ID
     val Patient_id: Int,  // Odniesienie do Patient
     val Medicine_id: Int, // Odniesienie do Medicine
-    val day: DayWeek,
-    val hour: Int,
-    val minute: Int,
-    val dose: Int,
     val startDate: Date,
-    val endDate: Date?,
-    val mealRelation : MealRelation
+    val endDate: Date?
 )

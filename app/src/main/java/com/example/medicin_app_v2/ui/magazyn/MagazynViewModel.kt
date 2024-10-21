@@ -1,5 +1,6 @@
 package com.example.medicin_app_v2.ui.magazyn
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,25 +9,31 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
 import com.example.medicin_app_v2.data.storage.Storage
 import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.ui.PatientDetails
 import com.example.medicin_app_v2.ui.PatientUiState
+import org.apache.commons.collections4.queue.CircularFifoQueue
 import com.example.medicin_app_v2.ui.home.HomeDestination
 import com.example.medicin_app_v2.ui.home.PatientScheduleDetailsInfo
 import com.example.medicin_app_v2.ui.home.PatientScheduleInfo
+import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
 import com.example.medicin_app_v2.ui.home.toMedicinDetails
 import com.example.medicin_app_v2.ui.home.toScheduleDetails
+import com.example.medicin_app_v2.ui.home.toScheduleTermDetails
 import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 
@@ -36,7 +43,8 @@ class MagazynViewModel (
  scheduleRepository: ScheduleRepository,
  medicinRepository: MedicinRepository,
     private val storageRepository: StorageRepository,
-    firstaidkitRepository: FirstaidkitRepository
+    firstaidkitRepository: FirstaidkitRepository,
+    private val scheduleTermRepository: ScheduleTermRepository
 ) : ViewModel()
 {
 
@@ -73,9 +81,12 @@ class MagazynViewModel (
                     medicinId =  storage.Medicineid,
                     quantity = storage.quantity,
                     medName = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().name,
+                   // daysToEnd = 0,
                     daysToEnd = calculateDaysToEnd(
-                        dose = scheduleRepository.getPatientMedicineSchedule(patientId, storage.Medicineid).filterNotNull().first().get(0).dose,
-                        timesAWeek =scheduleRepository.getPatientMedicineSchedule(patientId, storage.Medicineid).filterNotNull().first().size,
+                        scheduleTermDetailsList =  scheduleTermRepository.getAllsSchedulesTerms(
+                            scheduleId = scheduleRepository.getPatientMedicineSchedule(patient_id = patientId , medicine_id = storage.Medicineid ).filterNotNull().first().id
+                        ).filterNotNull().first().map { it.toScheduleTermDetails() }
+                        ,
                         quantity = storage.quantity
                     ),
                     medicinForm = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().form
@@ -91,11 +102,60 @@ class MagazynViewModel (
         }
     }
 
-    private fun calculateDaysToEnd(dose: Int, timesAWeek: Int, quantity: Int) : Int
+    private fun calculateDaysToEnd(scheduleTermDetailsList: List<ScheduleTermDetails>, quantity: Int) : Int
     {
         //DO POPRAWYYY
-        return 7*quantity/(dose*timesAWeek)
+        val calendar = Calendar.getInstance()
+        var dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        var toEnd =0
+        var stopPit: Boolean = false
+        val usageDay: List<Int> =calculateWeeklyUsage(scheduleTermDetailsList)
+        Log.i("calday", "${DayWeek.values().find{it.weekDay==1}?.name}  ${usageDay[0]}")
+        Log.i("calday", "${DayWeek.values().find{it.weekDay==5}?.name}  ${usageDay[4]}")
+        var used =0
+        while(used<=quantity && !stopPit)
+        {
+            Log.i("calday", "while: used = ${used} , toEnd= ${toEnd}  dayOfWeek =${dayOfWeek}")
+            if(usageDay[dayOfWeek]+ used > quantity)
+                stopPit = true
+            else {
+                used += usageDay[dayOfWeek]
+                dayOfWeek = (dayOfWeek + 1) % 7
+                toEnd++
+            }
+
+        }
+        Log.i("calday", "nie wychodzi z while")
+
+        return toEnd
     }
+
+    private fun calculateWeeklyUsage(scheduleTermDetailsList: List<ScheduleTermDetails>): List<Int>
+    {
+        val list = MutableList(7) { 0 }
+        for(day in DayWeek.values())
+        {
+            list[day.weekDay-1] = calculateDayUsage(scheduleTermDetailsList, day)
+            Log.i("calday", "${day.name}  -- ${list[day.weekDay -1]}")
+        }
+        return list
+    }
+
+    private fun calculateDayUsage(scheduleTermDetailsList: List<ScheduleTermDetails>, dayWeek: DayWeek): Int
+    {
+        var uasage: Int =0
+        for ( scheduleTermDetail in scheduleTermDetailsList)
+        {
+            if(scheduleTermDetail.day == dayWeek)
+            {
+                uasage+=scheduleTermDetail.dose
+            }
+
+        }
+
+        return  uasage
+    }
+
 
     fun getPatientsName(): String{
         return magazynUiState.patientDetails.name

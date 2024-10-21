@@ -27,7 +27,8 @@ object AppViewModelProvider {
                 savedStateHandle =  this.createSavedStateHandle(),
                 patientsRepository =  medicinApplication().container.patientsRepository,
                 medicinRepository = medicinApplication().container.medicinRepository,
-                scheduleRepository = medicinApplication().container.scheduleRepository
+                scheduleRepository = medicinApplication().container.scheduleRepository,
+                scheduleTermRepository = medicinApplication().container.scheduleTermRepository
             )
         }
 
@@ -38,7 +39,8 @@ object AppViewModelProvider {
                 storageRepository = medicinApplication().container.storageRepository,
                 scheduleRepository = medicinApplication().container.scheduleRepository,
                 patientsRepository = medicinApplication().container.patientsRepository,
-                firstaidkitRepository = medicinApplication().container.firstaidkitRepository
+                firstaidkitRepository = medicinApplication().container.firstaidkitRepository,
+                scheduleTermRepository = medicinApplication().container.scheduleTermRepository
             )
         }
 
@@ -49,7 +51,8 @@ object AppViewModelProvider {
                 storageRepository = medicinApplication().container.storageRepository,
                 scheduleRepository = medicinApplication().container.scheduleRepository,
                 patientsRepository = medicinApplication().container.patientsRepository,
-                firstaidkitRepository = medicinApplication().container.firstaidkitRepository
+                firstaidkitRepository = medicinApplication().container.firstaidkitRepository,
+                scheduleTermRepository = medicinApplication().container.scheduleTermRepository
             )
         }
     }

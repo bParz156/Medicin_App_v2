@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation("org.apache.commons:commons-collections4:4.4")
 
     testImplementation(libs.junit)
 
