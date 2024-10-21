@@ -1,11 +1,13 @@
 package com.example.medicin_app_v2.ui.magazyn
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
@@ -33,12 +35,12 @@ class MagazynViewModel (
  patientsRepository: PatientsRepository,
  scheduleRepository: ScheduleRepository,
  medicinRepository: MedicinRepository,
-    storageRepository: StorageRepository,
+    private val storageRepository: StorageRepository,
     firstaidkitRepository: FirstaidkitRepository
 ) : ViewModel()
 {
 
-    var homeUiState by mutableStateOf(ZaleceniaUiState())
+    var magazynUiState by mutableStateOf(ZaleceniaUiState())
         private set
 
 
@@ -80,7 +82,7 @@ class MagazynViewModel (
                 )
             }
 
-            homeUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList,
+            magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList,
                 patientDetails =  PatientDetails(id= patientId,
                     name =  patientsRepository.getPatientStream(patientId).filterNotNull().first().name)
             )
@@ -96,22 +98,50 @@ class MagazynViewModel (
     }
 
     fun getPatientsName(): String{
-        return homeUiState.patientDetails.name
+        return magazynUiState.patientDetails.name
     }
+
+
+    fun increaseStorageQuantity()
+    {
+        storageDetailsList - magazynUiState.changingStoragDetails
+        Log.i("magazyn", "in increase")
+        viewModelScope.launch {
+            val currentStorage =magazynUiState.changingStoragDetails.toStorage()
+            storageRepository.updateStorage(currentStorage)
+        }
+        storageDetailsList + magazynUiState.changingStoragDetails
+
+    }
+
+    fun updateUiState(storageDetails: StorageDetails) {
+        Log.i("magazyn", "in updateUI : ${magazynUiState.changingStoragDetails.medName}")
+        magazynUiState.changingStoragDetails = storageDetails
+        Log.i("magazyn", "in updateUI : ${magazynUiState.changingStoragDetails.medName}")
+
+    }
+
 
 }
 
 
 data class ZaleceniaUiState(
     val storageDetailsList: List<StorageDetails> = listOf(),
-    val patientDetails: PatientDetails = PatientDetails()
+    val patientDetails: PatientDetails = PatientDetails(),
+    var changingStoragDetails: StorageDetails = StorageDetails()
 )
 
 data class StorageDetails(
-    val storageId: Int,
-    val medicinId: Int,
-    val quantity: Int,
+    val storageId: Int =0,
+    val medicinId: Int =0,
+    val quantity: Int =0,
     val medName: String = "",
-    val daysToEnd: Int,
-    val medicinForm: MedicinForm
+    val daysToEnd: Int =0,
+    val medicinForm: MedicinForm =MedicinForm.TABLETKA
+)
+
+fun StorageDetails.toStorage() : Storage = Storage(
+    id = this.storageId,
+    Medicineid = this.medicinId,
+    quantity =  this.quantity
 )

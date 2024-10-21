@@ -73,7 +73,8 @@ fun MedicinNavHost(
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
+                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")},
+                navigateToStorage = {}
             )
         }
 
