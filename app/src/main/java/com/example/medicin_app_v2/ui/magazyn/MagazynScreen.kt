@@ -194,7 +194,7 @@ fun storageCard(
     Log.i("filtr", "in here")
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
@@ -239,7 +239,7 @@ fun magazynDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier
             .padding(dimensionResource(R.dimen.padding_medium))
-            .background(Color.Gray)
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
     )
     {
         Column {

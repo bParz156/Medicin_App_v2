@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation("org.apache.commons:commons-collections4:4.4")
+    implementation(libs.androidx.ui.text.google.fonts)
 
     testImplementation(libs.junit)
 

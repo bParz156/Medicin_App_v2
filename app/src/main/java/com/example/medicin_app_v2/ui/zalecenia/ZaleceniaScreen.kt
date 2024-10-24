@@ -3,6 +3,10 @@ package com.example.medicin_app_v2.ui.zalecenia
 import android.app.TimePickerDialog
 import android.util.Log
 import android.widget.TimePicker
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -221,7 +225,7 @@ fun addNewMedicin(
     {
         Column(modifier = Modifier
             .wrapContentSize().fillMaxWidth()
-            .background(color = Color.LightGray)
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Text(text = stringResource(R.string.add_medicin_title),
                 textAlign = TextAlign.Center,
@@ -573,13 +577,22 @@ fun medicinCard(
     expanded: Boolean
 )
 {
+    val color by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.tertiaryContainer
+    else MaterialTheme.colorScheme.primaryContainer,
+    )
+
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .animateContentSize(animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMedium)
+                )
+                .background(color = color),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
 
