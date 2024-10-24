@@ -23,7 +23,7 @@ import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageDao
 
 @Database(entities= [Patient::class, Medicine::class, Storage::class, FirstAidKit::class, Schedule::class, Usage::class, Notification::class , ScheduleTerm::class],
-    version=1, exportSchema = false)
+    version=4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -45,6 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
             return Instance?: synchronized(this)
             {
                 Room.databaseBuilder(context, AppDatabase::class.java, "medicin_database")
+                    .fallbackToDestructiveMigration()
                     .build()
                     .also{ Instance = it}
             }

@@ -2,6 +2,7 @@ package com.example.medicin_app_v2.data.notification
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.medicin_app_v2.data.usage.Usage
 import java.util.Date
@@ -15,7 +16,8 @@ import java.util.Date
             childColumns = ["Usageid"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["Usageid"])]
 )
 data class Notification(
     @PrimaryKey(autoGenerate = true)

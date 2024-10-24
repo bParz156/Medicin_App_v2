@@ -74,6 +74,7 @@ import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.home.MedicinDetails
 import com.example.medicin_app_v2.ui.home.ScheduleDetails
 import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
+import com.example.medicin_app_v2.ui.magazyn.areYouSureDialog
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -360,6 +361,8 @@ fun addNewMedicin(
 
 
             var openDialog by remember { mutableStateOf(false) }
+            var allSet by remember { mutableStateOf(false) }
+            var confirmed by remember { mutableStateOf(false) }
 
             NavigationBar(modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_small))
@@ -403,6 +406,8 @@ fun addNewMedicin(
                 )
             }
 
+            var infoScheduleMed by remember { mutableStateOf("") }
+
             if(openDialog)
             {
                 showTimePickersForTimesADay(timeADay.toInt()) { selectedTimes ->
@@ -433,12 +438,47 @@ fun addNewMedicin(
                             medicinDetails = MedicinDetails(name = medicinName , form = selectedForm, relation =  selectedRelation)
                             )
                         )
-                  //  onScheduleListChange(scheduleDetailsListPriv)
-                    onAdd()
-                    openDialog = false
-                    onDismiss()
                 }
+                Log.i("aaaa","${scheduleTermDetailsListPriv.size}")
+                for(schedule in scheduleTermDetailsListPriv)
+                     {
+                    Log.i("aaaa","aaaassdffgafa")
+                        infoScheduleMed += "${stringResource(schedule.day.title)} o ${schedule.hour}:${schedule.minute} w dawce ${schedule.dose} ${stringResource(selectedForm.dopelniacz)} \n"
+                  }
+               // allSet =true
+                openDialog = false
+                allSet =true
+
             }
+
+            if(allSet)
+            {
+            //    for(schedule in scheduleTermDetailsListPriv)
+           //     {
+            //        infoScheduleMed += "${stringResource(schedule.day.title)} o ${schedule.hour}:${schedule.minute} w dawce ${schedule.dose} ${stringResource(selectedForm.dopelniacz)} \n"
+              //  }
+
+                areYouSureDialog(
+                    onConfirm = {
+                        confirmed = true
+                    },
+                    onDismiss = {
+                        allSet =false
+                        infoScheduleMed = ""
+                    },
+                    info = "Lek o nazwie ${medicinName} jest przyjmowany ${selectedRelation} w formie ${stringResource(selectedForm.dopelniacz)} w:\n" +
+                            infoScheduleMed
+                   // scheduleTermDetailsListPriv.get(0).hour
+                )
+            }
+
+            if(confirmed)
+            {
+                onAdd()
+               // openDialog = false
+                onDismiss()
+            }
+
         }
     }
 }

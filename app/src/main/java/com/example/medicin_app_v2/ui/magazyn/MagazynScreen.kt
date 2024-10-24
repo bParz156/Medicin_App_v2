@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -331,7 +333,8 @@ fun areYouSureDialog(
 )
 {
     BasicAlertDialog(onDismissRequest = onDismiss,
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium)))
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium))
+            .verticalScroll(rememberScrollState()))
     {
         Column {
             Text(text= "Sprawdź poprawność informacji",

@@ -1,8 +1,11 @@
 package com.example.medicin_app_v2.ui.home
 
+import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,11 +19,15 @@ import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
+import com.example.medicin_app_v2.data.usage.Usage
+import com.example.medicin_app_v2.data.usage.UsageRepository
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 
 
@@ -29,15 +36,16 @@ class HomeViewModel (
  patientsRepository: PatientsRepository,
     scheduleRepository: ScheduleRepository,
  scheduleTermRepository: ScheduleTermRepository,
-    medicinRepository: MedicinRepository
+    medicinRepository: MedicinRepository,
+    val usageRepository: UsageRepository
 
 ) : ViewModel()
 {
 
-    var homeUiState by mutableStateOf(PatientUiState())
+    var homeUiState by mutableStateOf(HomeUiState())
         private set
 
-    var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
+    private var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
 
@@ -50,29 +58,34 @@ class HomeViewModel (
 
 
     init {
+        Log.i("homeeee", "start init")
         viewModelScope.launch {
-            homeUiState = patientsRepository.getPatientStream(patientId)
+            homeUiState.patientUiState = patientsRepository.getPatientStream(patientId)
                 .filterNotNull()
                 .first()
                 .toPatientUiState()
-
-
+            Log.i("homeeee", "65")
+        if(patientId!=-1) {
+            Log.i("homeeee", "id istnieje")
             val Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
                 .first() // Poczekaj na pierwszy wynik z Flow
                 .let { PatientScheduleInfo(it) } // Zmapuj wynik na PatientScheduleInfo
 
-            patientsSchedule =PatientScheduleDetailsInfo(
-                Schedules.scheduleList.map { it.toScheduleDetails(
-                    medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
-                        .filterNotNull()
-                        .first()
-                        .toMedicinDetails(),
-                    scheduleTermList =  scheduleTermRepository.getAllsSchedulesTerms(it.id).filterNotNull().first()
+            patientsSchedule = PatientScheduleDetailsInfo(
+                Schedules.scheduleList.map {
+                    it.toScheduleDetails(
+                        medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
+                            .filterNotNull()
+                            .first()
+                            .toMedicinDetails(),
+                        scheduleTermList = scheduleTermRepository.getAllsSchedulesTerms(it.id)
+                            .filterNotNull().first()
 
-                )
+                    )
                 })
 
-
+            genereteUsagesForNextPeriodOfTime(7)
+        }
         }
     }
 
@@ -80,12 +93,75 @@ class HomeViewModel (
 
 
     fun getPatientsName(): String{
-        return homeUiState.patientDetails.name
+        Log.i("homeeee", "get name")
+        return homeUiState.patientUiState.patientDetails.name
+    }
+
+    suspend fun genereteUsagesForNextPeriodOfTime(days: Int)
+    {
+        val calendar = Calendar.getInstance() // Bieżąca data
+        val currentDate = calendar.time
+        for(scheduleDetail in patientsSchedule.scheduleDetailsList)
+        {
+            for(scheduleTerm in scheduleDetail.scheduleTermDetailsList)
+            {
+                for(dayOffset in 0..days)
+                {
+                    calendar.time = currentDate
+                    calendar.add(Calendar.DAY_OF_YEAR, dayOffset)
+                    val eventDate = calendar.time
+                    if(isValidEventDay(scheduleTerm, calendar))
+                    {
+                        calendar.set(Calendar.HOUR_OF_DAY, scheduleTerm.hour)
+                        calendar.set(Calendar.MINUTE, scheduleTerm.minute)
+                        val eventTime = calendar.time
+                        Log.i("usageeee", "id scheduleTerm = ${scheduleTerm.id}")
+                        val usage = Usage(id=0,
+                            ScheduleTerm_id = scheduleTerm.id,
+                            confirmed = false,
+                            date = eventTime)
+                        Log.i("usageeee", " Create usage scheudle Term = ${usage.ScheduleTerm_id}")
+                        val id = usageRepository.insert(usage)
+                        Log.i("usageeee", " id created = $id")
+                        // homeUiState.usageList.add(usage)
+                        homeUiState.usageList.add(
+                            UsageDetails(
+                                id = id.toInt(),
+                                date = eventTime,
+                                dose = scheduleTerm.dose,
+                                medicinDetails = scheduleDetail.medicinDetails
+                            )
+
+
+                        )
+                       // Log.i("usageeee", " w usageList= id= $id , date.hou")
+                    }
+
+                }
+            }
+        }
+
+
+
+    }
+
+
+    private fun isValidEventDay(scheduleTerm: ScheduleTermDetails, calendar: Calendar): Boolean {
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)  // Zwraca dzień tygodnia: 1 = Niedziela, 7 = Sobota
+        Log.i("usageeee", "isValidDay  == scheudleDay: $(${scheduleTerm.day.weekDay}) ==? ${dayOfWeek}")
+        return scheduleTerm.day.weekDay == dayOfWeek  // Załóżmy, że 'dayOfWeek' w harmonogramie jest zgodne z `Calendar`
     }
 
 
 
 }
+
+data class HomeUiState(
+    var patientUiState: PatientUiState = PatientUiState(),
+    val usageList : MutableList<UsageDetails> = mutableListOf()
+ //   val usageList : List<UsageDetails> = listOf()
+)
+
 
 data class PatientScheduleDetailsInfo(
     var scheduleDetailsList: List<ScheduleDetails> = listOf()
@@ -104,12 +180,14 @@ data class ScheduleDetails(
 )
 
 data class ScheduleTermDetails(
+    var id: Int =0,
     var day: DayWeek = DayWeek.PON,
     var hour: Int =0,
     var minute: Int =0,
     var dose: Int =0
 ) {
     fun toScheduleTerm(scheduleId: Int) : ScheduleTerm = ScheduleTerm(
+        id=id,
         dose = dose,
         day =day,
         minute = minute,
@@ -117,6 +195,15 @@ data class ScheduleTermDetails(
         ScheduleId = scheduleId
     )
 }
+
+data class UsageDetails(
+    val id : Int = 0,
+    val confirmed : Boolean = false,
+    val date: Date,
+    val dose: Int = 0,
+    val medicinDetails: MedicinDetails = MedicinDetails()
+
+)
 
 
 fun ScheduleDetails.toSchedule(patiendId : Int): Schedule = Schedule(
@@ -161,6 +248,7 @@ fun Medicine.toMedicinDetails() : MedicinDetails = MedicinDetails(
 
 
 fun ScheduleTerm.toScheduleTermDetails(): ScheduleTermDetails = ScheduleTermDetails(
+    id =id,
     minute = minute,
     hour = hour,
     day = day,

@@ -3,6 +3,7 @@ package com.example.medicin_app_v2.data.scheduleTerms
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Index
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.schedule.Schedule
 
@@ -16,7 +17,8 @@ import com.example.medicin_app_v2.data.schedule.Schedule
             childColumns = ["ScheduleId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["ScheduleId"])]
 )
 
 

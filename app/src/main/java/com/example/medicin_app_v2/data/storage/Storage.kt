@@ -2,6 +2,7 @@ package com.example.medicin_app_v2.data.storage
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.medicin_app_v2.data.medicine.Medicine
 
@@ -14,7 +15,8 @@ import com.example.medicin_app_v2.data.medicine.Medicine
             childColumns = ["Medicineid"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["Medicineid"])]
 )
 data class Storage(
     @PrimaryKey(autoGenerate = true)

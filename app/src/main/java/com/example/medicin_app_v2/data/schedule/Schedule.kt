@@ -1,6 +1,7 @@
 package com.example.medicin_app_v2.data.schedule
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.example.medicin_app_v2.data.DayWeek
@@ -25,7 +26,9 @@ import java.util.Date
             childColumns = ["Medicine_id"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["Medicine_id"]), Index(value = ["Patient_id"])]
+
 )
 data class Schedule(
     @PrimaryKey(autoGenerate = true)

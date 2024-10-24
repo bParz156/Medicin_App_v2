@@ -32,9 +32,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.ui.MedicinTopAppBar
 import com.example.medicin_app_v2.R
+import com.example.medicin_app_v2.data.DayWeek
+import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.data.schedule.Schedule
@@ -45,6 +48,8 @@ import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.PatientViewModel
 import com.example.medicin_app_v2.ui.toPatient
+import java.util.Calendar
+import java.util.Date
 
 
 object HomeDestination : NavigationDestination {
@@ -78,11 +83,11 @@ fun HomeScreen(
         topBar = {CommunUI(
             location = Location.HOME,
             onButtonHomeClick = onButtonHomeClick,
-            onButtonMagazynClicked = { onButtonMagazynClicked(viewModel.homeUiState.patientDetails.id)},
-            onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.homeUiState.patientDetails.id)},
+            onButtonMagazynClicked = { onButtonMagazynClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
+            onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
-            onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientDetails.id)},
+            onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName()
         )}
     ) {  innerPadding ->
@@ -105,8 +110,12 @@ private fun HomeBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-
+        Log.i("homeeee", "in homebody")
+        Log.i("homeeee", "name: "+ homeViewModel.homeUiState.patientUiState.patientDetails.name)
         if (homeViewModel.getPatientsName().isEmpty()) {
+         //   Log.i("homeeee", "list empty? "+
+            //    homeViewModel.homeUiState.usageList.isEmpty().toString()
+         //       )
             Text(
                 text = stringResource(R.string.no_patient),
                 textAlign = TextAlign.Center,
@@ -114,15 +123,16 @@ private fun HomeBody(
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            //medicinRemainders(scheduleList =homeViewModel.patientsSchedule.scheduleDetailsList ,
-             //   contentPadding = contentPadding)
+            Log.i("homeeee", "in else")
+            MedicinRemainders(scheduleList =homeViewModel.homeUiState.usageList ,
+                contentPadding = contentPadding)
         }
     }
 }
-/*
+
 @Composable
-fun medicinRemainders(
-    scheduleList: List<ScheduleDetails>,
+fun MedicinRemainders(
+    scheduleList: List<UsageDetails>,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
 {
@@ -140,12 +150,16 @@ fun medicinRemainders(
     else {
         LazyColumn(modifier = Modifier.padding(contentPadding)) {
 
-            items(items = scheduleList, key = { it.day })
+            items(items = scheduleList, key = { it.id })
             { schedule ->
+                Log.i("homeeee", schedule.medicinDetails.name)
                 medicinCard(
                     schedule.medicinDetails.name,
-                    schedule.day, schedule.hour,
-                    schedule.dose, schedule.medicinDetails.form
+                    schedule.date,
+                    schedule.dose, schedule.medicinDetails.form,
+                    mealRelation = schedule.medicinDetails.relation,
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_small))
                 )
             }
 
@@ -155,22 +169,39 @@ fun medicinRemainders(
 }
 
 
+
+
+
 @Composable
 fun medicinCard(
     medicinName: String,
-    day: Int,
-    hour: Int,
+    date: Date,
     dose: Int,
-    medicinForm: MedicinForm
+    medicinForm: MedicinForm,
+    mealRelation: MealRelation,
+    modifier: Modifier = Modifier
 )
 {
+    val calendar = Calendar.getInstance()
+    calendar.time = date
+
+    // Pobieranie poszczególnych elementów daty
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) + 1  // Miesiące zaczynają się od 0
+    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)  // Dzień tygodnia (1=Sunday, 7=Saturday)
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)  // Godzina w formacie 24-godzinnym
+    val minute = calendar.get(Calendar.MINUTE)
+    Log.i("usage date","${medicinName} $hour:$minute dayofweek : $dayOfWeek  $dayOfMonth.$month.$year")
+
     Card(
-        modifier = Modifier,
+        modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row()
-        {
-            Column()
+
+            Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
             {
 
                 Text(
@@ -181,14 +212,14 @@ fun medicinCard(
                 )
 
                 Text(
-                    text = "dawka: $dose  ${medicinForm.name}",
+                    text = "dawka: $dose  ${medicinForm.name} $mealRelation",
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center,
                 )
-            }
+
 
             Text(
-                text = "Dzien przyjecia: $day godzina: $hour",
+                text = "Dzien przyjecia: $dayOfWeek ($dayOfMonth.$month) - godzina: $hour:$minute",
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
             )
@@ -196,4 +227,5 @@ fun medicinCard(
     }
 }
 
- */
+
+
