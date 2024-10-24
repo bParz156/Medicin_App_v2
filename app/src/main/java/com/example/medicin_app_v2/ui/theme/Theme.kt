@@ -274,6 +274,7 @@ fun Medicin_App_v2Theme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography,
+        shapes = Shapes,
         content = content
     )
 }

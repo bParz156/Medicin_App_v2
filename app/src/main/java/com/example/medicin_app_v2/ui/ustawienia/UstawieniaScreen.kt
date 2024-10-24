@@ -33,7 +33,7 @@ fun UstawieniaScreen(onButtonHomeClick: () -> Unit ,
 
     Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {CommunUI(
-            location = Location.POWIADOMIENIA,
+            location = Location.USTAWIENIA,
             onButtonHomeClick = onButtonHomeClick,
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,

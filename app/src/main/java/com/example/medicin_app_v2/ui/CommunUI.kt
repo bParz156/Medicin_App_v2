@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -35,10 +36,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,15 +76,15 @@ fun CommunUI(
         .background(color = MaterialTheme.colorScheme.background))
     {
         MedicinTopAppBar(location = location, scrollBehavior = scrollBehavior, onButtonHomeClick = onButtonHomeClick)
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        HorizontalDivider(thickness = dimensionResource(R.dimen.padding_very_small), color = MaterialTheme.colorScheme.outline)
         PatientBar(onPatientsButtonCLick = onButtonPatientClicked, patientsName = patientsName?: "Nie wybrano pacjenta" , onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             isAtUstawienie = location==Location.USTAWIENIA)
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        HorizontalDivider(thickness = dimensionResource(R.dimen.padding_very_small), color = MaterialTheme.colorScheme.outline)
         MedicinNavigationBar(location=location,
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
-            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked)
+        HorizontalDivider(thickness = dimensionResource(R.dimen.padding_very_small), color = MaterialTheme.colorScheme.outline)
     }
 }
 
@@ -100,20 +104,30 @@ fun MedicinTopAppBar(
         modifier= modifier,
         scrollBehavior = scrollBehavior,
         navigationIcon = {
-            IconButton(onClick = onButtonHomeClick,
-                enabled = location!=Location.HOME,
-                modifier = Modifier
-                    .background(color = if(location==Location.HOME) MaterialTheme.colorScheme.secondaryContainer
-                    else MaterialTheme.colorScheme.tertiaryContainer)
+
+            ButtonIcon(
+                onButtonCLick = onButtonHomeClick,
+                isSelected = location == Location.HOME,
+                labelTextId = Location.HOME.title,
+                imageVector = Icons.Filled.Home,
+                showLabel = false
             )
-            {
-                Icon(
-                    imageVector = Icons.Filled.Home,
-                    contentDescription = "Home",
-                    tint = if(location==Location.HOME) MaterialTheme.colorScheme.onSecondaryContainer
-                    else MaterialTheme.colorScheme.onTertiaryContainer
-                )
-            }
+//
+//            IconButton(onClick = onButtonHomeClick,
+//                enabled = location!=Location.HOME,
+//                modifier = Modifier
+//                    .background(color = if(location==Location.HOME) MaterialTheme.colorScheme.primaryContainer
+//                    else MaterialTheme.colorScheme.secondaryContainer,
+//                    shape =MaterialTheme.shapes.small)
+//            )
+//            {
+//                Icon(
+//                    imageVector = Icons.Filled.Home,
+//                    contentDescription = "Home",
+//                    tint = if(location==Location.HOME) MaterialTheme.colorScheme.onPrimaryContainer
+//                    else MaterialTheme.colorScheme.onSecondaryContainer
+//                )
+//            }
         }
     )
 }
@@ -126,32 +140,54 @@ fun PatientBar(
     isAtUstawienie: Boolean,
     modifier: Modifier = Modifier,
 ) {
+
     Row(modifier = modifier
-        .wrapContentSize().fillMaxWidth(),
+        .wrapContentSize().fillMaxWidth()
+        .background(color = MaterialTheme.colorScheme.secondaryContainer),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        ButtonIcon(
+            onButtonCLick =  onPatientsButtonCLick,
+            isSelected = false,
+            labelTextId = Location.PACJENCI.title,
+            imageVector = Icons.Filled.Person,
+            showLabel = false
+        )
+
+        /*
         IconButton(onClick = onPatientsButtonCLick,
             modifier = Modifier.padding(start=dimensionResource(R.dimen.padding_small))
-                .background(color  =MaterialTheme.colorScheme.tertiaryContainer))
+                .background(color = MaterialTheme.colorScheme.tertiaryContainer,
+                    shape =MaterialTheme.shapes.small))
         {
            Icon(imageVector = Icons.Filled.Person,
                contentDescription = "Patient",
                tint = MaterialTheme.colorScheme.onTertiaryContainer)
         }
 
-        Text(text=patientsName,
+         */
+
+        Text(text=if(patientsName.isNotBlank()) patientsName else "Wybierz pacjenta",
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(start=dimensionResource(R.dimen.padding_medium))
                 .weight(1f))
 
-        IconButton(onClick = onButtonUstawieniaClicked,
-            modifier = Modifier.padding(end=dimensionResource(R.dimen.padding_small))
-                .background(color = if(isAtUstawienie) MaterialTheme.colorScheme.secondaryContainer
-                else MaterialTheme.colorScheme.tertiaryContainer))
-        {
-            Icon(imageVector = Icons.Filled.Settings, contentDescription = Location.USTAWIENIA.name)
-        }
+        ButtonIcon(onButtonCLick = onButtonUstawieniaClicked,
+            isSelected = isAtUstawienie,
+            labelTextId = Location.USTAWIENIA.title,
+            imageVector = Icons.Filled.Settings,
+            showLabel = false
+            )
+//        IconButton(onClick = onButtonUstawieniaClicked,
+//            modifier = Modifier.padding(end=dimensionResource(R.dimen.padding_small))
+//                .background(color = if(isAtUstawienie) MaterialTheme.colorScheme.secondaryContainer
+//                else MaterialTheme.colorScheme.tertiaryContainer,
+//                    shape =MaterialTheme.shapes.small)
+//        )
+//        {
+//            Icon(imageVector = Icons.Filled.Settings, contentDescription = Location.USTAWIENIA.name)
+//        }
 
     }
 }
@@ -163,69 +199,92 @@ fun MedicinNavigationBar(
     onButtonMagazynClicked: () ->Unit,
     onButtonZaleceniaClicked: () ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
-    onButtonUstawieniaClicked: () ->Unit,
     modifier: Modifier = Modifier,
 ) {
 
-    val navigatitionBarColors=NavigationBarItemColors(
-        selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        selectedIndicatorColor= MaterialTheme.colorScheme.secondaryContainer,
-        unselectedIconColor=MaterialTheme.colorScheme.onTertiaryContainer,
-        unselectedTextColor=MaterialTheme.colorScheme.onTertiaryContainer,
-        disabledIconColor=MaterialTheme.colorScheme.onTertiaryContainer,
-        disabledTextColor=MaterialTheme.colorScheme.onTertiaryContainer
-    )
-
-
-    NavigationBar(modifier=modifier
-        .background(color = MaterialTheme.colorScheme.tertiary)
-        .padding(dimensionResource(R.dimen.padding_very_small)))
-    {
+    Row(
+        modifier = modifier
+            .wrapContentSize().fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.secondaryContainer),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         //MAGAZYN
-        NavigationBarItem(selected = (location==Location.MAGAZYN),
-            onClick = onButtonMagazynClicked,
-            icon = { Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = Location.MAGAZYN.name) },
-            label = {Text(text=Location.MAGAZYN.name, textAlign = TextAlign.Center,
-                fontWeight = if(location==Location.MAGAZYN) FontWeight.Bold else FontWeight.Normal,
-               // color = MaterialTheme.colorScheme.onTertiaryContainer
-            )},
-            colors =  navigatitionBarColors
-            )
-
-        //ZALECENIA
-        NavigationBarItem(selected = (location==Location.ZALECENIA),
-            onClick = onButtonZaleceniaClicked,
-            icon = { Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = Location.ZALECENIA.name) },
-            label = {Text(text=Location.ZALECENIA.name, textAlign = TextAlign.Center,
-                fontWeight = if(location==Location.ZALECENIA) FontWeight.Bold else FontWeight.Normal,
-              //  color = MaterialTheme.colorScheme.onTertiaryContainer
-            )},
-            colors= navigatitionBarColors
-            )
-
-        //POWIADOMIENIA
-        NavigationBarItem(selected = (location==Location.POWIADOMIENIA),
-            onClick = onButtonPowiadomieniaClicked,
-            icon = { Icon(imageVector = Icons.Filled.Notifications, contentDescription = Location.POWIADOMIENIA.name) },
-            label = {Text(text=Location.POWIADOMIENIA.name, textAlign = TextAlign.Center,
-                fontWeight = if(location==Location.POWIADOMIENIA) FontWeight.Bold else FontWeight.Normal,
-             //   color = MaterialTheme.colorScheme.onTertiaryContainer
-            )},
-            colors = navigatitionBarColors
+        ButtonIcon(onButtonCLick = onButtonMagazynClicked,
+            isSelected = location==Location.MAGAZYN,
+            labelTextId = Location.MAGAZYN.title,
+            imageVector = Icons.Filled.ShoppingCart,
+            modifier = Modifier.weight(1f)
         )
-//
-//        //USTAWIENIA
-//        NavigationBarItem(selected = (location==Location.USTAWIENIA),
-//            onClick = onButtonUstawieniaClicked,
-//            icon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = Location.USTAWIENIA.name) },
-//            label = {Text(text=Location.USTAWIENIA.name, textAlign = TextAlign.Center,
-//                fontWeight = if(location==Location.USTAWIENIA) FontWeight.Bold else FontWeight.Normal)}
-//            )
+        //ZALECENIA
+        ButtonIcon(onButtonCLick = onButtonZaleceniaClicked,
+            isSelected = location==Location.ZALECENIA,
+            labelTextId = Location.ZALECENIA.title,
+            imageVector = Icons.AutoMirrored.Filled.List,
+            modifier = Modifier.weight(1f)
+        )
+        //POWIADOMIENIA
+        ButtonIcon(onButtonCLick = onButtonPowiadomieniaClicked,
+            isSelected = location==Location.POWIADOMIENIA,
+            labelTextId = Location.POWIADOMIENIA.title,
+            imageVector = Icons.Filled.Notifications,
+            modifier = Modifier.weight(1f)
+        )
 
+    }
+}
+
+@Composable
+fun ButtonIcon(
+    onButtonCLick: () -> Unit,
+    isSelected : Boolean,
+    @StringRes labelTextId: Int,
+    imageVector: ImageVector,
+    showLabel: Boolean = true,
+    modifier: Modifier = Modifier
+)
+{
+    IconButton(
+        onClick = onButtonCLick,
+        modifier = modifier.padding(start = dimensionResource(R.dimen.padding_small))
+            .background(
+                color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.tertiaryContainer,
+            )
+            .wrapContentSize()
+    )
+    {
+        Column(
+//            modifier = Modifier
+//                .background(
+//                    color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
+//                    else MaterialTheme.colorScheme.tertiaryContainer,
+//                    shape = if(!showLabel) MaterialTheme.shapes.small else MaterialTheme.shapes.extraLarge
+//                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+
+        ) {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = stringResource(labelTextId),
+                tint = if(isSelected) MaterialTheme.colorScheme.onSecondaryContainer
+                else MaterialTheme.colorScheme.onTertiaryContainer
+            )
+            if(showLabel) {
+                Text(
+                    text = stringResource(labelTextId), textAlign = TextAlign.Center,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer
+                    else MaterialTheme.colorScheme.onTertiaryContainer
+                )
+            }
+        }
     }
 
 }
+
+
 
 
 /*
@@ -251,7 +310,7 @@ fun MedicinTopBarPreviewNotHome()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true)
+@Preview()
 fun CommunUIPreviw()
 {
     val location = Location.POWIADOMIENIA

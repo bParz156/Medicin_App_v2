@@ -2,6 +2,7 @@ package com.example.medicin_app_v2.ui.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -108,7 +109,8 @@ private fun HomeBody(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+        modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background),
     ) {
         Log.i("homeeee", "in homebody")
         Log.i("homeeee", "name: "+ homeViewModel.homeUiState.patientUiState.patientDetails.name)
@@ -121,6 +123,7 @@ private fun HomeBody(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
+                color = MaterialTheme.colorScheme.onBackground
             )
         } else {
             Log.i("homeeee", "in else")
@@ -144,11 +147,13 @@ fun MedicinRemainders(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(contentPadding),
+            color = MaterialTheme.colorScheme.onBackground
         )
 
     }
     else {
-        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+        LazyColumn(modifier = Modifier.padding(contentPadding)
+            .background(color = MaterialTheme.colorScheme.background)) {
 
             items(items = scheduleList, key = { it.id })
             { schedule ->
@@ -160,6 +165,7 @@ fun MedicinRemainders(
                     mealRelation = schedule.medicinDetails.relation,
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
+                        .background(color = MaterialTheme.colorScheme.primaryContainer)
                 )
             }
 
@@ -208,13 +214,15 @@ fun medicinCard(
                     text = medicinName,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.wrapContentSize().fillMaxWidth()
+                    modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
                 Text(
                     text = "dawka: $dose  ${medicinForm.name} $mealRelation",
                     style = MaterialTheme.typography.labelMedium,
                     textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
 
@@ -222,6 +230,7 @@ fun medicinCard(
                 text = "Dzien przyjecia: $dayOfWeek ($dayOfMonth.$month) - godzina: $hour:$minute",
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
