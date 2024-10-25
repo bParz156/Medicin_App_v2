@@ -37,13 +37,13 @@
 
     <string name="PatientsListDialog">Wszyscy pacjenci</string>
     <string name="PatientsListDialogText">Wybierz pacjenta, którego opieką chcesz się zająć klikając w jego imię</string>
-    <string name="new_patient">Dodaj pacjenta</string>
+    <string name="new_patient">Dodaj </string>
     <string name="back">"Wróć"</string>
     <string name="no_patient">Wygląda na to, że nie dodano jeszcze żadnego pacjenta, aby móc zacząć korzystać z aplikaci należy dodać pacjenta</string>
     <string name="delete_patient">Usuń pacjenta</string>
 
     <string name="add_pateint_title">Dodawanie nowego pacjenta</string>
-    <string name="requiered_to_add">Podaj imię i nazwisko pacjenta</string>
+    <string name="requiered_to_add">Podaj imię pacjenta</string>
     <string name="confirm">Potwierdź</string>
 
     <string name="delete_patient_title">Usuwanie pacjenta</string>

@@ -107,7 +107,7 @@ fun ZaleceniaScreen(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(
         topBar = {CommunUI(
             location = Location.ZALECENIA,
             onButtonHomeClick = {onButtonHomeClick(viewModel.patientUiState.patientDetails.id)},
@@ -116,7 +116,8 @@ fun ZaleceniaScreen(
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.patientUiState.patientDetails.id)},
-            patientsName = viewModel.getPatientsName()
+            patientsName = viewModel.getPatientsName(),
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         )}
     ) {  innerPadding ->
 

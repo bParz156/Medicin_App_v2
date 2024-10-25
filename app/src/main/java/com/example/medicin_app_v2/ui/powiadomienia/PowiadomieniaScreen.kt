@@ -31,7 +31,7 @@ fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(
         topBar = {CommunUI(
             location = Location.POWIADOMIENIA,
             onButtonHomeClick = onButtonHomeClick,
@@ -39,7 +39,8 @@ fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
-            onButtonPatientClicked = onButtonPatientClicked
+            onButtonPatientClicked = onButtonPatientClicked,
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         )}
     ) {  innerPadding ->
         PowiadomieniaBody(

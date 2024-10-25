@@ -3,10 +3,13 @@ package com.example.medicin_app_v2.ui
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,8 +39,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -46,6 +51,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -99,12 +105,14 @@ fun MedicinTopAppBar(
 ) {
     CenterAlignedTopAppBar(
         title = {Text(text =stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onPrimary
         )},
-        modifier= modifier,
+        modifier= modifier
+            .wrapContentSize().fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.primary),
         scrollBehavior = scrollBehavior,
         navigationIcon = {
-
             ButtonIcon(
                 onButtonCLick = onButtonHomeClick,
                 isSelected = location == Location.HOME,
@@ -136,7 +144,7 @@ fun MedicinTopAppBar(
 fun PatientBar(
     onPatientsButtonCLick : () -> Unit,
     onButtonUstawieniaClicked: () -> Unit,
-    patientsName : String = "Wybierz pacjenta",
+    patientsName : String = "Nie wybrano pacjenta",
     isAtUstawienie: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -152,7 +160,8 @@ fun PatientBar(
             isSelected = false,
             labelTextId = Location.PACJENCI.title,
             imageVector = Icons.Filled.Person,
-            showLabel = false
+            showLabel = false,
+            modifier = Modifier.weight(1f)
         )
 
         /*
@@ -170,14 +179,21 @@ fun PatientBar(
 
         Text(text=if(patientsName.isNotBlank()) patientsName else "Wybierz pacjenta",
             textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start=dimensionResource(R.dimen.padding_medium))
-                .weight(1f))
+                .weight(2f)
+                .alpha(0.7f)
+                .background(color = MaterialTheme.colorScheme.secondary,
+                    shape = RectangleShape),
+            color = MaterialTheme.colorScheme.onSecondary
+        )
 
         ButtonIcon(onButtonCLick = onButtonUstawieniaClicked,
             isSelected = isAtUstawienie,
             labelTextId = Location.USTAWIENIA.title,
             imageVector = Icons.Filled.Settings,
-            showLabel = false
+            showLabel = false,
+            modifier = Modifier.weight(1f)
             )
 //        IconButton(onClick = onButtonUstawieniaClicked,
 //            modifier = Modifier.padding(end=dimensionResource(R.dimen.padding_small))
@@ -205,7 +221,8 @@ fun MedicinNavigationBar(
     Row(
         modifier = modifier
             .wrapContentSize().fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.secondaryContainer),
+            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+            .padding(vertical =  dimensionResource(R.dimen.padding_small)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -244,16 +261,17 @@ fun ButtonIcon(
     modifier: Modifier = Modifier
 )
 {
-    IconButton(
-        onClick = onButtonCLick,
-        modifier = modifier.padding(start = dimensionResource(R.dimen.padding_small))
-            .background(
-                color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
-                else MaterialTheme.colorScheme.tertiaryContainer,
-            )
-            .wrapContentSize()
-    )
-    {
+//    IconButton(
+//        onClick = onButtonCLick,
+//        modifier = modifier.padding(start = dimensionResource(R.dimen.padding_small))
+//            .background(
+//                color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
+//                else MaterialTheme.colorScheme.tertiaryContainer,
+//                shape = MaterialTheme.shapes.medium
+//            )
+//            .wrapContentSize()
+//    )
+//    {
         Column(
 //            modifier = Modifier
 //                .background(
@@ -262,7 +280,16 @@ fun ButtonIcon(
 //                    shape = if(!showLabel) MaterialTheme.shapes.small else MaterialTheme.shapes.extraLarge
 //                ),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
+                .background(
+                    color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
+                    else MaterialTheme.colorScheme.tertiaryContainer,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .wrapContentSize()
+                .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                .clickable (onClick = onButtonCLick, enabled = !isSelected)
 
         ) {
             Icon(
@@ -280,7 +307,7 @@ fun ButtonIcon(
                 )
             }
         }
-    }
+  //  }
 
 }
 

@@ -18,3 +18,7 @@ enum class DayWeek(@StringRes val title: Int, val weekDay: Int) {
     SB(title= R.string.sb, weekDay = 7),
     ND(title= R.string.nd, weekDay = 1)
 }
+
+fun getDayWeekByWeekDay(weekDay: Int) : DayWeek?{
+    return DayWeek.values().firstOrNull { it.weekDay == weekDay }
+}

@@ -84,7 +84,28 @@ class HomeViewModel (
                     )
                 })
 
-            genereteUsagesForNextPeriodOfTime(7)
+            for(scheduleDetail in patientsSchedule.scheduleDetailsList)
+            {
+                for(scheduleTerm in scheduleDetail.scheduleTermDetailsList)
+                {
+                    val usageList = usageRepository.getAllScheduleTermUsages(scheduleTerm.id).filterNotNull().first()
+
+                    for(usage in usageList)
+                    {
+                        homeUiState.usageMapDay.getOrPut(usage.date) { mutableListOf() }.add(UsageDetails(
+                            id = usage.id,
+                            date = usage.date,
+                            dose = scheduleTerm.dose,
+                            medicinDetails = scheduleDetail.medicinDetails,
+                            confirmed = usage.confirmed
+                        ))
+
+                    }
+
+                }
+            }
+
+        //    genereteUsagesForNextPeriodOfTime(7)
         }
         }
     }
@@ -123,17 +144,15 @@ class HomeViewModel (
                         Log.i("usageeee", " Create usage scheudle Term = ${usage.ScheduleTerm_id}")
                         val id = usageRepository.insert(usage)
                         Log.i("usageeee", " id created = $id")
-                        // homeUiState.usageList.add(usage)
-                        homeUiState.usageList.add(
-                            UsageDetails(
-                                id = id.toInt(),
-                                date = eventTime,
-                                dose = scheduleTerm.dose,
-                                medicinDetails = scheduleDetail.medicinDetails
-                            )
-
-
-                        )
+//                        // homeUiState.usageList.add(usage)
+////                        homeUiState.usageList.add(
+////                            UsageDetails(
+////                                id = id.toInt(),
+////                                date = eventTime,
+////                                dose = scheduleTerm.dose,
+////                                medicinDetails = scheduleDetail.medicinDetails
+////                            )
+//                        )
                        // Log.i("usageeee", " w usageList= id= $id , date.hou")
                     }
 
@@ -158,7 +177,7 @@ class HomeViewModel (
 
 data class HomeUiState(
     var patientUiState: PatientUiState = PatientUiState(),
-    val usageList : MutableList<UsageDetails> = mutableListOf()
+    val usageMapDay: MutableMap<Date, MutableList<UsageDetails>> = mutableMapOf()
  //   val usageList : List<UsageDetails> = listOf()
 )
 
@@ -195,6 +214,8 @@ data class ScheduleTermDetails(
         ScheduleId = scheduleId
     )
 }
+
+
 
 data class UsageDetails(
     val id : Int = 0,

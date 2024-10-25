@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +38,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -47,10 +54,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
+import com.example.medicin_app_v2.ui.ButtonIcon
 import com.example.medicin_app_v2.ui.PatientDetails
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.PatientViewModel
@@ -81,14 +90,14 @@ fun PatientsListScreen(
 {
     Log.i("startOFScreen", "Przed czymkowliek")
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+  //  val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var openDialog  = remember { mutableStateOf(false)}
     val patientsListviewModel = viewModel.patientslistUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Log.i("startOFScreen", "86")
 
-    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(
         topBar = {
             DialogTopBar(onBack = onBack , onAdd = {
                 openDialog.value=true
@@ -134,48 +143,56 @@ private fun DialogTopBar(
 {
     Column(modifier = modifier
         .wrapContentSize()
-        .padding(dimensionResource(R.dimen.padding_small))
+        .padding(dimensionResource(R.dimen.padding_medium))
     ) {
-        Text(text = stringResource(R.string.PatientsListDialog),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_large)))
 
-        Text(text = stringResource(R.string.PatientsListDialogText),
-            textAlign = TextAlign.Justify,
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium)))
-
-
-
-        NavigationBar(modifier = modifier
-            .padding(dimensionResource(R.dimen.padding_small))
-            ) {
-                NavigationBarItem(selected = false, onClick = onBack,
-                    icon = {Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                    )},
-                    label = {Text(text =stringResource(R.string.back),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
+        Row(modifier =Modifier
+            .wrapContentSize().fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.primary),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        )
+        {
+            ButtonIcon(onButtonCLick = onBack,
+                isSelected = false,
+                labelTextId = R.string.back,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                modifier = Modifier.weight(1f)
                 )
 
-                NavigationBarItem(selected = false, onClick = onAdd,
-                    icon = {Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.new_patient)
-                    )},
-                    label = {Text(text =stringResource(R.string.new_patient),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
-                )
+
+            Text(text = stringResource(R.string.PatientsListDialog),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_large))
+                  //  .background(color= MaterialTheme.colorScheme.primary)
+                    .weight(3f),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            ButtonIcon(
+                onButtonCLick = onAdd,
+                imageVector = Icons.Filled.Add,
+                labelTextId = R.string.new_patient,
+                isSelected = false,
+                modifier = Modifier.weight(1f)
+            )
 
         }
+
+
+
+        Text(text = stringResource(R.string.PatientsListDialogText),
+            textAlign = TextAlign.Start,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(vertical =  dimensionResource(R.dimen.padding_medium))
+                .background(color= MaterialTheme.colorScheme.primaryContainer)
+                .fillMaxWidth(),
+            color= MaterialTheme.colorScheme.onPrimaryContainer
+        )
+
 
     }
 }
@@ -209,8 +226,8 @@ private fun PatientsList(
                 Row(
                     modifier = Modifier
                         .wrapContentSize().fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.padding_small))
-                        .background(if (patient == currentPatient) Color.Yellow else Color.Transparent),
+                        .padding(dimensionResource(R.dimen.padding_small)),
+                     //   .background(if (patient == currentPatient) Color.Yellow else Color.Transparent),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 )
@@ -221,6 +238,8 @@ private fun PatientsList(
                                 start = dimensionResource(R.dimen.padding_medium),
                                 end = dimensionResource(R.dimen.padding_small)
                             )
+                            .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                            //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                             .weight(1f)
                             .clickable {viewModel.updatePatientUiState(patientDetails = patient.toPatientDetails())
                                 viewModel.updatetUiState(patientDetails = patient.toPatientDetails())
@@ -231,11 +250,15 @@ private fun PatientsList(
                     Icon(imageVector = Icons.Filled.Delete,
                         modifier = Modifier
                             .padding(end = dimensionResource(R.dimen.padding_small))
+                            .background(color = MaterialTheme.colorScheme.secondaryContainer)
                             .clickable {
                                 viewModel.updatePatientUiState(patientDetails = patient.toPatientDetails())
                                 Log.i("delete", "pacjent do usuniecia ${viewModel.patientUiState.patientDetails.name}")
                                 openDialog.value = true
-                            },
+                            }
+                            .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                        ,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentDescription = stringResource(R.string.delete_patient)
                     )
                 }
@@ -262,17 +285,26 @@ private fun PatientsList(
 @Composable
 private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
 {
+    val cardColors = CardColors(
+        containerColor = MaterialTheme.colorScheme.secondary,
+        contentColor = MaterialTheme.colorScheme.onSecondary,
+        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        disabledContentColor = MaterialTheme.colorScheme.surfaceTint
+    )
+
 
     Card(
         modifier = modifier,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small)),
+        colors = cardColors
     ) {
 
         Text(
             text = patient.name,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            modifier = Modifier.wrapContentSize().fillMaxWidth()
+            modifier = Modifier.wrapContentSize().fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
 }
@@ -288,67 +320,77 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
         onDismissRequest = onDismiss,
         modifier = Modifier
             .padding(dimensionResource(R.dimen.padding_small))
+            .background(color = MaterialTheme.colorScheme.tertiary)
     )
     {
         Column(modifier = Modifier
             .wrapContentSize()
             .padding(dimensionResource(R.dimen.padding_small))
-            .background(color = Color.Cyan)
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Text(text = stringResource(R.string.add_pateint_title),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_large)))
+                    .padding(dimensionResource(R.dimen.padding_large)),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
 
             Text(text = stringResource(R.string.requiered_to_add),
-                textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium)))
+                    .padding(dimensionResource(R.dimen.padding_medium)),
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
 
             TextField( value = patientName,
                 onValueChange = {patientName = it
                                 onValueChange(patientsDetails.copy(name=it))},
-                placeholder = { Text("Podaj imię i nazwisko")})
+                placeholder = { Text(stringResource(R.string.requiered_to_add))},
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_small))
+                    .background(
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+            )
 
-            NavigationBar(modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_small))
-            ) {
-                NavigationBarItem(selected = false, onClick = onDismiss,
-                    icon = {Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )},
-                    label = {Text(text =stringResource(R.string.back),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
+
+            Row(
+                modifier = Modifier
+                    .wrapContentSize().fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(vertical =  dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                ButtonIcon(
+                    onButtonCLick = onDismiss,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    isSelected = false,
+                    labelTextId = R.string.back,
+                    modifier = Modifier.weight(1f)
                 )
-
-                NavigationBarItem(selected = false, onClick =
-                {
-                    Log.i("in Add","imie to $patientName")
-                    patientsDetails.name=patientName
-                    //onValueChange(patientsDetails.copy(name=patientName))
-                    Log.i("in Add","imie to ${patientsDetails.name} : ${patientsDetails.name.isNotBlank()}")
-                    if(patientsDetails.name.isNotBlank())
-                    {
-                        onAdd()
-                        Log.i("in Add, after ADD","patinetDetails ${patientsDetails.name}")
-                        onDismiss()
-                    }
-                },
-                    icon = {Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = stringResource(R.string.confirm)
-                    )},
-                    label = {Text(text =stringResource(R.string.confirm),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
+                ButtonIcon(
+                    onButtonCLick = {
+                        patientsDetails.name=patientName
+                        //onValueChange(patientsDetails.copy(name=patientName))
+                        Log.i("in Add","imie to ${patientsDetails.name} : ${patientsDetails.name.isNotBlank()}")
+                        if(patientsDetails.name.isNotBlank())
+                        {
+                            onAdd()
+                            Log.i("in Add, after ADD","patinetDetails ${patientsDetails.name}")
+                            onDismiss()
+                        }
+                    },
+                    imageVector = Icons.Filled.Check,
+                    isSelected = false,
+                    labelTextId = R.string.confirm,
+                    modifier = Modifier.weight(1f)
                 )
             }
+
         }
     }
 }

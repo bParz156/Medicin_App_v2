@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,6 +41,7 @@ import com.example.medicin_app_v2.R
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
+import com.example.medicin_app_v2.data.getDayWeekByWeekDay
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.navigation.Location
@@ -80,7 +82,7 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
 
-    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(
         topBar = {CommunUI(
             location = Location.HOME,
             onButtonHomeClick = onButtonHomeClick,
@@ -89,7 +91,8 @@ fun HomeScreen(
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
-            patientsName = viewModel.getPatientsName()
+            patientsName = viewModel.getPatientsName(),
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
         )}
     ) {  innerPadding ->
                 HomeBody(
@@ -127,7 +130,7 @@ private fun HomeBody(
             )
         } else {
             Log.i("homeeee", "in else")
-            MedicinRemainders(scheduleList =homeViewModel.homeUiState.usageList ,
+            MedicinRemainders(scheduleMap =homeViewModel.homeUiState.usageMapDay ,
                 contentPadding = contentPadding)
         }
     }
@@ -135,12 +138,12 @@ private fun HomeBody(
 
 @Composable
 fun MedicinRemainders(
-    scheduleList: List<UsageDetails>,
+    scheduleMap: Map<Date, List<UsageDetails>>,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
 {
 
-    if(scheduleList.isEmpty())
+    if(scheduleMap.isEmpty())
     {
         Text(
             text = stringResource(R.string.no_medicin),
@@ -152,23 +155,54 @@ fun MedicinRemainders(
 
     }
     else {
-        LazyColumn(modifier = Modifier.padding(contentPadding)
-            .background(color = MaterialTheme.colorScheme.background)) {
+        LazyColumn(
+            modifier = Modifier.padding(contentPadding)
+                .background(color = MaterialTheme.colorScheme.background)
+        ) {
 
-            items(items = scheduleList, key = { it.id })
-            { schedule ->
-                Log.i("homeeee", schedule.medicinDetails.name)
-                medicinCard(
-                    schedule.medicinDetails.name,
-                    schedule.date,
-                    schedule.dose, schedule.medicinDetails.form,
-                    mealRelation = schedule.medicinDetails.relation,
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_small))
-                        .background(color = MaterialTheme.colorScheme.primaryContainer)
-                )
+            scheduleMap.forEach { (date, usageList) ->
+
+                val calendar = Calendar.getInstance()
+                calendar.time = date
+
+                // Pobieranie poszczególnych elementów daty
+                val month = calendar.get(Calendar.MONTH) + 1  // Miesiące zaczynają się od 0
+                val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+                val dayWeek = getDayWeekByWeekDay(calendar.get(Calendar.DAY_OF_WEEK) )?.title
+
+                item {
+                    Text(
+                        text = "${dayWeek?.let { stringResource(it) }} $dayOfMonth.$month",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(color = MaterialTheme.colorScheme.primary),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    HorizontalDivider(
+                        thickness = dimensionResource(R.dimen.padding_very_small) / 2,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+
+
+                items(usageList)
+                { schedule ->
+                    Log.i("homeeee", schedule.medicinDetails.name)
+                    medicinCard(
+                        schedule.medicinDetails.name,
+                        schedule.date,
+                        schedule.dose, schedule.medicinDetails.form,
+                        mealRelation = schedule.medicinDetails.relation,
+                        modifier = Modifier
+                            .padding(dimensionResource(id = R.dimen.padding_small))
+                            .background(color = MaterialTheme.colorScheme.primaryContainer)
+                    )
+                }
+
             }
-
         }
     }
 
@@ -192,13 +226,13 @@ fun medicinCard(
     calendar.time = date
 
     // Pobieranie poszczególnych elementów daty
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH) + 1  // Miesiące zaczynają się od 0
-    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+ //   val year = calendar.get(Calendar.YEAR)
+ //   val month = calendar.get(Calendar.MONTH) + 1  // Miesiące zaczynają się od 0
+ //   val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
     val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)  // Dzień tygodnia (1=Sunday, 7=Saturday)
     val hour = calendar.get(Calendar.HOUR_OF_DAY)  // Godzina w formacie 24-godzinnym
     val minute = calendar.get(Calendar.MINUTE)
-    Log.i("usage date","${medicinName} $hour:$minute dayofweek : $dayOfWeek  $dayOfMonth.$month.$year")
+    Log.i("usage date","${medicinName} $hour:$minute ")
 
     Card(
         modifier = modifier,
@@ -227,7 +261,7 @@ fun medicinCard(
 
 
             Text(
-                text = "Dzien przyjecia: $dayOfWeek ($dayOfMonth.$month) - godzina: $hour:$minute",
+                text = "godzina: $hour:$minute",
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
