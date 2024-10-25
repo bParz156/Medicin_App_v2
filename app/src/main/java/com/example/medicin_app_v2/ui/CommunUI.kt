@@ -78,8 +78,7 @@ fun CommunUI(
     patientsName: String? = null
 )
 {
-    Column(modifier = modifier
-        .background(color = MaterialTheme.colorScheme.background))
+    Column(modifier = modifier)
     {
         MedicinTopAppBar(location = location, scrollBehavior = scrollBehavior, onButtonHomeClick = onButtonHomeClick)
         HorizontalDivider(thickness = dimensionResource(R.dimen.padding_very_small), color = MaterialTheme.colorScheme.outline)
@@ -103,23 +102,55 @@ fun MedicinTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     onButtonHomeClick: () -> Unit = {}
 ) {
-    CenterAlignedTopAppBar(
-        title = {Text(text =stringResource(R.string.app_name),
+
+    Row(modifier= modifier
+        .wrapContentSize().fillMaxWidth()
+        .background(color = MaterialTheme.colorScheme.primaryContainer)
+        .padding(vertical = dimensionResource(R.dimen.padding_large)),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
+        ButtonIcon(
+            onButtonCLick = onButtonHomeClick,
+            isSelected = location == Location.HOME,
+            labelTextId = Location.HOME.title,
+            imageVector = Icons.Filled.Home,
+            showLabel = false,
+            modifier = Modifier.weight(1f)
+        )
+
+        Text(text =stringResource(R.string.app_name),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary
-        )},
-        modifier= modifier
-            .wrapContentSize().fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.primary),
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            ButtonIcon(
-                onButtonCLick = onButtonHomeClick,
-                isSelected = location == Location.HOME,
-                labelTextId = Location.HOME.title,
-                imageVector = Icons.Filled.Home,
-                showLabel = false
-            )
+            color = MaterialTheme.colorScheme.onPrimary,
+            textAlign = TextAlign.Center,
+            modifier= modifier
+                .wrapContentSize().fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.primary)
+                .weight(2f),
+        )
+    }
+
+//    CenterAlignedTopAppBar(
+//        title = {Text(text =stringResource(R.string.app_name),
+//            style = MaterialTheme.typography.titleLarge,
+//            color = MaterialTheme.colorScheme.onPrimary,
+//            modifier= modifier
+//                .wrapContentSize().fillMaxWidth()
+//                .background(color = MaterialTheme.colorScheme.primary),
+//        )},
+//        modifier= modifier
+//            .wrapContentSize().fillMaxWidth()
+//            .background(color = MaterialTheme.colorScheme.primaryContainer),
+//        scrollBehavior = scrollBehavior,
+//        navigationIcon = {
+//            ButtonIcon(
+//                onButtonCLick = onButtonHomeClick,
+//                isSelected = location == Location.HOME,
+//                labelTextId = Location.HOME.title,
+//                imageVector = Icons.Filled.Home,
+//                showLabel = false
+//            )
 //
 //            IconButton(onClick = onButtonHomeClick,
 //                enabled = location!=Location.HOME,
@@ -136,8 +167,8 @@ fun MedicinTopAppBar(
 //                    else MaterialTheme.colorScheme.onSecondaryContainer
 //                )
 //            }
-        }
-    )
+ //       }
+//    )
 }
 
 @Composable
@@ -283,8 +314,10 @@ fun ButtonIcon(
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
                 .background(
-                    color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
-                    else MaterialTheme.colorScheme.tertiaryContainer,
+//                    color = if(isSelected) MaterialTheme.colorScheme.secondaryContainer
+//                    else MaterialTheme.colorScheme.tertiaryContainer,
+                    color = if(isSelected) MaterialTheme.colorScheme.secondary
+                    else MaterialTheme.colorScheme.tertiary,
                     shape = MaterialTheme.shapes.medium,
                 )
                 .wrapContentSize()
@@ -295,15 +328,19 @@ fun ButtonIcon(
             Icon(
                 imageVector = imageVector,
                 contentDescription = stringResource(labelTextId),
-                tint = if(isSelected) MaterialTheme.colorScheme.onSecondaryContainer
-                else MaterialTheme.colorScheme.onTertiaryContainer
+//                tint = if(isSelected) MaterialTheme.colorScheme.onSecondaryContainer
+//                else MaterialTheme.colorScheme.onTertiaryContainer
+                tint =if(isSelected) MaterialTheme.colorScheme.onSecondary
+                else MaterialTheme.colorScheme.onTertiary,
             )
             if(showLabel) {
                 Text(
                     text = stringResource(labelTextId), textAlign = TextAlign.Center,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer
-                    else MaterialTheme.colorScheme.onTertiaryContainer
+//                    color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer
+//                    else MaterialTheme.colorScheme.onTertiaryContainer
+                    color=if(isSelected) MaterialTheme.colorScheme.onSecondary
+                            else MaterialTheme.colorScheme.onTertiary
                 )
             }
         }

@@ -320,29 +320,30 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
         onDismissRequest = onDismiss,
         modifier = Modifier
             .padding(dimensionResource(R.dimen.padding_small))
-            .background(color = MaterialTheme.colorScheme.tertiary)
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
     )
     {
         Column(modifier = Modifier
             .wrapContentSize()
             .padding(dimensionResource(R.dimen.padding_small))
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+          //  .background(color = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Text(text = stringResource(R.string.add_pateint_title),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.tertiary)
                     .padding(dimensionResource(R.dimen.padding_large)),
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onTertiary
             )
 
-            Text(text = stringResource(R.string.requiered_to_add),
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium)),
-                color = MaterialTheme.colorScheme.onTertiaryContainer
-            )
+//            Text(text = stringResource(R.string.requiered_to_add),
+//                textAlign = TextAlign.Start,
+//                style = MaterialTheme.typography.titleMedium,
+//                modifier = Modifier
+//                    .padding(dimensionResource(R.dimen.padding_medium)),
+//                color = MaterialTheme.colorScheme.onTertiaryContainer
+//            )
 
             TextField( value = patientName,
                 onValueChange = {patientName = it
@@ -359,7 +360,7 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
             Row(
                 modifier = Modifier
                     .wrapContentSize().fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                    .background(color = MaterialTheme.colorScheme.tertiaryContainer)
                     .padding(vertical =  dimensionResource(R.dimen.padding_small)),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
