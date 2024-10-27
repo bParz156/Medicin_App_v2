@@ -239,7 +239,7 @@ fun medicinCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
 
-            Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+            Column(modifier = modifier.padding(dimensionResource(id = R.dimen.padding_large))
                 .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)))
             {
@@ -261,7 +261,7 @@ fun medicinCard(
 
 
             Text(
-                text = "godzina: $hour:$minute",
+                text = "godzina: ${"%02d".format(hour)}:${"%02d".format(minute)}",
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimaryContainer

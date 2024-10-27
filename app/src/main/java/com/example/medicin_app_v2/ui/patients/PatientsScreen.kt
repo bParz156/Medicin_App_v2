@@ -8,23 +8,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,35 +31,29 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
-import com.example.medicin_app_v2.ui.ButtonIcon
+import com.example.medicin_app_v2.ui.ButtonIconColumn
+import com.example.medicin_app_v2.ui.ButtonIconRow
 import com.example.medicin_app_v2.ui.PatientDetails
-import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.PatientViewModel
 import com.example.medicin_app_v2.ui.toPatient
 import com.example.medicin_app_v2.ui.toPatientDetails
-import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.launch
 
 
@@ -101,8 +89,11 @@ fun PatientsListScreen(
         topBar = {
             DialogTopBar(onBack = onBack , onAdd = {
                 openDialog.value=true
-            })
-        }
+            },
+                modifier = Modifier.background(color  =MaterialTheme.colorScheme.secondary)
+            )
+        },
+        modifier = Modifier.background(color  =MaterialTheme.colorScheme.secondary)
     ) {  innerPadding ->
 
             PatientsList(
@@ -117,6 +108,7 @@ fun PatientsListScreen(
                     navigateToPatientHome(it.id)},
                 currentPatient= viewModel.uiState.value.patientDetails.toPatient(),
                 viewModel = viewModel,
+                modifier = Modifier.background(color  =MaterialTheme.colorScheme.secondary),
                 contentPadding = innerPadding)
 
             if(openDialog.value)
@@ -153,11 +145,13 @@ private fun DialogTopBar(
             verticalAlignment = Alignment.CenterVertically
         )
         {
-            ButtonIcon(onButtonCLick = onBack,
+            ButtonIconColumn(onButtonCLick = onBack,
                 isSelected = false,
                 labelTextId = R.string.back,
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                containerColorUnselected = MaterialTheme.colorScheme.primaryContainer,
+                contentColorUnselected = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
 
@@ -171,12 +165,14 @@ private fun DialogTopBar(
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-            ButtonIcon(
+            ButtonIconColumn(
                 onButtonCLick = onAdd,
                 imageVector = Icons.Filled.Add,
                 labelTextId = R.string.new_patient,
                 isSelected = false,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                containerColorUnselected = MaterialTheme.colorScheme.primaryContainer,
+                contentColorUnselected = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
         }
@@ -220,6 +216,7 @@ private fun PatientsList(
     else {
         LazyColumn(
             modifier = modifier,
+               // .background(color  =MaterialTheme.colorScheme.secondary),
             contentPadding = contentPadding
         ) {
             items(items = patientsList, key = { it.name }) { patient ->
@@ -286,8 +283,8 @@ private fun PatientsList(
 private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
 {
     val cardColors = CardColors(
-        containerColor = MaterialTheme.colorScheme.secondary,
-        contentColor = MaterialTheme.colorScheme.onSecondary,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
         disabledContentColor = MaterialTheme.colorScheme.surfaceTint
     )
@@ -304,7 +301,7 @@ private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.wrapContentSize().fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onSecondaryContainer
+            color = cardColors.contentColor
         )
     }
 }
@@ -315,6 +312,7 @@ private fun PatientCard(patient: Patient, modifier: Modifier = Modifier)
 private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patientsDetails: PatientDetails, onValueChange: (PatientDetails)-> Unit)
 {
     var patientName by remember { mutableStateOf("") }
+    var openDialog  = remember { mutableStateOf(false)}
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -366,14 +364,14 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                ButtonIcon(
+                ButtonIconColumn(
                     onButtonCLick = onDismiss,
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     isSelected = false,
                     labelTextId = R.string.back,
                     modifier = Modifier.weight(1f)
                 )
-                ButtonIcon(
+                ButtonIconColumn(
                     onButtonCLick = {
                         patientsDetails.name=patientName
                         //onValueChange(patientsDetails.copy(name=patientName))
@@ -384,12 +382,24 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
                             Log.i("in Add, after ADD","patinetDetails ${patientsDetails.name}")
                             onDismiss()
                         }
+                        else
+                        {
+                            openDialog.value = true
+                        }
                     },
                     imageVector = Icons.Filled.Check,
                     isSelected = false,
                     labelTextId = R.string.confirm,
                     modifier = Modifier.weight(1f)
                 )
+                if(openDialog.value)
+                {
+                    missingFieldsDialog(
+                        onDismiss = {openDialog.value = false},
+                        missingValues = "Imię pacjenta"
+                    )
+                }
+
             }
 
         }
@@ -407,56 +417,137 @@ private fun DeletePatientDialog(patient: Patient, onDeleteClicked: () -> Unit, o
         onDismissRequest = onDismiss,
         modifier = Modifier
             .padding(dimensionResource(R.dimen.padding_small))
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
     )
     {
         Column(modifier = Modifier
             .wrapContentSize()
             .padding(dimensionResource(R.dimen.padding_small))
-            .background(color = Color.Cyan)
+           // .background(color = Color.Cyan)
         ) {
             Text(text = stringResource(R.string.delete_patient_title),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_large)))
+                    .background(color = MaterialTheme.colorScheme.tertiary)
+                    .padding(dimensionResource(R.dimen.padding_large)),
+                color = MaterialTheme.colorScheme.onTertiary
+            )
 
             Text(text = stringResource(R.string.are_you_sure, patient.name),
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium)))
+                    .background(color = MaterialTheme.colorScheme.tertiary)
+                    .padding(dimensionResource(R.dimen.padding_medium)),
+                color = MaterialTheme.colorScheme.onTertiary
+            )
+
+            Row(modifier = Modifier
+                .wrapContentSize().fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+                .padding(vertical =  dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically)
+            {
 
 
-            NavigationBar(modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_small))
-            ) {
-                NavigationBarItem(selected = false, onClick = onDismiss,
-                    icon = {Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )},
-                    label = {Text(text =stringResource(R.string.back),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
+                ButtonIconRow(
+                    onButtonCLick = onDismiss,
+                    isSelected = false,
+                    labelTextId = R.string.back,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    showLabel = true
                 )
 
-                NavigationBarItem(selected = false, onClick =
-                {
-                    Log.i("delete", "pacjent do usuniecia ${patient.name}")
-                    onDeleteClicked()
-                    onDismiss()
-                },
-                    icon = {Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = stringResource(R.string.delete_patient)
-                    )},
-                    label = {Text(text =stringResource(R.string.delete_patient),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
+                ButtonIconRow(
+                    onButtonCLick = { onDeleteClicked()
+                    onDismiss()},
+                    isSelected = false,
+                    labelTextId = R.string.delete_patient,
+                    imageVector = Icons.Filled.Delete,
+                    showLabel = true
                 )
+
+//                Button(onClick = onDismiss)
+//                {
+//                    Row()
+//                    {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = stringResource(R.string.back)
+//                        )
+//
+//                        Text(text=stringResource(R.string.back))
+//                    }
+//                }
+
+//                Button(onClick = {onDeleteClicked()
+//                    onDismiss()})
+//                {
+//                    Row()
+//                    {
+//                        Icon(
+//                            imageVector = Icons.Filled.Delete,
+//                            contentDescription = stringResource(R.string.delete_patient)
+//                        )
+//
+//                        Text(text=stringResource(R.string.delete_patient))
+//                    }
+//                }
+
             }
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun missingFieldsDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    missingValues: String
+)
+{
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_medium))
+            .background(color = MaterialTheme.colorScheme.errorContainer)
+    )
+    {
+        Column(modifier = Modifier
+            .wrapContentSize()
+            .padding(dimensionResource(R.dimen.padding_small)),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            Text(text="Uzupełnij brakujące informacje:",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.error)
+                    .padding(dimensionResource(R.dimen.padding_large)),
+                color = MaterialTheme.colorScheme.onError
+            )
+            Text(text= missingValues,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Justify,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.errorContainer)
+                    .padding(dimensionResource(R.dimen.padding_medium)),
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+
+            ButtonIconRow(
+                onButtonCLick = onDismiss,
+                isSelected = false,
+                labelTextId = R.string.back,
+                imageVector = Icons.Filled.Check,
+                containerColorSelected = MaterialTheme.colorScheme.error,
+                contentColorUnselected = MaterialTheme.colorScheme.onError
+            )
+
         }
     }
 }

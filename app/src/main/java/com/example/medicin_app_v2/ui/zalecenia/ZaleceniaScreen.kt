@@ -74,6 +74,7 @@ import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
+import com.example.medicin_app_v2.ui.ButtonIconRow
 import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.home.MedicinDetails
 import com.example.medicin_app_v2.ui.home.ScheduleDetails
@@ -162,13 +163,12 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                     onScheduleClick = {//TODO}
                     })
 
-                Button(onClick = {openDialog.value=true})
-                {
-                    Row() {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add))
-                        Text(stringResource(R.string.add))
-                    }
-                }
+            ButtonIconRow(
+                onButtonCLick = {openDialog.value = true},
+                labelTextId =  R.string.add,
+                isSelected = false,
+                imageVector = Icons.Filled.Add
+            )
             }
 
             if(openDialog.value)
@@ -579,12 +579,15 @@ fun medicinCard(
 )
 {
     val color by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.tertiaryContainer
-    else MaterialTheme.colorScheme.primaryContainer,
-    )
+    else MaterialTheme.colorScheme.primaryContainer)
+    val contentColor by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.onTertiaryContainer
+    else MaterialTheme.colorScheme.onPrimaryContainer)
 
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .background(color = color),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
+
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
@@ -596,19 +599,32 @@ fun medicinCard(
                 .background(color = color),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(color = color))
+            {
+                Text(
+                    text = medicinScheduleInfo.medicinDetails.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                    color = contentColor
+                )
 
-            Text(
-                text = medicinScheduleInfo.medicinDetails.name,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.wrapContentSize().fillMaxWidth()
-            )
+                Icon(
+                    imageVector = if(!expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "Rozwinięcie",
+                    tint = contentColor
+                )
 
+
+            }
 
 
             Spacer(Modifier.weight(1f))
             if (expanded) {
-                Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))) {
+                Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.schedule),
                         contentDescription = null
@@ -619,7 +635,8 @@ fun medicinCard(
                         "scheduleListSize = ${medicinScheduleInfo.scheduleList.size}"
                     )
                     for (scheduleInfo in medicinScheduleInfo.scheduleList) {
-                        Text("${stringResource(scheduleInfo.day.title)} ${scheduleInfo.hour}:${scheduleInfo.minute}  - ${scheduleInfo.dose} ${medicinScheduleInfo.medicinDetails.form}")
+                        Text(text="${stringResource(scheduleInfo.day.title)} ${"%02d".format(scheduleInfo.hour)}:${"%02d".format(scheduleInfo.minute)}  - ${scheduleInfo.dose} ${medicinScheduleInfo.medicinDetails.form}",
+                            color = contentColor)
                     }
 
                 }

@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     testImplementation(libs.junit)
 

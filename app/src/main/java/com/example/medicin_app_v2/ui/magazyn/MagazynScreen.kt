@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -48,6 +49,7 @@ import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
+import com.example.medicin_app_v2.ui.patients.missingFieldsDialog
 
 
 object MagazynDestination : NavigationDestination {
@@ -74,7 +76,7 @@ fun MagazynScreen(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Scaffold(modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(
         topBar = {CommunUI(
             location = Location.MAGAZYN,
             onButtonHomeClick = {onButtonHomeClick(viewModel.magazynUiState.patientDetails.id)},
@@ -84,7 +86,8 @@ fun MagazynScreen(
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.magazynUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName()
-        )}
+        )},
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) {  innerPadding ->
         MagazynBody(
             viewModel = viewModel,
@@ -104,23 +107,44 @@ fun MagazynBody (
     onStorageClick: (Int) -> Unit
 ) {
 
-    Column(
-        modifier = modifier.padding(contentPadding),
-    ) {
-        Text(
-            text = "Status apteczki",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(contentPadding)
-        )
 
-        MagazynList(
-            storageList = viewModel.magazynUiState.storageDetailsList,
-            //onStorageClick = {onStorageClick(it.storageId)},
-           // changingStorageDetails = viewModel.magazynUiState.changingStoragDetails,
-            onStorageClick = {viewModel.increaseStorageQuantity()},
-            contentPadding = contentPadding,
-            onValueChange = viewModel::updateUiState
-        )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .background(color = MaterialTheme.colorScheme.background),
+    ) {
+        if (viewModel.getPatientsName().isEmpty()) {
+            //   Log.i("homeeee", "list empty? "+
+            //    homeViewModel.homeUiState.usageList.isEmpty().toString()
+            //       )
+            Text(
+                text = stringResource(R.string.no_patient),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(contentPadding),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+        else {
+            Text(
+                text = "Status apteczki",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+              //  modifier = modifier.padding(contentPadding)
+               //     .background(color = MaterialTheme.colorScheme.primary),
+               // color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            MagazynList(
+                storageList = viewModel.magazynUiState.storageDetailsList,
+                //onStorageClick = {onStorageClick(it.storageId)},
+                // changingStorageDetails = viewModel.magazynUiState.changingStoragDetails,
+                onStorageClick = { viewModel.increaseStorageQuantity() },
+                contentPadding = contentPadding,
+                onValueChange = viewModel::updateUiState,
+                modifier = modifier.padding(contentPadding)
+            )
+        }
     }
 }
 
@@ -131,7 +155,8 @@ fun MagazynList(
    // changingStorageDetails: StorageDetails,
     onValueChange: (StorageDetails) -> Unit,
     onStorageClick: () -> Unit,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    modifier: Modifier = Modifier
 )
 {
     if(storageList.isEmpty())
@@ -140,50 +165,55 @@ fun MagazynList(
             text = stringResource(R.string.no_medicin),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(contentPadding),
+            modifier = modifier.padding(contentPadding),
         )
     }
-    else{
+
+    else
+    {
         Log.i("filtr", "${storageList.size}")
 
-        var openDialog  = remember { mutableStateOf(false)}
+        var openDialog = remember { mutableStateOf(false) }
         var changingStorageDetails = remember { mutableStateOf(StorageDetails()) }
 
+//        Column {
+//
 
+            LazyColumn(modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))) {
 
-        LazyColumn(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))) {
+                items(items = storageList, key = { it.storageId })
+                { storage ->
 
-            items(items = storageList, key = { it.storageId})
-            { storage ->
+                    storageCard(
+                        storageInfo = storage,
+                        modifier = Modifier
+                            .padding(dimensionResource(id = R.dimen.padding_small))
+                            .clickable {
+                                // onStorageClick(storage)
+                                openDialog.value = true
+                                onValueChange(storage)
+                                changingStorageDetails.value = storage
+                            }
+                            .background(color = MaterialTheme.colorScheme.primaryContainer)
+                    )
+                }
 
-                storageCard(
-                    storageInfo= storage,
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_small))
-                        .clickable {
-                           // onStorageClick(storage)
-                            openDialog.value = true
-                            onValueChange(storage)
-                            changingStorageDetails.value = storage
-
-                        }
-                )
             }
+   //     }
 
-        }
-
-        if(openDialog.value)
-        {
+        if (openDialog.value) {
             magazynDialog(
                 storageDetails = changingStorageDetails.value,
-                onDismiss = {openDialog.value = false},
-                onConfirm =  onStorageClick,
+                onDismiss = { openDialog.value = false },
+                onConfirm = onStorageClick,
                 onValueChange = onValueChange
             )
-        }
-
     }
 }
+
+}
+
+
 
 @Composable
 fun storageCard(
@@ -206,12 +236,14 @@ fun storageCard(
                 text = "${storageInfo.medName} - ${storageInfo.quantity} ${stringResource(storageInfo.medicinForm.dopelniacz)}",
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.wrapContentSize().fillMaxWidth()
+                modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             Text(
                 text="Przewidywany czas wyczerpania zapasów: ${storageInfo.daysToEnd} dni",
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
         }
@@ -231,6 +263,7 @@ fun magazynDialog(
     )
 {
     var medQuantity by remember { mutableStateOf("0") }
+    var openDialogAdd by remember { mutableStateOf(false) }
     var openDialog by remember { mutableStateOf(false) }
     var confirmed by remember { mutableStateOf(false) }
 
@@ -251,7 +284,7 @@ fun magazynDialog(
             )
 
             Text(
-                text = "Wpisz w pole zakupioną ilość leku. Wpisz ty;lp liczbę, przyjęte jednostka to: ${storageDetails.medicinForm.name}",
+                text = "Wpisz w pole zakupioną ilość leku. Wpisz tylko liczbę, przyjęte jednostka to: ${storageDetails.medicinForm.name}",
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Justify,
                 modifier = Modifier.wrapContentSize().fillMaxWidth()
@@ -297,24 +330,36 @@ fun magazynDialog(
 
     if(openDialog)
     {
+        if(medQuantity.isBlank() || medQuantity.all { !it.isDigit() } || (medQuantity.all { it.isDigit() } && medQuantity.toInt() < 1))
+        {
+            missingFieldsDialog(
+                onDismiss = {openDialog = false},
+                missingValues = "kupiona ilość (ilość musi być liczbę naturalnąi musi być większa od zera)"
+            )
+
+        }
+        else
+        {
+            openDialog = false
+            openDialogAdd = true
+        }
+
+    }
+
+    if(openDialogAdd)
+    {
         areYouSureDialog(
-            onDismiss = {openDialog = false},
+            onDismiss = {openDialogAdd = false},
             onConfirm = {confirmed = true
                             Log.i("magazyn", "kliknieto w accept")
                             //onValueChange(patientsDetails.copy(name=patientName))
-                            if (medQuantity.isNotBlank() && medQuantity.all { it.isDigit() } && medQuantity.toInt() > 0) {
-                                Log.i(
-                                    "magazyn",
-                                    "spelnia warunek: quant: ${storageDetails.quantity}  + ${medQuantity.toInt()}"
-                                )
-                                onValueChange(storageDetails.copy(quantity = storageDetails.quantity + medQuantity.toInt()))
-                                Log.i(
-                                    "magazyn",
-                                    "po valueChange new_quant : ${storageDetails.quantity}"
-                                )
-                                onConfirm()
-                                onDismiss()
-                            }
+                           onValueChange(storageDetails.copy(quantity = storageDetails.quantity + medQuantity.toInt()))
+                            Log.i(
+                                "magazyn",
+                                "po valueChange new_quant : ${storageDetails.quantity}"
+                            )
+                            onConfirm()
+                            onDismiss()
                         },
             info = "Dokupiono ${medQuantity} ${stringResource(storageDetails.medicinForm.dopelniacz)} leku o nazwie ${storageDetails.medName}"
         )
@@ -334,16 +379,38 @@ fun areYouSureDialog(
 {
     BasicAlertDialog(onDismissRequest = onDismiss,
         modifier = modifier.padding(dimensionResource(R.dimen.padding_medium))
-            .verticalScroll(rememberScrollState()))
+            .verticalScroll(rememberScrollState())
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+    )
     {
-        Column {
+        Column(modifier = Modifier
+            .wrapContentSize()
+            .padding(dimensionResource(R.dimen.padding_small))
+        ) {
             Text(text= "Sprawdź poprawność informacji",
-                style = MaterialTheme.typography.titleLarge)
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.tertiary)
+                    .padding(dimensionResource(R.dimen.padding_large)),
+                color = MaterialTheme.colorScheme.onTertiary
+            )
 
             Text(text= info,
-                style = MaterialTheme.typography.titleMedium)
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Justify,
+                modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.tertiary)
+                    .padding(dimensionResource(R.dimen.padding_medium)),
+                color = MaterialTheme.colorScheme.onTertiary
+            )
 
-            Row(modifier = Modifier.fillMaxWidth())
+            Row(modifier = Modifier
+                .wrapContentSize().fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+                .padding(vertical =  dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically)
             {
 
                 Button(onClick = onDismiss)
