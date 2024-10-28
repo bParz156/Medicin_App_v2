@@ -6,8 +6,10 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.medicin_app_v2.MedicinApplication
+import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.ui.home.HomeViewModel
 import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
+import com.example.medicin_app_v2.ui.ustawienia.UstawieniaViewModel
 import com.example.medicin_app_v2.ui.zalecenia.ZalecenieViewModel
 
 object AppViewModelProvider {
@@ -56,6 +58,15 @@ object AppViewModelProvider {
                 scheduleTermRepository = medicinApplication().container.scheduleTermRepository
             )
         }
+
+        initializer {
+            UstawieniaViewModel(
+                savedStateHandle =  this.createSavedStateHandle(),
+                patientsRepository = medicinApplication().container.patientsRepository,
+                userPreferencesRepository = medicinApplication().container.userPreferencesRepository
+                )
+        }
+
     }
 }
 

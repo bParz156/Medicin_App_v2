@@ -68,7 +68,7 @@ fun MagazynScreen(
     onButtonMagazynClicked: () ->Unit,
     onButtonZaleceniaClicked: (Int) ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
-    onButtonUstawieniaClicked: () ->Unit,
+    onButtonUstawieniaClicked: (Int) ->Unit,
     onButtonPatientClicked: (Int) ->Unit,
     navigateToStorage: (Int) -> Unit,
     modifier: Modifier= Modifier)
@@ -82,7 +82,7 @@ fun MagazynScreen(
             onButtonHomeClick = {onButtonHomeClick(viewModel.magazynUiState.patientDetails.id)},
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = {onButtonZaleceniaClicked(viewModel.magazynUiState.patientDetails.id)},
-            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
+            onButtonUstawieniaClicked = {onButtonUstawieniaClicked(viewModel.magazynUiState.patientDetails.id)},
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.magazynUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName()

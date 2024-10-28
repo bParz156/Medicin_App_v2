@@ -14,6 +14,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import com.example.medicin_app_v2.data.ThemeMode
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -256,7 +257,8 @@ val unspecified_scheme = ColorFamily(
 )
 @Composable
 fun Medicin_App_v2Theme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode,
+    //darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
@@ -264,10 +266,15 @@ fun Medicin_App_v2Theme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            when (themeMode) {
+                ThemeMode.DARK_MODE -> dynamicDarkColorScheme(context)
+                ThemeMode.DAY_MODE -> dynamicLightColorScheme(context)
+                ThemeMode.HIGH_CONTRAST -> dynamicLightColorScheme(context) // Define this scheme separately
+            }
         }
 
-        darkTheme -> darkScheme
+        themeMode == ThemeMode.DARK_MODE -> darkScheme
+        themeMode == ThemeMode.HIGH_CONTRAST -> mediumContrastLightColorScheme // Define separately
         else -> lightScheme
     }
 

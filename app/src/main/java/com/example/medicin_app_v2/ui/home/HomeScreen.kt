@@ -75,7 +75,7 @@ fun HomeScreen(
     onButtonMagazynClicked: (Int) ->Unit,
     onButtonZaleceniaClicked: (Int) ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
-    onButtonUstawieniaClicked: () ->Unit,
+    onButtonUstawieniaClicked: (Int) ->Unit,
     onButtonPatientClicked: (Int) ->Unit
     ) {
 
@@ -88,7 +88,7 @@ fun HomeScreen(
             onButtonHomeClick = onButtonHomeClick,
             onButtonMagazynClicked = { onButtonMagazynClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
             onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
-            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
+            onButtonUstawieniaClicked = {onButtonUstawieniaClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked ={ onButtonPatientClicked(viewModel.homeUiState.patientUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName(),

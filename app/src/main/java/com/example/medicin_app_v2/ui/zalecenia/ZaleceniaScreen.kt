@@ -101,7 +101,7 @@ fun ZaleceniaScreen(
     onButtonMagazynClicked: (Int) ->Unit,
     onButtonZaleceniaClicked: () ->Unit,
     onButtonPowiadomieniaClicked: () ->Unit,
-    onButtonUstawieniaClicked: () ->Unit,
+    onButtonUstawieniaClicked: (Int) ->Unit,
     onButtonPatientClicked: (Int) ->Unit,
     modifier: Modifier = Modifier)
 {
@@ -114,7 +114,7 @@ fun ZaleceniaScreen(
             onButtonHomeClick = {onButtonHomeClick(viewModel.patientUiState.patientDetails.id)},
             onButtonMagazynClicked = {onButtonMagazynClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
-            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
+            onButtonUstawieniaClicked = {onButtonUstawieniaClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.patientUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName(),

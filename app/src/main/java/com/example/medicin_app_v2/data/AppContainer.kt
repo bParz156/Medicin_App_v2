@@ -1,6 +1,9 @@
 package com.example.medicin_app_v2.data
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.firstAidKit.OfflineFirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
@@ -17,6 +20,7 @@ import com.example.medicin_app_v2.data.storage.OfflineStorageRepository
 import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.data.usage.OfflineUsageRepository
 import com.example.medicin_app_v2.data.usage.UsageRepository
+import com.example.medicin_app_v2.dataStore
 
 
 interface AppContainer {
@@ -28,6 +32,7 @@ interface AppContainer {
     val storageRepository : StorageRepository
     val usageRepository : UsageRepository
     val scheduleTermRepository: ScheduleTermRepository
+    val userPreferencesRepository: UserPreferencesRepository
 }
 
 
@@ -64,6 +69,10 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val scheduleTermRepository: ScheduleTermRepository by lazy {
         OfflineScheduleTermRepository(AppDatabase.getDatabase(context).scheduleTermDao())
      }
+
+    override val userPreferencesRepository: UserPreferencesRepository by lazy {
+        UserPreferencesRepository(context.dataStore)
+    }
 
 
 }

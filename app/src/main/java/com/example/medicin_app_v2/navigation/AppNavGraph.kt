@@ -18,6 +18,7 @@ import com.example.medicin_app_v2.ui.magazyn.MagazynScreen
 import com.example.medicin_app_v2.ui.patients.PatientsDestination
 import com.example.medicin_app_v2.ui.patients.PatientsListScreen
 import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaScreen
+import com.example.medicin_app_v2.ui.ustawienia.UstawieniaDestination
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaDestination
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaScreen
@@ -59,12 +60,12 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
 
-        composable(route = MagazynDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
+        composable(route = MagazynDestination.routeWithArgs, arguments = listOf(navArgument(MagazynDestination.patientIdArg){
             type = NavType.IntType
         })) {
             MagazynScreen(
@@ -72,14 +73,14 @@ fun MedicinNavHost(
                 onButtonMagazynClicked = { },
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")},
                 navigateToStorage = {}
             )
         }
 
 
-        composable(route = ZaleceniaDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
+        composable(route = ZaleceniaDestination.routeWithArgs, arguments = listOf(navArgument(ZaleceniaDestination.patientIdArg){
             type = NavType.IntType
         })) {
             ZaleceniaScreen(
@@ -87,7 +88,7 @@ fun MedicinNavHost(
                 onButtonMagazynClicked =  {navController.navigate("${MagazynDestination.route}/$it")},
                 onButtonZaleceniaClicked = { },
                 onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
+                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
@@ -104,14 +105,17 @@ fun MedicinNavHost(
             )
         }
 
-        composable(route = Location.USTAWIENIA.name) {
+
+        composable(route = UstawieniaDestination.routeWithArgs, arguments = listOf(navArgument(UstawieniaDestination.patientIdArg){
+            type = NavType.IntType
+        })) {
             UstawieniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
+                onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
+                onButtonMagazynClicked =  {navController.navigate("${MagazynDestination.route}/$it")},
+                onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = {  navController.navigate(Location.POWIADOMIENIA.name) },
                 onButtonUstawieniaClicked = { },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
+                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
 

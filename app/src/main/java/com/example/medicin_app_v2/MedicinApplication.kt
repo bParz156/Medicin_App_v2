@@ -15,16 +15,16 @@ class MedicinApplication : Application() {
      * AppContainer instance used by the rest of classes to obtain dependencies
      */
     lateinit var container: AppContainer
-    lateinit var userPreferencesRepository: UserPreferencesRepository
+  //  lateinit var userPreferencesRepository: UserPreferencesRepository
 
     override fun onCreate() {
         super.onCreate()
         container = AppDataContainer(this)
-        userPreferencesRepository = UserPreferencesRepository(dataStore)
+      //  userPreferencesRepository = UserPreferencesRepository(dataStore)
     }
 }
 
-private const val LAYOUT_PREFERENCE_NAME = "layout_preferences"
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-    name = LAYOUT_PREFERENCE_NAME
+private const val THEME_MODE_PREFERENCE = "theme_mode"
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = THEME_MODE_PREFERENCE
 )
