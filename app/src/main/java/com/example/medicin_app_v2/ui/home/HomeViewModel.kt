@@ -11,6 +11,7 @@ import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.UserPreferencesRepository
+import com.example.medicin_app_v2.data.WorkerRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
@@ -22,6 +23,7 @@ import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageRepository
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.toPatientUiState
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -31,12 +33,13 @@ import java.util.Date
 
 class HomeViewModel (
     savedStateHandle: SavedStateHandle,
- patientsRepository: PatientsRepository,
+    patientsRepository: PatientsRepository,
     scheduleRepository: ScheduleRepository,
- scheduleTermRepository: ScheduleTermRepository,
+    scheduleTermRepository: ScheduleTermRepository,
     medicinRepository: MedicinRepository,
     val usageRepository: UsageRepository,
-    userPreferencesRepository: UserPreferencesRepository
+    userPreferencesRepository: UserPreferencesRepository,
+    workerRepository: WorkerRepository
 
 ) : ViewModel()
 {
@@ -48,8 +51,10 @@ class HomeViewModel (
         private set
 
 
-    //val patient_Id: Int = userPreferencesRepository.patient_id.first()
-        //.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), -1)
+//    val patientId: Int = viewModelScope.launch {
+//        userPreferencesRepository.patient_id.first()
+//            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), -1)
+//    }
 
 
     private var patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
@@ -131,6 +136,7 @@ class HomeViewModel (
 
                 }
             }
+            workerRepository.generateUsages()
 
         //    genereteUsagesForNextPeriodOfTime(7)
         }

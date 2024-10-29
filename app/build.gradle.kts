@@ -66,6 +66,7 @@ dependencies {
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation(libs.androidx.ui.text.google.fonts)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 
     testImplementation(libs.junit)
 

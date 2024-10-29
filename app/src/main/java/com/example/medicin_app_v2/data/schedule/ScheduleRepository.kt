@@ -10,6 +10,8 @@ interface ScheduleRepository {
 
     fun getScheduleById(id: Int) : Flow<Schedule>
 
+    fun getAllSchedules(): Flow<List<Schedule>>
+
     suspend fun insertSchedule(schedule: Schedule)
 
     suspend fun deleteSchedule(schedule: Schedule)

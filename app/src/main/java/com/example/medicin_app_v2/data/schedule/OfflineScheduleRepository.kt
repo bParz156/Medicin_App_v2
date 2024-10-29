@@ -21,6 +21,10 @@ class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : Schedule
         return scheduleDao.getScheduleById(id)
     }
 
+    override fun getAllSchedules(): Flow<List<Schedule>> {
+        return scheduleDao.getAllSchedules()
+    }
+
     override suspend fun insertSchedule(schedule: Schedule) {
         scheduleDao.insert(schedule)
     }

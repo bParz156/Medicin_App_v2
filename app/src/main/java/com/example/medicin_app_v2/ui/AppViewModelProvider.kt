@@ -33,7 +33,8 @@ object AppViewModelProvider {
                 scheduleRepository = medicinApplication().container.scheduleRepository,
                 scheduleTermRepository = medicinApplication().container.scheduleTermRepository,
                 usageRepository = medicinApplication().container.usageRepository,
-                userPreferencesRepository = medicinApplication().container.userPreferencesRepository
+                userPreferencesRepository = medicinApplication().container.userPreferencesRepository,
+                workerRepository =  medicinApplication().container.workerRepository
             )
         }
 

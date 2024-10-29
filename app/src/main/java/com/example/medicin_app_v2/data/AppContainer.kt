@@ -33,6 +33,7 @@ interface AppContainer {
     val usageRepository : UsageRepository
     val scheduleTermRepository: ScheduleTermRepository
     val userPreferencesRepository: UserPreferencesRepository
+    val workerRepository : WorkerRepository
 }
 
 
@@ -72,6 +73,9 @@ class AppDataContainer(private val context: Context) : AppContainer {
 
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
         UserPreferencesRepository(context.dataStore)
+    }
+    override val workerRepository: WorkerRepository by lazy {
+        WorkManagerRepository(context)
     }
 
 
