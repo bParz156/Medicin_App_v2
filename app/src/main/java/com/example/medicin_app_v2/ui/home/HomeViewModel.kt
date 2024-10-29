@@ -1,23 +1,22 @@
 package com.example.medicin_app_v2.ui.home
 
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
-import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTerm
+import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
+import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTerm
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageRepository
@@ -26,7 +25,6 @@ import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 
@@ -37,7 +35,8 @@ class HomeViewModel (
     scheduleRepository: ScheduleRepository,
  scheduleTermRepository: ScheduleTermRepository,
     medicinRepository: MedicinRepository,
-    val usageRepository: UsageRepository
+    val usageRepository: UsageRepository,
+    userPreferencesRepository: UserPreferencesRepository
 
 ) : ViewModel()
 {
@@ -49,17 +48,45 @@ class HomeViewModel (
         private set
 
 
+    //val patient_Id: Int = userPreferencesRepository.patient_id.first()
+        //.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), -1)
 
-    private val patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
+
+    private var patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
     catch (e:IllegalStateException)
     {
-        -1
+        viewModelScope.launch {
+            userPreferencesRepository.patient_id.first()
+        }
+        Log.i("patientId", "czytanie z Home 61: ${userPreferencesRepository.patient_id}")
+        //patientIdFlow.value
+        //-1
     }
 
 
+//    private var patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
+//    catch (e:IllegalStateException)
+//    {
+//        viewModelScope.launch {
+//           userPreferencesRepository.patient_id.first()
+//       }
+//    }
+
     init {
-        Log.i("homeeee", "start init")
+
         viewModelScope.launch {
+        //    val patient_Id: Int = userPreferencesRepository.patient_id.first()
+        //    Log.i("homeeee", "start init: $patientId -- ${patient_Id}")
+       //     patientId = patient_Id
+
+            if(patientId==-1)
+            {
+                viewModelScope.launch {
+                   patientId = userPreferencesRepository.patient_id.first()
+                    Log.i("patientId", "BYło -1 więc teraz zmiana")
+                }
+            }
+            Log.i("patientId", "init, id z savedStateHandle: ${patientId}")
             homeUiState.patientUiState = patientsRepository.getPatientStream(patientId)
                 .filterNotNull()
                 .first()

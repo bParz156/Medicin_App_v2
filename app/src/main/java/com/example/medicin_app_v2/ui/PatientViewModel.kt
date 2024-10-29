@@ -1,6 +1,8 @@
 package com.example.medicin_app_v2.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -8,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.data.patient.PatientsRepository
 import com.example.medicin_app_v2.ui.home.HomeDestination
@@ -16,14 +19,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class PatientViewModel(
     savedStateHandle: SavedStateHandle,
-    private val patientsRepository: PatientsRepository) : ViewModel()
+    private val patientsRepository: PatientsRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel()
 {
-        private val patientId : Int = try{checkNotNull(savedStateHandle[PatientsDestination.patientIdArg])}
+        var patientUPR: StateFlow<Int> = userPreferencesRepository.patient_id
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), -1)
+
+
+        private var patientId : Int = try{checkNotNull(savedStateHandle[PatientsDestination.patientIdArg])}
         catch (e:IllegalStateException)
         {
             -1
@@ -75,6 +86,21 @@ class PatientViewModel(
         }
 
     }
+
+    suspend fun changePatientId(id: Int)
+    {
+        viewModelScope.launch {
+            Log.i("patientId", "z chabge przed savem: id =$id")
+            userPreferencesRepository.savePatientId(id)
+           // Log.i("patientId", "change po save")
+            patientUPR = userPreferencesRepository.patient_id
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), id)
+            Log.i("patientId", "change po save patientUPR: ${patientUPR.value}")
+        }
+        patientId =id
+
+    }
+
 
 
     companion object {

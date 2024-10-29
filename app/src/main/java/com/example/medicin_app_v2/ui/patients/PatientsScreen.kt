@@ -105,6 +105,10 @@ fun PatientsListScreen(
                     }
                 },
                 onPatientClick = {Log.i("przekierowanie", "ListScreen do ${it.id}")
+                    coroutineScope.launch {
+                        Log.i("patientId", "Dochodzi do zmiany: ${it.id}?")
+                        viewModel.changePatientId(it.id)
+                    }
                     navigateToPatientHome(it.id)},
                 currentPatient= viewModel.uiState.value.patientDetails.toPatient(),
                 viewModel = viewModel,

@@ -21,6 +21,7 @@ object AppViewModelProvider {
             PatientViewModel(
                 savedStateHandle =  this.createSavedStateHandle(),
                 patientsRepository =  medicinApplication().container.patientsRepository,
+                userPreferencesRepository = medicinApplication().container.userPreferencesRepository
             )
         }
 
@@ -31,7 +32,8 @@ object AppViewModelProvider {
                 medicinRepository = medicinApplication().container.medicinRepository,
                 scheduleRepository = medicinApplication().container.scheduleRepository,
                 scheduleTermRepository = medicinApplication().container.scheduleTermRepository,
-                usageRepository = medicinApplication().container.usageRepository
+                usageRepository = medicinApplication().container.usageRepository,
+                userPreferencesRepository = medicinApplication().container.userPreferencesRepository
             )
         }
 

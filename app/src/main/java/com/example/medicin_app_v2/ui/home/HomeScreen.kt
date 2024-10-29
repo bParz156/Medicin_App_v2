@@ -3,12 +3,9 @@ package com.example.medicin_app_v2.ui.home
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,9 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -34,23 +28,15 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medicin_app_v2.ui.MedicinTopAppBar
 import com.example.medicin_app_v2.R
-import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.getDayWeekByWeekDay
-import com.example.medicin_app_v2.data.patient.Patient
-import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.navigation.Location
 import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
-import com.example.medicin_app_v2.ui.PatientUiState
-import com.example.medicin_app_v2.ui.PatientViewModel
-import com.example.medicin_app_v2.ui.toPatient
 import java.util.Calendar
 import java.util.Date
 

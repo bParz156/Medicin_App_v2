@@ -24,7 +24,7 @@ class MedicinApplication : Application() {
     }
 }
 
-private const val THEME_MODE_PREFERENCE = "theme_mode"
+private const val PREFERENCES_NAME = "user_preferences"
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-    name = THEME_MODE_PREFERENCE
+    name = PREFERENCES_NAME
 )

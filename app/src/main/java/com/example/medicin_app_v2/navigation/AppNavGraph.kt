@@ -23,38 +23,40 @@ import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaDestination
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicinNavHost(
+    patientId: Int,
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val id=-1
+    val id=patientId
+
 
     NavHost(
         navController = navController,
         startDestination = "${HomeDestination.route}/$id",
+      //  startDestination = HomeDestination.route,
         modifier = modifier
     ) {
-    /*
-        composable(route = HomeDestination.route ) {
-            Log.i("przekierowanie", "zly home")
-            HomeScreen(
-                onButtonHomeClick = {},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(PatientsDestination.route)}
-            )
-        }
-*/
+
+//        composable(route = HomeDestination.route ) {
+//            Log.i("przekierowanie", "zly home")
+//           HomeScreen(
+//                onButtonHomeClick = {},
+//                onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},
+//                onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
+//                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
+//                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
+//                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
+//            )
+//        }
+
 
 
         composable(route = HomeDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
             type = NavType.IntType
         })) {
-            Log.i("przekierowanie", "dobry home")
+            Log.i("patientdId", "z AppNavGraph $id")
             HomeScreen(
                 onButtonHomeClick = {},
                 onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},

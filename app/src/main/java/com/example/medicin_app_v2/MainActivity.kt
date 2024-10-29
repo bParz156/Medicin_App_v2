@@ -24,12 +24,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsState(initial = ThemeMode.DAY_MODE)
+            val id by userPreferencesRepository.patient_id.collectAsState(initial = 0)
             Medicin_App_v2Theme(themeMode = themeMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MedicinApp()
+                    MedicinApp(id = id)
                     //HomeScreen()
                 }
             }
