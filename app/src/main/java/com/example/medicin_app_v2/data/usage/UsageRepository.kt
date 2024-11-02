@@ -21,7 +21,7 @@ interface UsageRepository {
 
     fun getAllScheduleTermUsages(scheduleTerm_id: Int): Flow<List<Usage>>
 
-    fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage>
+    fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage?>
 
 
 }

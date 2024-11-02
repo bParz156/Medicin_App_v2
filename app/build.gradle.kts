@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.espresso.core)
 
     testImplementation(libs.junit)
 

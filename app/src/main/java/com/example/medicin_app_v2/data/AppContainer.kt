@@ -74,9 +74,9 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
         UserPreferencesRepository(context.dataStore)
     }
-    override val workerRepository: WorkerRepository by lazy {
-        WorkManagerRepository(context)
-    }
-
+//    override val workerRepository: WorkerRepository by lazy {
+//        WorkManagerRepository(context)
+//    }
+    override val workerRepository: WorkerRepository = WorkManagerRepository(context)
 
 }

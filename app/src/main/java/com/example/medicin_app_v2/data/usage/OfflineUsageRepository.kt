@@ -31,7 +31,7 @@ class OfflineUsageRepository (private val usageDao: UsageDao) : UsageRepository 
         return usageDao.getAllSchedulesTermUsage(scheduleTerm_id)
     }
 
-    override fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage> {
+    override fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage?> {
         return usageDao.getUsage(scheduleTerm_id =scheduleTerm_id, useDate = useDate)
     }
 

@@ -7,8 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.medicin_app_v2.data.AppContainer
 import com.example.medicin_app_v2.data.AppDataContainer
-import com.example.medicin_app_v2.data.UserPreferencesRepository
 
+private const val TAG = "UsageWorker"
 class MedicinApplication : Application() {
 
     /**
@@ -21,6 +21,7 @@ class MedicinApplication : Application() {
         super.onCreate()
         container = AppDataContainer(this)
       //  userPreferencesRepository = UserPreferencesRepository(dataStore)
+
     }
 }
 

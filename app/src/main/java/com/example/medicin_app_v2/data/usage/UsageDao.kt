@@ -37,6 +37,9 @@ interface UsageDao {
     fun getAllUsages(): Flow<List<Usage>>
 
     @Query("select * from usage where ScheduleTerm_id = :scheduleTerm_id and date = :useDate")
-    fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage>
+    fun getUsage(scheduleTerm_id: Int, useDate: Date): Flow<Usage?>
+
+
+
 
 }

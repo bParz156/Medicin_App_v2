@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.medicin_app_v2.data.AppDatabase
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
@@ -21,27 +22,36 @@ import java.util.Calendar
 
 
 private const val TAG = "UsageWorker"
-class UsageWorker(
-    ctx: Context,
+class UsageWorker (
+ctx: Context,
     params: WorkerParameters,
-    private val usageRepository: UsageRepository,
-    private val scheduleRepository : ScheduleRepository,
-    val medicinRepository: MedicinRepository,
-    val scheduleTermRepository: ScheduleTermRepository
+//    private val usageRepository: UsageRepository,
+//    private val scheduleRepository : ScheduleRepository,
+//    val medicinRepository: MedicinRepository,
+//    val scheduleTermRepository: ScheduleTermRepository
 ) : CoroutineWorker(ctx, params)  {
+
+    private val usageDao  = AppDatabase.getDatabase(ctx).usageDao()
+    private val scheduleDao = AppDatabase.getDatabase(ctx).scheduleDao()
+    val medicinDao= AppDatabase.getDatabase(ctx).medicineDao()
+    val scheduleTermDao = AppDatabase.getDatabase(ctx).scheduleTermDao()
+
     override suspend fun doWork(): Result {
-        val allSchedules = scheduleRepository.getAllSchedules().first()
+        val allSchedules = scheduleDao.getAllSchedules().first()
             .let { PatientScheduleInfo(it) }// Poczekaj na pierwszy wynik z Flow
 
         val scheduleDetails = PatientScheduleDetailsInfo(
             allSchedules.scheduleList.map{
                 it.toScheduleDetails(
-                    medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
+                    medicinDetails =  medicinDao.getmedicine(it.Medicine_id)
+//                    medicinDetails = medicinRepository.getMedicineStream(it.Medicine_id)
                         .filterNotNull()
                         .first()
                         .toMedicinDetails(),
-                    scheduleTermList = scheduleTermRepository.getAllsSchedulesTerms(it.id)
-                        .filterNotNull().first()
+                    scheduleTermList =  scheduleTermDao.getScheduleTermBySchedule(it.id)
+//                    scheduleTermList = scheduleTermRepository.getAllsSchedulesTerms(it.id)
+                        .filterNotNull()
+                        .first()
                 )
             }
         )
@@ -53,7 +63,8 @@ class UsageWorker(
                 days =7
             )
             Result.success()
-        }catch(throwable: Throwable) {
+        }catch(e: Exception) {
+            Log.e(TAG, "failed due to :", e)
             Result.failure()
         }
     }
@@ -72,24 +83,22 @@ class UsageWorker(
                         calendar.time = currentDate
                         calendar.add(Calendar.DAY_OF_YEAR, dayOffset)
                         val eventDate = calendar.time
-                        if(eventDate > scheduleDetail.startDate && eventDate<= scheduleDetail.endDate) {
+                        if(eventDate > scheduleDetail.startDate && (scheduleDetail.endDate ==null || eventDate<= scheduleDetail.endDate)) {
                             if (isValidEventDay(scheduleTerm, calendar)) {
                                 calendar.set(Calendar.HOUR_OF_DAY, scheduleTerm.hour)
                                 calendar.set(Calendar.MINUTE, scheduleTerm.minute)
                                 val eventTime = calendar.time
-                                Log.i("usageeee", "id scheduleTerm = ${scheduleTerm.id}")
-                                val usage = Usage(
+                               val usage = Usage(
                                     id = 0,
                                     ScheduleTerm_id = scheduleTerm.id,
                                     confirmed = false,
                                     date = eventTime
                                 )
-                                Log.i(
-                                    "usageeee",
-                                    " Create usage scheudle Term = ${usage.ScheduleTerm_id}"
-                                )
-                                val id = usageRepository.insert(usage)
-                                Log.i("usageeee", " id created = $id")
+                                Log.i(TAG, "bylo?")
+                                if(usageDao.getUsage(scheduleTerm_id = scheduleTerm.id, useDate = eventTime).first() ==null) {
+                                    Log.i(TAG, "nie bylo")
+                                    val id = usageDao.insert(usage)
+                                }
                             }
                         }
                     }
@@ -100,7 +109,7 @@ class UsageWorker(
 
     private fun isValidEventDay(scheduleTerm: ScheduleTermDetails, calendar: Calendar): Boolean {
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)  // Zwraca dzień tygodnia: 1 = Niedziela, 7 = Sobota
-        Log.i("usageeee", "isValidDay  == scheudleDay: $(${scheduleTerm.day.weekDay}) ==? ${dayOfWeek}")
+       // Log.i(TAG, "isValidDay  == scheudleDay: $(${scheduleTerm.day.weekDay}) ==? ${dayOfWeek}")
         return scheduleTerm.day.weekDay == dayOfWeek  // Załóżmy, że 'dayOfWeek' w harmonogramie jest zgodne z `Calendar`
     }
 

@@ -124,7 +124,13 @@ class HomeViewModel (
 
                     for(usage in usageList)
                     {
-                        homeUiState.usageMapDay.getOrPut(usage.date) { mutableListOf() }.add(UsageDetails(
+                        val calendar = Calendar.getInstance()
+                        calendar.time = usage.date
+                        val day = calendar.get(Calendar.DAY_OF_MONTH)
+                        val month = calendar.get(Calendar.MONTH)
+                        val year = calendar.get(Calendar.YEAR)
+                        val eventDate = Date(year - 1900, month, day)
+                        homeUiState.usageMapDay.getOrPut(eventDate) { mutableListOf() }.add(UsageDetails(
                             id = usage.id,
                             date = usage.date,
                             dose = scheduleTerm.dose,
@@ -136,6 +142,7 @@ class HomeViewModel (
 
                 }
             }
+            workerRepository.deleteAncient()
             workerRepository.generateUsages()
 
         //    genereteUsagesForNextPeriodOfTime(7)
