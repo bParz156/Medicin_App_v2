@@ -12,7 +12,7 @@ interface ScheduleRepository {
 
     fun getAllSchedules(): Flow<List<Schedule>>
 
-    suspend fun insertSchedule(schedule: Schedule)
+    suspend fun insertSchedule(schedule: Schedule) : Long
 
     suspend fun deleteSchedule(schedule: Schedule)
 

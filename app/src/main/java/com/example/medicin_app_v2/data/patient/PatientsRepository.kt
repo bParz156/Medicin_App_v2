@@ -12,7 +12,7 @@ interface PatientsRepository {
     /**
      * Insert Patient in the data source
      */
-    suspend fun insertPatient(patient: Patient)
+    suspend fun insertPatient(patient: Patient) : Long
 
     /**
      * Delete Patient from the data source

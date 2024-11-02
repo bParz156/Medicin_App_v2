@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface ScheduleDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(schedule: Schedule)
+    suspend fun insert(schedule: Schedule) : Long
 
     @Update
     suspend fun update(schedule: Schedule)

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface FirstAidKitDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(firstAidKit: FirstAidKit)
+    suspend fun insert(firstAidKit: FirstAidKit) : Long
 
     @Update
     suspend fun update(firstAidKit: FirstAidKit)

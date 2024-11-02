@@ -21,7 +21,7 @@ interface MedicinRepository {
     /**
      * Insert Medicine in the data source
      */
-    suspend fun insertMedicine(medicine: Medicine)
+    suspend fun insertMedicine(medicine: Medicine) : Long
 
     /**
      * Delete Medicine from the data source

@@ -12,7 +12,7 @@ interface StorageRepository {
     /**
      * Insert Storage in the data source
      */
-    suspend fun insertStorage(storage: Storage)
+    suspend fun insertStorage(storage: Storage) : Long
 
     /**
      * Delete Storage from the data source

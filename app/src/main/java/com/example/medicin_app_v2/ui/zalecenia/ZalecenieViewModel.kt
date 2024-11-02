@@ -156,8 +156,9 @@ class ZalecenieViewModel(
         if(medicineinDB==null)
         {
             Log.i("createSchedule", "medicininDB: puste")
-            medicinRepository.insertMedicine(medicinDetails.toMedicin())
-            medicinId = medicinRepository.getAllMedicinesStream().first().size
+           // medicinRepository.insertMedicine(medicinDetails.toMedicin())
+          //  medicinId = medicinRepository.getAllMedicinesStream().first().size
+            medicinId = medicinRepository.insertMedicine(medicinDetails.toMedicin()).toInt()
         }
         else
         {
@@ -166,15 +167,14 @@ class ZalecenieViewModel(
         Log.i("createSchedule", "medID: $medicinId")
 
         storageUiState.storageDetails.MedicinId = medicinId
-        storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+        val idxStorage = storageRepository.insertStorage(storageUiState.storageDetails.toStorage()).toInt()
         Log.i("createSchedule", "storageCreated:")
-        val idxStorage = storageRepository.getAllStoragesStream().filterNotNull().first().size
+       // val idxStorage = storageRepository.getAllStoragesStream().filterNotNull().first().size
 
         firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =idxStorage ))
 
         scheduleUiState.scheduleDetails.medicinDetails.id= medicinId
-        scheduleRepository.insertSchedule( scheduleUiState.scheduleDetails.toSchedule(patientId))
-        val scheduleId = scheduleRepository.getSizeId()
+        val scheduleId = scheduleRepository.insertSchedule( scheduleUiState.scheduleDetails.toSchedule(patientId)).toInt()
 
         for(scheduleTermDetail in scheduleUiState.scheduleDetails.scheduleTermDetailsList)
         {

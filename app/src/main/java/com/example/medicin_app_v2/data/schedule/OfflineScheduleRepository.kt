@@ -25,8 +25,8 @@ class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : Schedule
         return scheduleDao.getAllSchedules()
     }
 
-    override suspend fun insertSchedule(schedule: Schedule) {
-        scheduleDao.insert(schedule)
+    override suspend fun insertSchedule(schedule: Schedule) : Long {
+        return scheduleDao.insert(schedule)
     }
 
     override suspend fun deleteSchedule(schedule: Schedule) {

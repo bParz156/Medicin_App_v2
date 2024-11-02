@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface NotificationDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(notification: Notification)
+    suspend fun insert(notification: Notification) : Long
 
     @Update
     suspend fun update(notification: Notification)

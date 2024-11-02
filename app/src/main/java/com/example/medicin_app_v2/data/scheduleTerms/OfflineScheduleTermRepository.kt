@@ -11,8 +11,8 @@ class OfflineScheduleTermRepository(private val scheduleTermDao: ScheduleTermDao
         return scheduleTermDao.getScheduleTermBySchedule(scheduleId)
     }
 
-    override suspend fun insertScheduleTerm(scheduleTerm: ScheduleTerm) {
-        scheduleTermDao.insert(scheduleTerm)
+    override suspend fun insertScheduleTerm(scheduleTerm: ScheduleTerm) : Long {
+        return scheduleTermDao.insert(scheduleTerm)
     }
 
     override suspend fun deleteScheduleTerm(scheduleTerm: ScheduleTerm) {

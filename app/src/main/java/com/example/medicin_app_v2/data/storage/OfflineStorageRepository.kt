@@ -11,8 +11,8 @@ class OfflineStorageRepository(private val storageDao: StorageDao) : StorageRepo
         return storageDao.getStorage(id)
     }
 
-    override suspend fun insertStorage(storage: Storage) {
-        storageDao.insert(storage)
+    override suspend fun insertStorage(storage: Storage) : Long {
+        return storageDao.insert(storage)
     }
 
     override suspend fun deleteStorage(storage: Storage) {

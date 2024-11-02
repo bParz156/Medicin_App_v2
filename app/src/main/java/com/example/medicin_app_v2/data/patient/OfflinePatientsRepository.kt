@@ -11,8 +11,8 @@ class OfflinePatientsRepository(private val patientDao: PatientDao) : PatientsRe
         return  patientDao.getpatient(id)
     }
 
-    override suspend fun insertPatient(patient: Patient) {
-        patientDao.insert(patient = patient)
+    override suspend fun insertPatient(patient: Patient) : Long {
+        return patientDao.insert(patient = patient)
     }
 
     override suspend fun deletePatient(patient: Patient) {

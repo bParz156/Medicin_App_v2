@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface PatientDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(patient: Patient)
+    suspend fun insert(patient: Patient) : Long
 
     @Update
     suspend fun update(patient: Patient)

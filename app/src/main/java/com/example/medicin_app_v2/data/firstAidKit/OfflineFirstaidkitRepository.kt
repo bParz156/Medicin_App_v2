@@ -8,8 +8,8 @@ class OfflineFirstaidkitRepository(private val firstAidKitDao: FirstAidKitDao) :
     }
 
 
-    override suspend fun insertFirstAidKit(firstAidKit: FirstAidKit) {
-        firstAidKitDao.insert(firstAidKit)
+    override suspend fun insertFirstAidKit(firstAidKit: FirstAidKit) : Long {
+        return firstAidKitDao.insert(firstAidKit)
     }
 
     override suspend fun deleteFirstAidKit(firstAidKit: FirstAidKit) {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface StorageDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(storage: Storage)
+    suspend fun insert(storage: Storage) : Long
 
     @Update
     suspend fun update(storage: Storage)

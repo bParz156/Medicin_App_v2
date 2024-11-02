@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface ScheduleTermDao
 {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(scheduleTerm: ScheduleTerm)
+    suspend fun insert(scheduleTerm: ScheduleTerm) : Long
 
     @Update
     suspend fun update(scheduleTerm: ScheduleTerm)

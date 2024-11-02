@@ -9,7 +9,7 @@ interface ScheduleTermRepository {
     fun getAllsSchedulesTerms(scheduleId: Int): Flow<List<ScheduleTerm>>
 
 
-    suspend fun insertScheduleTerm(scheduleTerm: ScheduleTerm)
+    suspend fun insertScheduleTerm(scheduleTerm: ScheduleTerm) : Long
 
     /**
      * Delete ScheduleTerm from the data source

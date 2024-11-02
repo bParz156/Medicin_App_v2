@@ -16,8 +16,8 @@ class OfflineMedicinRepository(private val medicineDao: MedicineDao) : MedicinRe
        return medicineDao.getmedicine(name, form)
     }
 
-    override suspend fun insertMedicine(medicine: Medicine) {
-        medicineDao.insert(medicine)
+    override suspend fun insertMedicine(medicine: Medicine) : Long {
+        return medicineDao.insert(medicine)
     }
 
     override suspend fun deleteMedicine(medicine: Medicine) {

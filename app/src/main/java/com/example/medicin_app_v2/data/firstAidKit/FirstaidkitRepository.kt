@@ -12,7 +12,7 @@ interface FirstaidkitRepository {
     /**
      * Insert FirstAidKit in the data source
      */
-    suspend fun insertFirstAidKit(firstAidKit: FirstAidKit)
+    suspend fun insertFirstAidKit(firstAidKit: FirstAidKit) : Long
 
     /**
      * Delete FirstAidKit from the data source

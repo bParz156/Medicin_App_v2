@@ -15,8 +15,8 @@ class OfflineNotificationRepository(private val notificationDao: NotificationDao
         return notificationDao.getNotification(id)
     }
 
-    override suspend fun insertNotification(notification: Notification) {
-        notificationDao.insert(notification)
+    override suspend fun insertNotification(notification: Notification) : Long {
+        return notificationDao.insert(notification)
     }
 
     override suspend fun deleteNotification(notification: Notification) {

@@ -23,7 +23,7 @@ interface NotificationRepository {
     /**
      * Insert Notification in the data source
      */
-    suspend fun insertNotification(notification: Notification)
+    suspend fun insertNotification(notification: Notification) : Long
 
     /**
      * Delete Notification from the data source
