@@ -2,6 +2,7 @@ package com.example.medicin_app_v2.ui.zalecenia
 
 import android.app.TimePickerDialog
 import android.util.Log
+import android.widget.AutoCompleteTextView
 import android.widget.TimePicker
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -26,6 +28,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BasicAlertDialog
@@ -80,8 +84,13 @@ import com.example.medicin_app_v2.ui.home.MedicinDetails
 import com.example.medicin_app_v2.ui.home.ScheduleDetails
 import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
 import com.example.medicin_app_v2.ui.magazyn.areYouSureDialog
+import com.example.medicin_app_v2.ui.toPatientDetails
 import kotlinx.coroutines.launch
 import java.util.Date
+import android.widget.ArrayAdapter
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExposedDropdownMenuBox
+
 
 object ZaleceniaDestination : NavigationDestination {
     override val route = "zalecenia"
@@ -159,9 +168,23 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
                     )
-                medicinRemainders(scheduleList =viewModel.patientsSchedule.toMedicinScheduleInfoList(),
-                    onScheduleClick = {//TODO}
-                    })
+                medicinRemainders(scheduleList =viewModel.patientsSchedule.scheduleDetailsList,//.toMedicinScheduleInfoList(),
+                    onScheduleClick = { viewModel.updatetUiState(it)
+                    },
+                    onDeleteClick = {
+                        coroutineScope.launch {
+                            viewModel.deleteZalecenie()
+                            viewModel.updateSchedulesInfo()
+                        }
+                        //TODO
+                    },
+                    onEditClick = {
+//                        coroutineScope.launch {
+//                            viewModel.updatetUiState(i)
+//                        }
+                        //TODO
+                    }
+                )
 
             ButtonIconRow(
                 onButtonCLick = {openDialog.value = true},
@@ -173,8 +196,21 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
 
             if(openDialog.value)
             {
-                addNewMedicin(
-                    onAdd ={
+//                addNewMedicin(
+//                    onAdd ={
+//                        coroutineScope.launch {
+//                            viewModel.createSchedule()
+//                        }
+//                    },
+//                    onDismiss = {openDialog.value=false},
+//                    scheduleDetails =  viewModel.scheduleUiState.scheduleDetails,
+//                    storageDetails = viewModel.storageUiState.storageDetails,
+//                    onValueStorageChange = viewModel::updatestorageState,
+//                    onScheduleChange = viewModel::updatetUiState,
+//                    )
+
+                zalecenieDialog(
+                    onConfirm =  {
                         coroutineScope.launch {
                             viewModel.createSchedule()
                         }
@@ -184,7 +220,8 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                     storageDetails = viewModel.storageUiState.storageDetails,
                     onValueStorageChange = viewModel::updatestorageState,
                     onScheduleChange = viewModel::updatetUiState,
-                    )
+                    viewModel = viewModel
+                )
             }
 
     }
@@ -198,17 +235,18 @@ fun addNewMedicin(
     scheduleDetails: ScheduleDetails,
     storageDetails: StorageDetails,
     onValueStorageChange: (StorageDetails) -> Unit,
-    onScheduleChange: (ScheduleDetails) -> Unit
+    onScheduleChange: (ScheduleDetails) -> Unit,
    ) {
 
-    var medicinName by remember { mutableStateOf("") }
+    var medicinName by remember { mutableStateOf(scheduleDetails.medicinDetails.name) }
     var medicinDose by remember { mutableStateOf("") }
-    var medicinStore by remember { mutableStateOf("") }
+    var medicinStore by remember { mutableStateOf(storageDetails.quantity.toString()) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedForm by remember { mutableStateOf(MedicinForm.TABLETKA) }
+    var selectedForm by remember { mutableStateOf(scheduleDetails.medicinDetails.form) }
 
-    var selectedRelation by remember { mutableStateOf(MealRelation.Nie) }
+    var selectedRelation by remember { mutableStateOf(scheduleDetails.medicinDetails.relation) }
     var expandedR by remember { mutableStateOf(false) }
+
 
     var selectedDays by remember { mutableStateOf(listOf<DayWeek>()) }
     var expandedDays by remember { mutableStateOf(false) }
@@ -531,8 +569,10 @@ onTimesSelected: (List<Pair<Int, Int>>) -> Unit
 
 @Composable
 fun medicinRemainders(
-    scheduleList: List<MedicinScheduleInfo>,
-    onScheduleClick: (MedicinScheduleInfo) -> Unit,
+    scheduleList: List<ScheduleDetails>,
+    onScheduleClick: (ScheduleDetails) -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit ,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
 {
@@ -555,14 +595,26 @@ fun medicinRemainders(
                 var expanded by remember { mutableStateOf(false) }
 
                 medicinCard(
-                    medicinScheduleInfo= schedule,
+                    medicinScheduleInfo = schedule,
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
-                        .clickable { onScheduleClick(schedule)
-                            expanded = !expanded},
-                    expanded = expanded
+                        .clickable {
+                            onScheduleClick(schedule)
+                            expanded = !expanded
+                        },
+                    expanded = expanded,
+                    onEditClick = {
+                        onScheduleClick(schedule)
+                        onEditClick()
+                    },
+                    onDeleteClick = {
+                        onScheduleClick(schedule)
+                        onDeleteClick()
+                    }
                     //expanded =false
                 )
+
+
             }
 
         }
@@ -573,15 +625,20 @@ fun medicinRemainders(
 
 @Composable
 fun medicinCard(
-    medicinScheduleInfo: MedicinScheduleInfo,
+    medicinScheduleInfo: ScheduleDetails,
     modifier: Modifier = Modifier,
-    expanded: Boolean
+    expanded: Boolean,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 )
 {
     val color by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.tertiaryContainer
     else MaterialTheme.colorScheme.primaryContainer)
     val contentColor by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.onTertiaryContainer
     else MaterialTheme.colorScheme.onPrimaryContainer)
+
+    var openDialogEdit by remember { mutableStateOf(false) }
+    var openDialogDelete by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -623,6 +680,41 @@ fun medicinCard(
 
             Spacer(Modifier.weight(1f))
             if (expanded) {
+                Row(
+                    modifier = Modifier
+                        .wrapContentSize().fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.padding_small)),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Icon(imageVector = Icons.Filled.Delete,
+                        modifier = Modifier
+                            .padding(end = dimensionResource(R.dimen.padding_small))
+                            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                            .clickable {
+                                openDialogDelete = true
+                            }
+                            .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                        ,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentDescription = "Usuń"
+                    )
+
+                    Icon(imageVector = Icons.Filled.Edit,
+                        modifier = Modifier
+                            .padding(end = dimensionResource(R.dimen.padding_small))
+                            .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                            .clickable {
+                                openDialogEdit = true
+                            }
+                            .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                        ,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentDescription = "Modyfikuj"
+                    )
+                }
+
                 Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
@@ -630,19 +722,139 @@ fun medicinCard(
                         contentDescription = null
                     )
                     Spacer(Modifier.weight(1f))
-                    Log.i(
-                        "listManipulation",
-                        "scheduleListSize = ${medicinScheduleInfo.scheduleList.size}"
-                    )
-                    for (scheduleInfo in medicinScheduleInfo.scheduleList) {
+
+                    for (scheduleInfo in medicinScheduleInfo.scheduleTermDetailsList) {
                         Text(text="${stringResource(scheduleInfo.day.title)} ${"%02d".format(scheduleInfo.hour)}:${"%02d".format(scheduleInfo.minute)}  - ${scheduleInfo.dose} ${medicinScheduleInfo.medicinDetails.form}",
                             color = contentColor)
                     }
 
                 }
             }
+
+            if(openDialogDelete)
+            {
+                areYouSureDialog(
+                    onConfirm = {onDeleteClick()},
+                    onDismiss = {openDialogDelete = false},
+                    info = "Czy na pewno chcesz usunąć zalecenia zażywania leku ${medicinScheduleInfo.medicinDetails.name}"
+                )
+            }
+
         }
 
 
+    }
+}
+
+
+
+@Composable
+fun zalecenieDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    scheduleDetails: ScheduleDetails,
+    storageDetails: StorageDetails,
+    onValueStorageChange: (StorageDetails) -> Unit,
+    onScheduleChange: (ScheduleDetails) -> Unit,
+    viewModel: ZalecenieViewModel
+)
+{
+    var openMedicinDialog by remember { mutableStateOf(true) }
+    var medicinDetails by remember { mutableStateOf(MedicinDetails()) }
+    if(openMedicinDialog)
+    {
+        addMedicinDialog(
+            viewModel = viewModel,
+            onDismiss = {openMedicinDialog = false},
+            onConfirm = { medicinDetails = it
+            Log.i("zalecenia", "Name: ${medicinDetails.name}")}
+        )
+    }
+
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun addMedicinDialog(
+    viewModel: ZalecenieViewModel,
+    onDismiss: () -> Unit,
+    onConfirm: (MedicinDetails) -> Unit
+)
+{
+    var medicinName by remember { mutableStateOf("")}
+    val suggestions by remember { mutableStateOf(viewModel.medicinSuggestions)}
+
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+    )
+    {
+        Column(modifier = Modifier
+            .wrapContentSize().fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = suggestions.isNotEmpty(),
+                onExpandedChange = { /* Ignore as we control it based on input */ }
+            ) {
+                TextField(
+                    value = medicinName,
+                    onValueChange = {
+                        Log.i("zalecenia", "zmieniono wartość w textfield")
+                        viewModel.onSearchMedicinTextChange(it)
+                                    medicinName = it
+                                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Podaj nazwę leku lub wybierz z istniejących") },
+                    singleLine = true,
+                )
+
+                ExposedDropdownMenu(
+                    expanded = suggestions.isNotEmpty(),
+                    onDismissRequest = { /* Dismiss when user clicks outside */ }
+                ) {
+                    suggestions.forEach { medicinDetails ->
+                        DropdownMenuItem(
+                            onClick = {
+                                medicinName = medicinDetails.name
+                                viewModel.onSearchMedicinTextChange(medicinDetails.name) // Set text on click
+                                //
+                                onConfirm(medicinDetails)
+                                onDismiss()
+                            },
+
+                            text = { Text(text = medicinDetails.name) }
+                        )
+                    }
+                }
+
+
+            }
+
+            Row(modifier = Modifier
+                .wrapContentSize().fillMaxWidth()
+                .padding(dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically)
+            {
+                ButtonIconRow(
+                    onButtonCLick = onDismiss,
+                    isSelected = false,
+                    labelTextId = R.string.back,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack
+                )
+
+                ButtonIconRow(
+                    onButtonCLick = {onConfirm(MedicinDetails(name = medicinName))
+                        onDismiss()},
+                    isSelected = false,
+                    labelTextId = R.string.confirm,
+                    imageVector = Icons.Filled.Check
+                )
+
+            }
+        }
     }
 }

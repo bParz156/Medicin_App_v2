@@ -145,7 +145,6 @@ class HomeViewModel (
             workerRepository.deleteAncient()
             workerRepository.generateUsages()
 
-        //    genereteUsagesForNextPeriodOfTime(7)
         }
         }
     }
@@ -158,58 +157,7 @@ class HomeViewModel (
         return homeUiState.patientUiState.patientDetails.name
     }
 
-    suspend fun genereteUsagesForNextPeriodOfTime(days: Int)
-    {
-        val calendar = Calendar.getInstance() // Bieżąca data
-        val currentDate = calendar.time
-        for(scheduleDetail in patientsSchedule.scheduleDetailsList)
-        {
-            for(scheduleTerm in scheduleDetail.scheduleTermDetailsList)
-            {
-                for(dayOffset in 0..days)
-                {
-                    calendar.time = currentDate
-                    calendar.add(Calendar.DAY_OF_YEAR, dayOffset)
-                    val eventDate = calendar.time
-                    if(isValidEventDay(scheduleTerm, calendar))
-                    {
-                        calendar.set(Calendar.HOUR_OF_DAY, scheduleTerm.hour)
-                        calendar.set(Calendar.MINUTE, scheduleTerm.minute)
-                        val eventTime = calendar.time
-                        Log.i("usageeee", "id scheduleTerm = ${scheduleTerm.id}")
-                        val usage = Usage(id=0,
-                            ScheduleTerm_id = scheduleTerm.id,
-                            confirmed = false,
-                            date = eventTime)
-                        Log.i("usageeee", " Create usage scheudle Term = ${usage.ScheduleTerm_id}")
-                        val id = usageRepository.insert(usage)
-                        Log.i("usageeee", " id created = $id")
-//                        // homeUiState.usageList.add(usage)
-////                        homeUiState.usageList.add(
-////                            UsageDetails(
-////                                id = id.toInt(),
-////                                date = eventTime,
-////                                dose = scheduleTerm.dose,
-////                                medicinDetails = scheduleDetail.medicinDetails
-////                            )
-//                        )
-                       // Log.i("usageeee", " w usageList= id= $id , date.hou")
-                    }
 
-                }
-            }
-        }
-
-
-
-    }
-
-
-    private fun isValidEventDay(scheduleTerm: ScheduleTermDetails, calendar: Calendar): Boolean {
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)  // Zwraca dzień tygodnia: 1 = Niedziela, 7 = Sobota
-        Log.i("usageeee", "isValidDay  == scheudleDay: $(${scheduleTerm.day.weekDay}) ==? ${dayOfWeek}")
-        return scheduleTerm.day.weekDay == dayOfWeek  // Załóżmy, że 'dayOfWeek' w harmonogramie jest zgodne z `Calendar`
-    }
 
 
 

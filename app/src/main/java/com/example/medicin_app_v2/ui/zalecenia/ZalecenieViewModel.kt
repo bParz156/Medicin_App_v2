@@ -70,6 +70,8 @@ class ZalecenieViewModel(
     var storageUiState by mutableStateOf(StorageUiState())
         private set
 
+    private var allMedicinDetails by mutableStateOf(listOf<MedicinDetails>())
+
     init {
         viewModelScope.launch {
 
@@ -91,7 +93,10 @@ class ZalecenieViewModel(
                     scheduleTermList =  scheduleTermRepository.getAllsSchedulesTerms(it.id).filterNotNull().first()
                 )
                 })
-
+            allMedicinDetails = medicinRepository.getAllMedicinesStream()
+                .filterNotNull()
+                .first()
+                .map { it.toMedicinDetails() }
 
         }
     }
@@ -188,93 +193,74 @@ class ZalecenieViewModel(
         Log.i("createSchedule", "czyszczenie")
 
     }
-//    suspend fun createSchedule()
-//    {
-//
-//        scheduleUiState.scheduleDetails.medicinDetails.id= createMedicin()
-//        scheduleRepository.insertSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
-//        updateSchedulesInfo()
-//    }
-
-
-
-//    suspend fun createMedicin() : Int
-//    {
-//        Log.i("zalecenia", "createMedicin")
-//
-//        val medicineinDB = medicinRepository.getMedicineStream(
-//            scheduleUiState.scheduleDetails.medicinDetails.name,
-//            scheduleUiState.scheduleDetails.medicinDetails.form).first()
-//        var idx : Int
-//        if(medicineinDB == null)
-//        {
-//            val idxm = medicinRepository.getAllMedicinesStream().first().size
-//            medicinRepository.insertMedicine(scheduleUiState.scheduleDetails.medicinDetails.toMedicin())
-//            storageUiState.storageDetails.MedicinId = idxm+1
-//          //  storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
-//            idx = idxm+1
-//        }
-//        else
-//        {
-//            storageUiState.storageDetails.MedicinId = medicineinDB.id
-//          //  storageRepository.updateStorage(storageUiState.storageDetails.toStorage())
-//            idx= medicineinDB.id
-//        }
-//        createStorage()
-//        return idx
-//
-//    }
 
 
     fun getPatientsName(): String{
         return patientUiState.patientDetails.name
     }
 
-}
+    suspend fun deleteZalecenie(){
+        scheduleRepository.deleteSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
+    }
+    var medicinSuggestions by mutableStateOf(listOf<MedicinDetails>())
 
+    fun onSearchMedicinTextChange(newText: String)
+    {
 
-fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<MedicinScheduleInfo>
-{
-    Log.i("listManipulation: ", "start conversion")
-    Log.i("listManipulation: ", "size list details=  ${this.scheduleDetailsList.size}")
+        medicinSuggestions = if(newText.isEmpty())
+        {
+            emptyList()
+        }
+        else
+        {
+            allMedicinDetails.filter {it.name.startsWith(newText, ignoreCase = true)}
 
-    var medicinScheduleInfoList : List<MedicinScheduleInfo> =listOf()
-   // return medicinScheduleInfoList
-    if(this.scheduleDetailsList.isNotEmpty()) {
-        Log.i("listManipulation: ", "nie jest empty ale jakos dalej nie widzie")
-        for (scheduleDetail in this.scheduleDetailsList) {
-            Log.i("listManipulation: ", "wywala przez fora")
-            var medicinScheduleInfo =
-                medicinScheduleInfoList.find { it.medicinDetails.id == scheduleDetail.medicinDetails.id }
-            if (medicinScheduleInfo == null) {
-
-                medicinScheduleInfo = MedicinScheduleInfo(
-                    medicinDetails = scheduleDetail.medicinDetails ,
-                    startDate = scheduleDetail.startDate,
-                    endDate = scheduleDetail.endDate,
-                    scheduleList = scheduleDetail.scheduleTermDetailsList
-                )
-
-                medicinScheduleInfoList =medicinScheduleInfoList+ medicinScheduleInfo
-            }
-
+        }
+        Log.i("zalecenia", "jest git")
+        for (sug in medicinSuggestions)
+        {
+            Log.i("zalecenia", sug.name)
         }
     }
 
-    Log.i("listManipulation: ", "wielkosc nowego ${medicinScheduleInfoList.size}")
 
-    return medicinScheduleInfoList
 }
 
 
-data class MedicinScheduleInfo(
-    val medicinDetails: MedicinDetails,
-    var scheduleList: List<ScheduleTermDetails> =listOf(),
-    val startDate: Date,
-    val endDate : Date?,
-)
-
-
+//fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<ScheduleDetails>
+//{
+//    Log.i("listManipulation: ", "start conversion")
+//    Log.i("listManipulation: ", "size list details=  ${this.scheduleDetailsList.size}")
+//
+//    var medicinScheduleInfoList : List<ScheduleDetails> =listOf()
+//   // return medicinScheduleInfoList
+//    if(this.scheduleDetailsList.isNotEmpty()) {
+//        Log.i("listManipulation: ", "nie jest empty ale jakos dalej nie widzie")
+//        for (scheduleDetail in this.scheduleDetailsList) {
+//            Log.i("listManipulation: ", "wywala przez fora")
+//            var medicinScheduleInfo =
+//                medicinScheduleInfoList.find { it.medicinDetails.id == scheduleDetail.medicinDetails.id }
+//            if (medicinScheduleInfo == null) {
+//
+//                medicinScheduleInfo = ScheduleDetails(
+//                    id = scheduleDetail.id,
+//                    medicinDetails = scheduleDetail.medicinDetails ,
+//                    startDate = scheduleDetail.startDate,
+//                    endDate = scheduleDetail.endDate,
+//                    scheduleTermDetailsList = scheduleDetail.scheduleTermDetailsList
+//                )
+//
+//                medicinScheduleInfoList =medicinScheduleInfoList+ medicinScheduleInfo
+//            }
+//
+//        }
+//    }
+//
+//    Log.i("listManipulation: ", "wielkosc nowego ${medicinScheduleInfoList.size}")
+//
+//    return medicinScheduleInfoList
+//}
+//
 
 
 
