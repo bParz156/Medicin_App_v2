@@ -88,8 +88,14 @@ import com.example.medicin_app_v2.ui.toPatientDetails
 import kotlinx.coroutines.launch
 import java.util.Date
 import android.widget.ArrayAdapter
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.ExposedDropdownMenuBox
+import com.example.medicin_app_v2.ui.ButtonIconColumn
+import java.util.Calendar
 
 
 object ZaleceniaDestination : NavigationDestination {
@@ -761,18 +767,274 @@ fun zalecenieDialog(
 {
     var openMedicinDialog by remember { mutableStateOf(true) }
     var medicinDetails by remember { mutableStateOf(MedicinDetails()) }
+    var openAreYouSure by remember { mutableStateOf(false) }
+    var confirmedMedicine by remember { mutableStateOf(false) }
+    var openScheduleDialog by remember { mutableStateOf(false) }
+
     if(openMedicinDialog)
     {
         addMedicinDialog(
             viewModel = viewModel,
             onDismiss = {openMedicinDialog = false},
-            onConfirm = { medicinDetails = it
+            onConfirm = {
+                medicinDetails =it
+                openAreYouSure = true
+
             Log.i("zalecenia", "Name: ${medicinDetails.name}")}
         )
     }
 
+    if(confirmedMedicine)
+    {
+        openAreYouSure = false
+        openMedicinDialog = false
+        openScheduleDialog = true
+    }
+
+    if(openScheduleDialog)
+    {
+        addScheduleDialog(
+            onDismiss = {openScheduleDialog = false},
+            onConfirm = {
+                onScheduleChange(it)
+                openAreYouSure = true
+            },
+            medicinDetails = medicinDetails
+        )
+    }
+
+
+    if(openAreYouSure)
+    {
+        if(!confirmedMedicine) {
+            areYouSureDialog(
+                onConfirm = {
+                    confirmedMedicine = true
+                },
+                onDismiss = { openAreYouSure = false },
+                info = "Lek, dla którego wprowadzane jest nowe zlecenie to: ${medicinDetails.name} przyjmowany jest w formie: ${medicinDetails.form}" +
+                        ". Zależność leku z posiłkiem: ${medicinDetails.relation}"
+            )
+        }
+    }
+
+
+
 
 }
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun addScheduleDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (ScheduleDetails) -> Unit,
+    medicinDetails: MedicinDetails
+)
+{
+    var addNewScheduleTerm by remember { mutableStateOf(false) }
+    val scheduleDetails by remember { mutableStateOf(ScheduleDetails(medicinDetails = medicinDetails)) }
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_small))
+    )
+    {
+        Column(modifier = Modifier
+            .wrapContentSize().fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+            Text(text = "Uzupełnij informacje na temat dawkowania leku ${medicinDetails.name}",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_large))
+            )
+
+            Text(text ="Wybierz datę początku kuracji")
+            Text(text = "Wybierz datę końca kuracji jeśli jest znana")
+
+            ButtonIconColumn(
+                onButtonCLick = {addNewScheduleTerm = true},
+                labelTextId = R.string.add_medicin_title,
+                imageVector = Icons.Filled.Add,
+                isSelected = false
+            )
+
+            LazyColumn {
+                items(items = scheduleDetails.scheduleTermDetailsList, key = {it.id})
+                {
+                    Text(text="${stringResource(it.day.title)} ${"%02d".format(it.hour)}:${"%02d".format(it.minute)}  - ${it.dose} ${medicinDetails.form}",
+                        color = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+            }
+
+        }
+
+        if(addNewScheduleTerm)
+        {
+            addScheduleTermDialog(
+                onDismiss = {addNewScheduleTerm = false},
+                onConfirm = {
+                    scheduleDetails.scheduleTermDetailsList + it
+                }
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.padding_small)),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        )
+        {
+            ButtonIconRow(
+                onButtonCLick = onDismiss,
+                isSelected = false,
+                labelTextId = R.string.back,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack
+            )
+
+            ButtonIconRow(
+                onButtonCLick = {
+                    onConfirm(scheduleDetails)
+                },
+                isSelected = false,
+                labelTextId = R.string.confirm,
+                imageVector = Icons.Filled.Check
+            )
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun addScheduleTermDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (ScheduleTermDetails) -> Unit
+)
+{
+    var scheduleTermDetails by mutableStateOf(ScheduleTermDetails())
+    var expandedDays by remember { mutableStateOf(false) }
+
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+            .fillMaxWidth()
+    )
+    {
+        Column(modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(dimensionResource(R.dimen.padding_large))
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+            Text(
+                text = "Uzupełnij infomacje na temat termin zażycia",
+                textAlign = TextAlign.Justify,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium))
+            )
+
+            TextField(value = scheduleTermDetails.dose.toString(),
+                onValueChange = { input ->
+                    // Tylko liczby będą akceptowane
+                    if (input.all { it.isDigit() }) {
+                        scheduleTermDetails.dose = input.toInt()
+                        // scheduleDetails = scheduleDetails.copy(dose = input.toInt())
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("Podaj dawkę leku") }
+            )
+
+            Column()
+            {
+                Row()
+                {
+                    Button(onClick = { expandedDays = !expandedDays })
+                    {
+                        Icon(
+                            imageVector = if (expandedDays) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null
+                        )
+                    }
+                    Text(
+                        text = "Wybrany dzień tygodnia: " + stringResource(scheduleTermDetails.day.title)
+                    )
+                }
+                DropdownMenu(expanded = expandedDays,
+                    onDismissRequest = { expandedDays = false }
+                )
+                {
+                    DayWeek.values().forEach { option ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(stringResource(option.title))
+                            },
+                            onClick = {
+                                scheduleTermDetails.day = option
+                            }
+                        )
+                    }
+                }
+
+            }
+
+            val context = LocalContext.current
+            var openTimeDialog by remember { mutableStateOf(false) }
+
+            val calendar = Calendar.getInstance()
+            var pickedHour by remember { mutableIntStateOf(calendar[Calendar.HOUR_OF_DAY]) }
+            var pickedMinute by remember { mutableIntStateOf(calendar[Calendar.MINUTE]) }
+            var scheduleHour by remember { mutableIntStateOf(scheduleTermDetails.hour) }
+            var scheduleMinute by remember { mutableIntStateOf(scheduleTermDetails.minute) }
+            val timePickerDialog = TimePickerDialog(
+                context,
+                { _: TimePicker, hour: Int, minute: Int ->
+                    scheduleTermDetails.hour = hour
+                    scheduleTermDetails.minute = minute
+                }, pickedHour, pickedMinute, true
+            )
+
+            Text("Czas zażycia: ${scheduleHour}:${scheduleMinute}")
+            ButtonIconRow(
+                onButtonCLick = { timePickerDialog.show() },
+                isSelected = false,
+                labelTextId = R.string.czas,
+                imageVector = Icons.Filled.DateRange
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.padding_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                ButtonIconRow(
+                    onButtonCLick = onDismiss,
+                    isSelected = false,
+                    labelTextId = R.string.back,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack
+                )
+
+                ButtonIconRow(
+                    onButtonCLick = {
+                        onConfirm(scheduleTermDetails)
+                    },
+                    isSelected = false,
+                    labelTextId = R.string.confirm,
+                    imageVector = Icons.Filled.Check
+                )
+
+            }
+        }
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -784,60 +1046,154 @@ fun addMedicinDialog(
 )
 {
     var medicinName by remember { mutableStateOf("")}
-    val suggestions by remember { mutableStateOf(viewModel.medicinSuggestions)}
+    val suggestions = viewModel.medicinSuggestions
+    var expandedOptions by remember { mutableStateOf(false) }
+    var medicinDetails by remember { mutableStateOf(MedicinDetails()) }
+    var expandedForm by remember { mutableStateOf(false) }
+    var expandedRelations by remember { mutableStateOf(false) }
+    var okey by remember { mutableStateOf(true) }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+            .fillMaxWidth()
     )
     {
         Column(modifier = Modifier
-            .wrapContentSize().fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+            .verticalScroll(rememberScrollState())
+            .padding(dimensionResource(R.dimen.padding_large))
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
-            ExposedDropdownMenuBox(
-                expanded = suggestions.isNotEmpty(),
-                onExpandedChange = { /* Ignore as we control it based on input */ }
-            ) {
+            Text(text = stringResource(R.string.add_medicin_title),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_large)))
+
+            Text(text = stringResource(R.string.requiered_to_add_medicin),
+                textAlign = TextAlign.Justify,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_medium)))
+
+
+
                 TextField(
                     value = medicinName,
                     onValueChange = {
                         Log.i("zalecenia", "zmieniono wartość w textfield")
-                        viewModel.onSearchMedicinTextChange(it)
-                                    medicinName = it
-                                    },
+                        viewModel.onValueMedicinNameChange(it)
+                        medicinName = it
+                        expandedOptions = suggestions.isNotEmpty()
+                    },
+                    isError = !okey,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Podaj nazwę leku lub wybierz z istniejących") },
-                    singleLine = true,
+                    placeholder = { Text("Podaj nazwę leku")}
                 )
 
-                ExposedDropdownMenu(
-                    expanded = suggestions.isNotEmpty(),
-                    onDismissRequest = { /* Dismiss when user clicks outside */ }
-                ) {
-                    suggestions.forEach { medicinDetails ->
-                        DropdownMenuItem(
-                            onClick = {
-                                medicinName = medicinDetails.name
-                                viewModel.onSearchMedicinTextChange(medicinDetails.name) // Set text on click
-                                //
-                                onConfirm(medicinDetails)
-                                onDismiss()
-                            },
+            DropdownMenu(
+                expanded = expandedOptions,
+                onDismissRequest = { expandedOptions = false },
+                modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
+            ) {
+                Text(text= "Wybierz lek z istniejących",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onTertiaryContainer)
 
-                            text = { Text(text = medicinDetails.name) }
+                suggestions.forEach { item ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = item.name, style = MaterialTheme.typography.titleMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        },
+                        onClick = {
+                            medicinName = item.name
+                            medicinDetails = item
+                            expandedOptions = false
+                            onConfirm(item)
+                            // onDismiss()
+                        }
+
+                    )
+                }
+
+            }
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically)
+            {
+                Text(text = "Forma: ${medicinDetails.form}")
+                Button(onClick = { expandedForm = !expandedForm })
+                {
+                    Icon(
+                        imageVector = if (expandedForm) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = null
+                    )
+                }
+            }
+                DropdownMenu(expanded = expandedForm,
+                    onDismissRequest = { expandedForm = false }
+                )
+                {
+                    MedicinForm.values().forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item.name) },
+                            onClick = {
+                                medicinDetails = medicinDetails.copy(form = item)
+                                expandedForm = false
+                            }
                         )
                     }
                 }
 
 
-            }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    Text(text = "Zależność od posiłku ${medicinDetails.relation}")
+                    Button(onClick = { expandedRelations = !expandedRelations })
+                    {
+                        Icon(
+                            imageVector = if (expandedRelations) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null
+                        )
+                    }
+                }
+                DropdownMenu(expanded = expandedRelations,
+                    onDismissRequest = { expandedRelations = false }
+                )
+                {
+                    MealRelation.values().forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item.name) },
+                            onClick = {
+                                medicinDetails = medicinDetails.copy(
+                                    relation = item
+                                )
+                                expandedRelations = false
+                            }
+                        )
+                    }
+                }
+            Spacer(Modifier.height(dimensionResource(R.dimen.padding_large)))
 
-            Row(modifier = Modifier
-                .wrapContentSize().fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_small)),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.padding_small)),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically)
+                verticalAlignment = Alignment.CenterVertically
+            )
             {
                 ButtonIconRow(
                     onButtonCLick = onDismiss,
@@ -847,8 +1203,13 @@ fun addMedicinDialog(
                 )
 
                 ButtonIconRow(
-                    onButtonCLick = {onConfirm(MedicinDetails(name = medicinName))
-                        onDismiss()},
+                    onButtonCLick = {
+                        if(medicinName.isNotBlank()) {
+                            onConfirm(medicinDetails)
+                        }
+                        else okey =false
+                    },
+                    // onDismiss()},
                     isSelected = false,
                     labelTextId = R.string.confirm,
                     imageVector = Icons.Filled.Check
@@ -858,3 +1219,6 @@ fun addMedicinDialog(
         }
     }
 }
+
+
+

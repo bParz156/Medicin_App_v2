@@ -69,6 +69,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.ui.test.android)
 
     testImplementation(libs.junit)
 

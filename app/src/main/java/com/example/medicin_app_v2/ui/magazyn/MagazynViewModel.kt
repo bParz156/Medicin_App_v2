@@ -29,6 +29,8 @@ import com.example.medicin_app_v2.ui.home.ScheduleTermDetails
 import com.example.medicin_app_v2.ui.home.toMedicinDetails
 import com.example.medicin_app_v2.ui.home.toScheduleDetails
 import com.example.medicin_app_v2.ui.home.toScheduleTermDetails
+import com.example.medicin_app_v2.ui.patients.PatientsDestination
+import com.example.medicin_app_v2.ui.toPatientDetails
 import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -52,7 +54,7 @@ class MagazynViewModel (
         private set
 
 
-    private val patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
+    private val patientId : Int = try{checkNotNull(savedStateHandle[MagazynDestination.patientIdArg])}
     catch (e:IllegalStateException)
     {
         -1
@@ -63,7 +65,18 @@ class MagazynViewModel (
 
 
     init {
+        Log.i("magazyn", "czy jest patientId: $patientId")
         viewModelScope.launch {
+
+            magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList,
+                patientDetails =  patientsRepository.getPatientStream(patientId)
+                    .filterNotNull()
+                    .first()
+                    .toPatientDetails()
+            )
+            Log.i("magazyn", "w funkcji init: ${magazynUiState.patientDetails.name}")
+
+
 
             val Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
                 .first() // Poczekaj na pierwszy wynik z Flow
@@ -92,11 +105,6 @@ class MagazynViewModel (
                     medicinForm = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().form
                 )
             }
-
-            magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList,
-                patientDetails =  PatientDetails(id= patientId,
-                    name =  patientsRepository.getPatientStream(patientId).filterNotNull().first().name)
-            )
 
 
         }
@@ -158,6 +166,7 @@ class MagazynViewModel (
 
 
     fun getPatientsName(): String{
+        Log.i("magazyn", "name: ${magazynUiState.patientDetails.name} a id to: ${magazynUiState.patientDetails.id}  <---to z uiState, a w wartroci: $patientId")
         return magazynUiState.patientDetails.name
     }
 

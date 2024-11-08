@@ -204,24 +204,18 @@ class ZalecenieViewModel(
     }
     var medicinSuggestions by mutableStateOf(listOf<MedicinDetails>())
 
-    fun onSearchMedicinTextChange(newText: String)
+    fun onValueMedicinNameChange(text: String)
     {
-
-        medicinSuggestions = if(newText.isEmpty())
+        medicinSuggestions = if(text.isEmpty())
         {
             emptyList()
         }
         else
         {
-            allMedicinDetails.filter {it.name.startsWith(newText, ignoreCase = true)}
-
-        }
-        Log.i("zalecenia", "jest git")
-        for (sug in medicinSuggestions)
-        {
-            Log.i("zalecenia", sug.name)
+            allMedicinDetails.filter { it.name.startsWith(text, ignoreCase = true) }
         }
     }
+
 
 
 }

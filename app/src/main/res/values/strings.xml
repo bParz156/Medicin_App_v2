@@ -65,6 +65,9 @@
 
     <string name="tabletka_dop">Tabletek</string>
     <string name="ciecz_dop">ml</string>
+    <string name="rozwion">Rozwiń</string>
+    <string name="zwin">Zwiń</string>
+    <string name="czas">Wybierz godzinę</string>
 
 
 </resources>
