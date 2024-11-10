@@ -24,6 +24,7 @@ interface FirstAidKitDao {
     @Query("SELECT * from FirstAidKit WHERE Patient_id = :patients_id")
     fun getpatientsfirstAidKit(patients_id: Int): Flow<List<FirstAidKit>>
 
-
+    @Query("SELECT * from FirstAidKit WHERE Storage_id = :storage_id")
+    fun getfirstAidKitByStorage(storage_id: Int): Flow<List<FirstAidKit>>
 
 }

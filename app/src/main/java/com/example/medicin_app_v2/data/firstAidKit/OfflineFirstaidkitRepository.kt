@@ -7,6 +7,10 @@ class OfflineFirstaidkitRepository(private val firstAidKitDao: FirstAidKitDao) :
         return firstAidKitDao.getpatientsfirstAidKit(patientId)
     }
 
+    override fun getfirstAidKitByStorage(storage_id: Int): Flow<List<FirstAidKit>> {
+        return  firstAidKitDao.getfirstAidKitByStorage(storage_id)
+    }
+
 
     override suspend fun insertFirstAidKit(firstAidKit: FirstAidKit) : Long {
         return firstAidKitDao.insert(firstAidKit)

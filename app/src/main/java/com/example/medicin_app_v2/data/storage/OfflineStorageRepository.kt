@@ -11,6 +11,10 @@ class OfflineStorageRepository(private val storageDao: StorageDao) : StorageRepo
         return storageDao.getStorage(id)
     }
 
+    override fun getAllMedicinesStorages(medicine_id: Int): Flow<List<Storage>> {
+        return storageDao.getAllMedicinesStorages(medicine_id)
+    }
+
     override suspend fun insertStorage(storage: Storage) : Long {
         return storageDao.insert(storage)
     }

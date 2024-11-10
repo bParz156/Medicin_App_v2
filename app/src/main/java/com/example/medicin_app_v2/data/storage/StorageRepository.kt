@@ -9,6 +9,8 @@ interface StorageRepository {
 
     fun getStorageStream(id: Int): Flow<Storage?>
 
+    fun getAllMedicinesStorages(medicine_id: Int): Flow<List<Storage>>
+
     /**
      * Insert Storage in the data source
      */

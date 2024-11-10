@@ -217,6 +217,41 @@ class ZalecenieViewModel(
     }
 
 
+    suspend fun getMedicinesStorage(medicinDetails: MedicinDetails) : MutableMap< StorageDetails, MutableList<String>>
+    {
+        val storageList: List<StorageDetails> = storageRepository.getAllMedicinesStorages(medicine_id = medicinDetails.id)
+            .filterNotNull()
+            .first()
+            .map { it.toStorageDetails() }
+
+        var map : MutableMap< StorageDetails, MutableList<String>> = mutableMapOf()
+
+        for(storageDetials in storageList)
+        {
+            Log.i("medicine", "viewModel: petla for id storage: ${storageDetials.id}")
+            val peopleUsingStorage = firstaidkitRepository.getfirstAidKitByStorage(storageDetials.id).filterNotNull().first().map {
+                patientsRepository.getPatientStream(it.Patient_id).filterNotNull().first().name
+            }
+
+            val mutableListOfPeople : MutableList<String> = mutableListOf()
+            for (people in peopleUsingStorage)
+            {
+                mutableListOfPeople.add(people)
+                Log.i("medicine", "viewModel: petla for w petli for, peopele =: ${people}")
+
+            }
+
+
+            map[storageDetials] = mutableListOfPeople
+            Log.i("medicine", "viewModel: map[${storageDetials.id}] = mutableListOfPeople ::: ${map[storageDetials]}")
+
+
+        }
+
+        return map
+    }
+
+
 
 }
 

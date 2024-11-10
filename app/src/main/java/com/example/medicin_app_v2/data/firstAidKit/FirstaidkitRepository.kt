@@ -9,6 +9,8 @@ interface FirstaidkitRepository {
      */
     fun getAllFirstAidKitsStream(patient_id : Int): Flow<List<FirstAidKit>>
 
+    fun getfirstAidKitByStorage(storage_id: Int): Flow<List<FirstAidKit>>
+
     /**
      * Insert FirstAidKit in the data source
      */
