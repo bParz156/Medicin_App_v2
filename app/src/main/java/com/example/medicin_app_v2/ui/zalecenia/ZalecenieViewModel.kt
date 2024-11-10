@@ -297,6 +297,18 @@ data class ScheduleUiState(val scheduleDetails: ScheduleDetails = ScheduleDetail
 
 data class StorageUiState(val storageDetails: StorageDetails = StorageDetails())
 
+
+fun ScheduleDetails.toInfo(): String = "Lek: ${medicinDetails.name} \n" +
+        "Przyjmowany jest w formie: ${medicinDetails.form} \n" +
+        "Relacja leku z posiłkiem: ${medicinDetails.relation} \n" +
+        "Początek kuracji: ${startDate}, koniec kuracji: ${endDate?: "nieznany"} \n" +
+        "Terminy zażyć: \n" +
+        "${scheduleTermDetailsList.map { "${it.day} - ${"%02d".format(it.hour)}:\${" +
+                "                            \"%02d\".format(" +
+                "                                it.minute" +
+                "                            )  ${it.dose} x ${medicinDetails.form} \n" }}"
+
+
 data class StorageDetails(
     val id: Int = 0,
     var MedicinId: Int =0,

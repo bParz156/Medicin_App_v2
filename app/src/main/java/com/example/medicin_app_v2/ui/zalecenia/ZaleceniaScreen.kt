@@ -781,6 +781,7 @@ fun zalecenieDialog(
             onConfirm = { medicinDetailsR, storageDetailsR ->
                 medicinDetails = medicinDetailsR
                 onValueStorageChange(storageDetailsR)
+                onScheduleChange(scheduleDetails.copy(medicinDetails = medicinDetails))
                 openAreYouSure = true
             Log.i("zalecenia", "Name: ${medicinDetails.name}")
             }
@@ -800,7 +801,9 @@ fun zalecenieDialog(
             onDismiss = {openScheduleDialog = false},
             onConfirm = {
                 onScheduleChange(it)
+                openScheduleDialog = false
                 openAreYouSure = true
+                Log.i("medicine", "tutaj")
             },
             medicinDetails = medicinDetails
         )
@@ -817,6 +820,18 @@ fun zalecenieDialog(
                 onDismiss = { openAreYouSure = false },
                 info = "Lek, dla którego wprowadzane jest nowe zlecenie to: ${medicinDetails.name} przyjmowany jest w formie: ${medicinDetails.form}" +
                         ". Zależność leku z posiłkiem: ${medicinDetails.relation}"
+            )
+        }
+
+        else
+        {
+            areYouSureDialog(
+                onConfirm = {
+                    onConfirm()
+                    onDismiss
+                },
+                onDismiss = { openAreYouSure = false },
+                info = scheduleDetails.toInfo()
             )
         }
     }
@@ -911,8 +926,10 @@ fun addScheduleDialog(
             addScheduleTermDialog(
                 onDismiss = { addNewScheduleTerm = false },
                 onConfirm = {
-                    scheduleDetails.copy(scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it)
+                    //scheduleDetails.copy(scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it)
                     //scheduleDetails.scheduleTermDetailsList + it
+                    scheduleDetails.scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it
+                    Log.i("medicine", "ile juz termow: ${scheduleDetails.scheduleTermDetailsList.size}")
                     addNewScheduleTerm = false
                 }
             )
@@ -929,6 +946,7 @@ fun addScheduleTermDialog(
 {
     val scheduleTermDetails by remember { mutableStateOf(ScheduleTermDetails())}
     var expandedDays by remember { mutableStateOf(false) }
+    var dose by remember { mutableStateOf(scheduleTermDetails.dose.toString()) }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -949,16 +967,17 @@ fun addScheduleTermDialog(
                     .padding(dimensionResource(R.dimen.padding_medium))
             )
 
-            TextField(value = scheduleTermDetails.dose.toString(),
+            TextField(value = dose,
                 onValueChange = { input ->
                     // Tylko liczby będą akceptowane
                     if (input.all { it.isDigit() }) {
-                        scheduleTermDetails.dose = if(input.isBlank()) 0 else input.toInt()
+                        dose = input
                         // scheduleDetails = scheduleDetails.copy(dose = input.toInt())
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj dawkę leku") }
+                placeholder = { Text("Podaj dawkę leku") },
+                isError = dose.isBlank() || dose.equals("0")
             )
 
             Column()
@@ -987,6 +1006,7 @@ fun addScheduleTermDialog(
                             },
                             onClick = {
                                 scheduleTermDetails.day = option
+                                expandedDays = false
                             }
                         )
                     }
@@ -1005,7 +1025,9 @@ fun addScheduleTermDialog(
                 context,
                 { _: TimePicker, hour: Int, minute: Int ->
                     scheduleTermDetails.hour = hour
+                    scheduleHour = hour
                     scheduleTermDetails.minute = minute
+                    scheduleMinute = minute
                 }, pickedHour, pickedMinute, true
             )
 
@@ -1034,6 +1056,7 @@ fun addScheduleTermDialog(
 
                 ButtonIconRow(
                     onButtonCLick = {
+                        scheduleTermDetails.dose = dose.toInt()
                         onConfirm(scheduleTermDetails)
                     },
                     isSelected = false,
@@ -1230,7 +1253,12 @@ fun addMedicinDialog(
                 onDismissRequest = { expandedStorage = false }
             )
             {
-                Text("Lek jest już przyjmowany przez innych pacjentów. Wybierz jeśli chcesz dzielić apteczkę z innym pacjentem")
+                Text(text ="Lek jest już przyjmowany przez innych pacjentów. Wybierz jeśli chcesz dzielić apteczkę z innym pacjentem",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                )
                 Log.i("medicine", "Wielkosc mapy; $storageMap")
                 storageMap.forEach { (storageDetailsM, patientsList) ->
 
@@ -1239,11 +1267,16 @@ fun addMedicinDialog(
                     {
                         Log.i("medicine", "w forze: $name")
                         listName.plus("$name,")
+                        listName = name
                     }
                     Log.i("medicine", "${storageDetailsM.id} : $listName")
 
                     DropdownMenuItem(
-                        text = { Text(listName) },
+                        text = { Text(text = listName, style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        ) },
                         onClick = {
                             storageDetails = storageDetailsM
                             expandedStorage = false
