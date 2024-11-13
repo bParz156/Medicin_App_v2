@@ -127,10 +127,6 @@ class ZalecenieViewModel(
         storageUiState = StorageUiState(storageDetails)
     }
 
-    suspend fun createStorage()
-    {
-        storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
-    }
 
     fun updatetUiState(scheduleDetails: ScheduleDetails)
     {
@@ -147,40 +143,53 @@ class ZalecenieViewModel(
 //    }
 
 
+    suspend fun createMedicine()
+    {
+        Log.i("createSchedule", "createMedicine")
+        val medicinDetails = scheduleUiState.scheduleDetails.medicinDetails
+        if(medicinDetails.id == 0)
+        {
+            Log.i("createSchedule", "createMedicine --leku nie bylo")
+            val id = medicinRepository.insertMedicine(medicinDetails.toMedicin())
+            medicinDetails.id = id.toInt()
+            updatetUiState(scheduleDetails = scheduleUiState.scheduleDetails.copy(medicinDetails = medicinDetails))
+        }
+    }
+
+    suspend fun createStorage()
+    {
+        Log.i("createSchedule", "createStorage")
+        if(storageUiState.storageDetails.MedicinId==0)
+        {
+            Log.i("createSchedule", "createStorage -- nie bylo id med")
+            updatestorageState(storageDetails = storageUiState.storageDetails.copy(MedicinId = scheduleUiState.scheduleDetails.medicinDetails.id))
+            val id = storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+            Log.i("createSchedule", "createStorage -- nie bylo id med -- id storage $id")
+            firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =id.toInt() ))
+        }
+        else if(storageUiState.storageDetails.id == 0)
+        {
+            Log.i("createSchedule", "nie bylo id storage")
+            val id = storageRepository.insertStorage(storageUiState.storageDetails.toStorage())
+            firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =id.toInt() ))
+        }
+        else
+        {
+            Log.i("createSchedule", "byl storage")
+            val id = storageUiState.storageDetails.id
+            firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =id ))
+        }
+    }
+
     suspend fun createSchedule()
     {
       //  Log.i("createSchedule", "start, listSize: ${scheduleUiState.scheduleDetailsList.size}")
      //  var medicinDetails = scheduleUiState.scheduleDetailsList.first().medicinDetails
-        var medicinDetails = scheduleUiState.scheduleDetails.medicinDetails
-        Log.i("createSchedule", "medicinDetails: ${medicinDetails.name}")
-
-        val medicineinDB = medicinRepository.getMedicineStream(
-            medicinDetails.name, medicinDetails.form).first()
-        Log.i("createSchedule", "medicininDB: ${medicineinDB?.id}")
-        var medicinId : Int
-        if(medicineinDB==null)
-        {
-            Log.i("createSchedule", "medicininDB: puste")
-           // medicinRepository.insertMedicine(medicinDetails.toMedicin())
-          //  medicinId = medicinRepository.getAllMedicinesStream().first().size
-            medicinId = medicinRepository.insertMedicine(medicinDetails.toMedicin()).toInt()
-        }
-        else
-        {
-            medicinId = medicineinDB.id
-        }
-        Log.i("createSchedule", "medID: $medicinId")
-
-        storageUiState.storageDetails.MedicinId = medicinId
-        val idxStorage = storageRepository.insertStorage(storageUiState.storageDetails.toStorage()).toInt()
-        Log.i("createSchedule", "storageCreated:")
-       // val idxStorage = storageRepository.getAllStoragesStream().filterNotNull().first().size
-
-        firstaidkitRepository.insertFirstAidKit(FirstAidKit(Patient_id= patientId, Storage_id =idxStorage ))
-
-        scheduleUiState.scheduleDetails.medicinDetails.id= medicinId
+        createMedicine()
+        createStorage()
+        Log.i("createSchedule", "craeteSchedule")
         val scheduleId = scheduleRepository.insertSchedule( scheduleUiState.scheduleDetails.toSchedule(patientId)).toInt()
-
+        Log.i("createSchedule", "id scheudle: ${scheduleId}")
         for(scheduleTermDetail in scheduleUiState.scheduleDetails.scheduleTermDetailsList)
         {
             scheduleTermRepository.insertScheduleTerm(scheduleTermDetail.toScheduleTerm(scheduleId))

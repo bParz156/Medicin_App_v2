@@ -88,12 +88,15 @@ import com.example.medicin_app_v2.ui.toPatientDetails
 import kotlinx.coroutines.launch
 import java.util.Date
 import android.widget.ArrayAdapter
+import android.widget.DatePicker
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.medicin_app_v2.ui.ButtonIconColumn
 import java.util.Calendar
 
@@ -788,12 +791,13 @@ fun zalecenieDialog(
         )
     }
 
-    if(confirmedMedicine)
-    {
-        openAreYouSure = false
-        openMedicinDialog = false
-        openScheduleDialog = true
-    }
+//    if(confirmedMedicine)
+//    {
+//        openAreYouSure = false
+//        openMedicinDialog = false
+//        openScheduleDialog = true
+//        Log.i("scheduleDetils new", "confirmed changed values")
+//    }
 
     if(openScheduleDialog)
     {
@@ -803,7 +807,7 @@ fun zalecenieDialog(
                 onScheduleChange(it)
                 openScheduleDialog = false
                 openAreYouSure = true
-                Log.i("medicine", "tutaj")
+                Log.i("scheduleDetils new", "openScheduleDialog = ${openScheduleDialog}, openAreYouSure = ${openAreYouSure}")
             },
             medicinDetails = medicinDetails
         )
@@ -812,10 +816,14 @@ fun zalecenieDialog(
 
     if(openAreYouSure)
     {
+        Log.i("scheduleDetils new", "openScheduleDialog = ${openScheduleDialog}, openAreYouSure = ${openAreYouSure}")
         if(!confirmedMedicine) {
+            Log.i("scheduleDetils new", "if")
             areYouSureDialog(
                 onConfirm = {
                     confirmedMedicine = true
+                    openMedicinDialog = false
+                    openScheduleDialog = true
                 },
                 onDismiss = { openAreYouSure = false },
                 info = "Lek, dla którego wprowadzane jest nowe zlecenie to: ${medicinDetails.name} przyjmowany jest w formie: ${medicinDetails.form}" +
@@ -825,10 +833,11 @@ fun zalecenieDialog(
 
         else
         {
+            Log.i("scheduleDetils new", "else")
             areYouSureDialog(
                 onConfirm = {
                     onConfirm()
-                    onDismiss
+                    onDismiss()
                 },
                 onDismiss = { openAreYouSure = false },
                 info = scheduleDetails.toInfo()
@@ -850,6 +859,7 @@ fun addScheduleDialog(
 )
 {
     var addNewScheduleTerm by remember { mutableStateOf(false) }
+    var existed by remember { mutableStateOf(false) }
     val scheduleDetails by remember { mutableStateOf(ScheduleDetails(medicinDetails = medicinDetails)) }
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -870,8 +880,61 @@ fun addScheduleDialog(
                     .padding(dimensionResource(R.dimen.padding_large))
             )
 
-            Text(text = "Wybierz datę początku kuracji")
-            Text(text = "Wybierz datę końca kuracji jeśli jest znana")
+
+            val context = LocalContext.current
+            val calendar = Calendar.getInstance()
+            var startDate by remember { mutableStateOf("${calendar.get(Calendar.DAY_OF_MONTH)}/" +
+                    "${calendar.get(Calendar.MONTH) + 1}/" +
+                    "${calendar.get(Calendar.YEAR)}") }
+            var endDate by remember { mutableStateOf("") }
+
+
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Text(text = "Początek kuracji: $startDate")
+                Button(onClick = {
+                    android.app.DatePickerDialog(
+                        context,
+                        { _, year, month, day ->
+                        startDate = "$day/${month + 1}/$year"
+                            scheduleDetails.startDate = Date(year - 1900, month, day)
+                            Log.i("data", "$startDate == ${scheduleDetails.startDate}")
+                    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                        .show()
+                }){
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Data początku kuracji"
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Text(text = "Data kuracji: ${if(endDate.isBlank()) "nieznana" else endDate}")
+                Button(onClick = {
+                    android.app.DatePickerDialog(
+                        context,
+                        { _, year, month, day ->
+                            endDate = "$day/${month + 1}/$year"
+                            scheduleDetails.endDate = Date(year - 1900, month, day)
+                           // Log.i("data", "$startDate == ${scheduleDetails.startDate}")
+                        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                        .show()
+                }){
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Data końca kuracji"
+                    )
+                }
+            }
 
             ButtonIconColumn(
                 onButtonCLick = { addNewScheduleTerm = true },
@@ -884,14 +947,51 @@ fun addScheduleDialog(
             LazyColumn {
                 items(items = scheduleDetails.scheduleTermDetailsList, key = { it.id })
                 {
-                    Text(
-                        text = "${stringResource(it.day.title)} ${"%02d".format(it.hour)}:${
-                            "%02d".format(
-                                it.minute
+                    Card( modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.tertiaryContainer),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small)))
+                    {
+                        Row(horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically)
+                        {
+
+                            Icon(imageVector = Icons.Filled.Delete,
+                                modifier = Modifier
+                                    .padding(end = dimensionResource(R.dimen.padding_small))
+                                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                                    .clickable {
+                                        scheduleDetails.scheduleTermDetailsList -= it
+                                    }
+                                    .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                                ,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                contentDescription = "Usuń"
                             )
-                        }  - ${it.dose} ${medicinDetails.form}",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                            Text(
+                                text = "${stringResource(it.day.title)} ${"%02d".format(it.hour)}:${
+                                    "%02d".format(
+                                        it.minute
+                                    )
+                                }  - ${it.dose} ${medicinDetails.form}",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+
+                            Icon(imageVector = Icons.Filled.Edit,
+                                modifier = Modifier
+                                    .padding(end = dimensionResource(R.dimen.padding_small))
+                                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                                    .clickable {
+                                        existed =true
+                                        addNewScheduleTerm = true
+                                    }
+                                    .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                                ,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                contentDescription = "Modyfikuj"
+                            )
+
+                        }
+                    }
                 }
             }
 
@@ -912,6 +1012,7 @@ fun addScheduleDialog(
 
                 ButtonIconRow(
                     onButtonCLick = {
+                        Log.i("scheduleDetils new", "on confirm click: ${scheduleDetails}")
                         onConfirm(scheduleDetails)
                     },
                     isSelected = false,
@@ -924,27 +1025,35 @@ fun addScheduleDialog(
 
         if (addNewScheduleTerm) {
             addScheduleTermDialog(
-                onDismiss = { addNewScheduleTerm = false },
+                onDismiss = { addNewScheduleTerm = false
+                    existed = false
+                            },
                 onConfirm = {
                     //scheduleDetails.copy(scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it)
                     //scheduleDetails.scheduleTermDetailsList + it
-                    scheduleDetails.scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it
+                    if(!existed) {
+                        scheduleDetails.scheduleTermDetailsList += it
+                    }
                     Log.i("medicine", "ile juz termow: ${scheduleDetails.scheduleTermDetailsList.size}")
                     addNewScheduleTerm = false
+                    existed = false
                 }
             )
         }
     }
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun addScheduleTermDialog(
+    scheduleTermDetailsGiven: ScheduleTermDetails = ScheduleTermDetails(),
     onDismiss: () -> Unit,
     onConfirm: (ScheduleTermDetails) -> Unit
 )
 {
-    val scheduleTermDetails by remember { mutableStateOf(ScheduleTermDetails())}
+    val scheduleTermDetails by remember { mutableStateOf(scheduleTermDetailsGiven)}
     var expandedDays by remember { mutableStateOf(false) }
     var dose by remember { mutableStateOf(scheduleTermDetails.dose.toString()) }
 
@@ -1192,7 +1301,7 @@ fun addMedicinDialog(
                     onDismissRequest = { expandedForm = false }
                 )
                 {
-                    MedicinForm.values().forEach { item ->
+                    MedicinForm.entries.forEach { item ->
                         DropdownMenuItem(
                             text = { Text(item.name) },
                             onClick = {
@@ -1243,7 +1352,7 @@ fun addMedicinDialog(
                     // Tylko liczby będą akceptowane
                     if (input.isBlank() || input.all { it.isDigit() }) {
                         medicinStore = input
-                        storageDetails.copy(MedicinId = medicinDetails.id, quantity = if(input.isBlank()) 0 else medicinStore.toInt())
+                        storageDetails = storageDetails.copy(MedicinId = medicinDetails.id, quantity = if(input.isBlank()) 0 else medicinStore.toInt())
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
