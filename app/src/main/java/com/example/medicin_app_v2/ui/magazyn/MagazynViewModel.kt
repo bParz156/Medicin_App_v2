@@ -75,6 +75,24 @@ class MagazynViewModel (
                     .toPatientDetails()
           //  )
 
+            val schedules =  scheduleRepository.getAllPatientsSchedules(
+                patient_id = patientId)
+                .filterNotNull()
+                .first()
+
+
+
+            val medicinSchedule : MutableMap<Int, List<ScheduleTermDetails>> = mutableMapOf()
+            for(schedule in schedules)
+            {
+                val medicinId = schedule.Medicine_id
+                val scheduleTermDetailsList = scheduleTermRepository.getAllsSchedulesTerms(
+                            scheduleId = schedule.id
+                        ).filterNotNull().first().map { it.toScheduleTermDetails() }
+                medicinSchedule[medicinId] =scheduleTermDetailsList
+            }
+
+
             val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
                 .first()
 
@@ -89,16 +107,17 @@ class MagazynViewModel (
                     quantity = storage.quantity,
                     medName = medicinRepository.getMedicineStream(storage.Medicineid)
                         .filterNotNull().first().name,
-                     daysToEnd = 0,
-//                    daysToEnd = calculateDaysToEnd(
+                   //  daysToEnd = 0,
+                    daysToEnd =   calculateDaysToEnd(
 //                        scheduleTermDetailsList = scheduleTermRepository.getAllsSchedulesTerms(
 //                            scheduleId = scheduleRepository.getPatientMedicineSchedule(
 //                                patient_id = patientId,
 //                                medicine_id = storage.Medicineid
 //                            ).filterNotNull().first().id
 //                        ).filterNotNull().first().map { it.toScheduleTermDetails() },
-//                        quantity = storage.quantity
-//                    ),
+                        scheduleTermDetailsList = medicinSchedule[storage.Medicineid]?: emptyList(),
+                        quantity = storage.quantity
+                    ),
                     medicinForm = medicinRepository.getMedicineStream(storage.Medicineid)
                         .filterNotNull().first().form
                 )
@@ -108,33 +127,18 @@ class MagazynViewModel (
 
 
             magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList, patientDetails = patientDetails)
-           // )
+//        for(storageDetail in magazynUiState.storageDetailsList)
+//        {
+//            storageDetail.daysToEnd = calculateDaysToEnd(
+//                scheduleTermDetailsList =
+//            )
+//        }
+        // )
           //  Log.i("magazyn", "w funkcji init: ${magazynUiState.patientDetails.name}")
 
         }
     }
 
-//
-//    private suspend fun storageDetailsList() : List<StorageDetails>
-//    {
-//        val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
-//            .first()
-//
-//
-//        for(kit in firstAidKits)
-//        {
-//            val storage = storageRepository.getStorageStream(kit.Storage_id).filterNotNull().first()
-//            storageDetailsList = storageDetailsList + StorageDetails(
-//                storageId = storage.id,
-//                medicinId =  storage.Medicineid,
-//                quantity = storage.quantity,
-//                medName = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().name,
-//                // daysToEnd = 0,
-//                daysToEnd = 0,
-//                medicinForm = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().form
-//            )
-//        }
-//    }
 
     private fun calculateDaysToEnd(scheduleTermDetailsList: List<ScheduleTermDetails>, quantity: Int) : Int
     {
@@ -143,24 +147,24 @@ class MagazynViewModel (
         var dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         var toEnd =0
         var stopPit: Boolean = false
-        val usageDay: List<Int> =calculateWeeklyUsage(scheduleTermDetailsList)
-        Log.i("calday", "${DayWeek.values().find{it.weekDay==1}?.name}  ${usageDay[0]}")
-        Log.i("calday", "${DayWeek.values().find{it.weekDay==5}?.name}  ${usageDay[4]}")
-        var used =0
-        while(used<=quantity && !stopPit)
-        {
-            Log.i("calday", "while: used = ${used} , toEnd= ${toEnd}  dayOfWeek =${dayOfWeek}")
-            if(usageDay[dayOfWeek]+ used > quantity)
-                stopPit = true
-            else {
-                used += usageDay[dayOfWeek]
-                dayOfWeek = (dayOfWeek + 1) % 7
-                toEnd++
+        if(scheduleTermDetailsList.isNotEmpty()) {
+            val usageDay: List<Int> = calculateWeeklyUsage(scheduleTermDetailsList)
+            // Log.i("calday", "${DayWeek.values().find{it.weekDay==1}?.name}  ${usageDay[0]}")
+            // Log.i("calday", "${DayWeek.values().find{it.weekDay==5}?.name}  ${usageDay[4]}")
+            var used = 0
+            while (used <= quantity && !stopPit) {
+                Log.i("calday", "while: used = ${used} , toEnd= ${toEnd}  dayOfWeek =${dayOfWeek}")
+                if (usageDay[dayOfWeek] + used > quantity)
+                    stopPit = true
+                else {
+                    used += usageDay[dayOfWeek]
+                    dayOfWeek = (dayOfWeek + 1) % 7
+                    toEnd++
+                }
+
             }
-
+            Log.i("calday", "nie wychodzi z while")
         }
-        Log.i("calday", "nie wychodzi z while")
-
         return toEnd
     }
 

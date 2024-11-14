@@ -22,5 +22,5 @@ data class Storage(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0, // Auto-generowane ID
     val Medicineid: Int, // Odniesienie do Medicine
-    val quantity: Int
+    var quantity: Int
 )

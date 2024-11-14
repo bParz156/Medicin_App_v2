@@ -41,7 +41,7 @@ fun UstawieniaScreen(
     onButtonHomeClick: (Int) -> Unit ,
                     onButtonMagazynClicked: (Int) ->Unit,
                     onButtonZaleceniaClicked: (Int) ->Unit,
-                    onButtonPowiadomieniaClicked: () ->Unit,
+                    onButtonPowiadomieniaClicked: (Int) ->Unit,
                     onButtonUstawieniaClicked: () ->Unit,
                      onButtonPatientClicked: (Int) ->Unit,
                      modifier: Modifier = Modifier)
@@ -55,7 +55,7 @@ fun UstawieniaScreen(
             onButtonMagazynClicked = {onButtonMagazynClicked(viewModel.ustawieniaUiState.patientDetails.id)},
             onButtonZaleceniaClicked = {onButtonZaleceniaClicked(viewModel.ustawieniaUiState.patientDetails.id)},
             onButtonUstawieniaClicked = onButtonUstawieniaClicked,
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPowiadomieniaClicked = {onButtonPowiadomieniaClicked(viewModel.ustawieniaUiState.patientDetails.id)},
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.ustawieniaUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName()
         )}

@@ -12,21 +12,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.R
 import com.example.medicin_app_v2.navigation.Location
+import com.example.medicin_app_v2.navigation.NavigationDestination
+import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
+import com.example.medicin_app_v2.ui.home.HomeViewModel
 import com.example.medicin_app_v2.ui.magazyn.MagazynBody
+
+
+object PowiadomieniaDestination : NavigationDestination {
+    override val route = "settings"
+    override val titleRes = R.string.Powiadomienia
+    const val patientIdArg = "patientId"
+    val routeWithArgs = "$route/{$patientIdArg}"
+
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
-                    onButtonMagazynClicked: () ->Unit,
-                    onButtonZaleceniaClicked: () ->Unit,
-                    onButtonPowiadomieniaClicked: () ->Unit,
-                    onButtonUstawieniaClicked: () ->Unit,
-                    onButtonPatientClicked: () ->Unit,
-                    modifier: Modifier = Modifier)
+fun PowiadomieniaScreen(
+    viewModel: PowiadomieniaViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onButtonHomeClick: (Int) -> Unit,
+    onButtonMagazynClicked: (Int) ->Unit,
+    onButtonZaleceniaClicked: (Int) ->Unit,
+    onButtonPowiadomieniaClicked: () ->Unit,
+    onButtonUstawieniaClicked: (Int) ->Unit,
+    onButtonPatientClicked: (Int) ->Unit,
+    modifier: Modifier = Modifier)
 {
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -34,12 +49,13 @@ fun PowiadomieniaScreen(onButtonHomeClick: () -> Unit ,
     Scaffold(
         topBar = {CommunUI(
             location = Location.POWIADOMIENIA,
-            onButtonHomeClick = onButtonHomeClick,
-            onButtonMagazynClicked = onButtonMagazynClicked,
-            onButtonZaleceniaClicked = onButtonZaleceniaClicked,
-            onButtonUstawieniaClicked = onButtonUstawieniaClicked,
+            onButtonHomeClick = { onButtonHomeClick(viewModel.patientUiState.patientDetails.id)},
+            onButtonMagazynClicked = { onButtonMagazynClicked(viewModel.patientUiState.patientDetails.id)},
+            onButtonZaleceniaClicked = { onButtonZaleceniaClicked(viewModel.patientUiState.patientDetails.id)},
+            onButtonUstawieniaClicked = { onButtonUstawieniaClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
-            onButtonPatientClicked = onButtonPatientClicked,
+            onButtonPatientClicked = { onButtonPatientClicked(viewModel.patientUiState.patientDetails.id)},
+            patientsName = viewModel.getPatientsName(),
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         )}
     ) {  innerPadding ->

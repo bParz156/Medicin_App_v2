@@ -12,6 +12,7 @@ import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
 import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.data.WorkerRepository
+import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
 import com.example.medicin_app_v2.data.medicine.Medicine
 import com.example.medicin_app_v2.data.patient.PatientsRepository
@@ -19,9 +20,12 @@ import com.example.medicin_app_v2.data.schedule.Schedule
 import com.example.medicin_app_v2.data.schedule.ScheduleRepository
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTerm
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTermRepository
+import com.example.medicin_app_v2.data.storage.Storage
+import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageRepository
 import com.example.medicin_app_v2.ui.PatientUiState
+import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
 import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
@@ -38,6 +42,8 @@ class HomeViewModel (
     scheduleTermRepository: ScheduleTermRepository,
     medicinRepository: MedicinRepository,
     val usageRepository: UsageRepository,
+    val storageRepository: StorageRepository,
+    val firstaidkitRepository: FirstaidkitRepository,
     userPreferencesRepository: UserPreferencesRepository,
     workerRepository: WorkerRepository
 
@@ -50,6 +56,7 @@ class HomeViewModel (
     private var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
+    private val medicinStorage : MutableMap<Int, Storage> = mutableMapOf()
 
 //    val patientId: Int = viewModelScope.launch {
 //        userPreferencesRepository.patient_id.first()
@@ -115,16 +122,26 @@ class HomeViewModel (
 
                     )
                 })
+            val calendar = Calendar.getInstance()
+
+            val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
+                .first()
+            //val storages : MutableList<Storage> = mutableListOf()
+            for(kit in firstAidKits)
+            {
+                val storage = storageRepository.getStorageStream(kit.Storage_id).filterNotNull().first()
+                medicinStorage[storage.Medicineid] = storage
+            }
 
             for(scheduleDetail in patientsSchedule.scheduleDetailsList)
             {
+
                 for(scheduleTerm in scheduleDetail.scheduleTermDetailsList)
                 {
                     val usageList = usageRepository.getAllScheduleTermUsages(scheduleTerm.id).filterNotNull().first()
 
                     for(usage in usageList)
                     {
-                        val calendar = Calendar.getInstance()
                         calendar.time = usage.date
                         val day = calendar.get(Calendar.DAY_OF_MONTH)
                         val month = calendar.get(Calendar.MONTH)
@@ -135,13 +152,20 @@ class HomeViewModel (
                             date = usage.date,
                             dose = scheduleTerm.dose,
                             medicinDetails = scheduleDetail.medicinDetails,
-                            confirmed = usage.confirmed
+                            confirmed = usage.confirmed,
+                            scheduleTermId = scheduleTerm.id,
+                            storageId = medicinStorage[scheduleDetail.medicinDetails.id]?.id ?: 0
                         ))
 
                     }
 
                 }
             }
+            homeUiState.usageMapDay = homeUiState.usageMapDay.toSortedMap()
+                .mapValues { entry ->
+                    entry.value.sortedBy { it.date }
+                } as MutableMap<Date, MutableList<UsageDetails>>
+
             workerRepository.deleteAncient()
             workerRepository.generateUsages()
 
@@ -157,15 +181,37 @@ class HomeViewModel (
         return homeUiState.patientUiState.patientDetails.name
     }
 
+    fun realizeUsage(usageDetails: UsageDetails)
+    {
+        usageDetails.confirmed = true
+       // val usage = usageDetails.toUsage()
+        val storage = medicinStorage[usageDetails.medicinDetails.id]
+        if(storage!=null) {
+            storage.quantity -= usageDetails.dose
+            viewModelScope.launch {
+                updateUsageState(usageDetails.toUsage())
+                updateStorage(storage)
+            }
+        }
 
+    }
 
+    suspend fun updateUsageState(usage: Usage)
+    {
+        usageRepository.update(usage)
+    }
+
+    suspend fun updateStorage(storage: Storage)
+    {
+        storageRepository.updateStorage(storage)
+    }
 
 
 }
 
 data class HomeUiState(
     var patientUiState: PatientUiState = PatientUiState(),
-    val usageMapDay: MutableMap<Date, MutableList<UsageDetails>> = mutableMapOf()
+    var usageMapDay: MutableMap<Date, MutableList<UsageDetails>> = mutableMapOf()
  //   val usageList : List<UsageDetails> = listOf()
 )
 
@@ -207,12 +253,22 @@ data class ScheduleTermDetails(
 
 data class UsageDetails(
     val id : Int = 0,
-    val confirmed : Boolean = false,
+    var confirmed : Boolean = false,
     val date: Date,
     val dose: Int = 0,
-    val medicinDetails: MedicinDetails = MedicinDetails()
+    val medicinDetails: MedicinDetails = MedicinDetails(),
+    val scheduleTermId : Int =0,
+    val storageId : Int =0
 
 )
+
+fun UsageDetails.toUsage() : Usage = Usage(
+    id= id,
+    confirmed = confirmed,
+    date = date,
+    ScheduleTerm_id = scheduleTermId
+)
+
 
 
 fun ScheduleDetails.toSchedule(patiendId : Int): Schedule = Schedule(

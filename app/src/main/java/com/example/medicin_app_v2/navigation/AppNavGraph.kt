@@ -17,6 +17,7 @@ import com.example.medicin_app_v2.ui.magazyn.MagazynDestination
 import com.example.medicin_app_v2.ui.magazyn.MagazynScreen
 import com.example.medicin_app_v2.ui.patients.PatientsDestination
 import com.example.medicin_app_v2.ui.patients.PatientsListScreen
+import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaDestination
 import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaScreen
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaDestination
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
@@ -61,7 +62,7 @@ fun MedicinNavHost(
                 onButtonHomeClick = {},
                 onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
+                onButtonPowiadomieniaClicked = { navController.navigate("${PowiadomieniaDestination.route}/$it") },
                 onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
@@ -74,7 +75,7 @@ fun MedicinNavHost(
                 onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
                 onButtonMagazynClicked = { },
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
+                onButtonPowiadomieniaClicked = { navController.navigate("${PowiadomieniaDestination.route}/$it") },
                 onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")},
                 navigateToStorage = {}
@@ -89,21 +90,22 @@ fun MedicinNavHost(
                 onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
                 onButtonMagazynClicked =  {navController.navigate("${MagazynDestination.route}/$it")},
                 onButtonZaleceniaClicked = { },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
+                onButtonPowiadomieniaClicked = { navController.navigate("${PowiadomieniaDestination.route}/$it") },
                 onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
 
-
-        composable(route = Location.POWIADOMIENIA.name) {
+        composable(route = PowiadomieniaDestination.routeWithArgs, arguments = listOf(navArgument(PowiadomieniaDestination.patientIdArg){
+            type = NavType.IntType
+        })) {
             PowiadomieniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
+                onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
+                onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},
+                onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
                 onButtonPowiadomieniaClicked = {  },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
+                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
+                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )
         }
 
@@ -115,7 +117,7 @@ fun MedicinNavHost(
                 onButtonHomeClick = {navController.navigate("${HomeDestination.route}/${it}")},
                 onButtonMagazynClicked =  {navController.navigate("${MagazynDestination.route}/$it")},
                 onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
-                onButtonPowiadomieniaClicked = {  navController.navigate(Location.POWIADOMIENIA.name) },
+                onButtonPowiadomieniaClicked = { navController.navigate("${PowiadomieniaDestination.route}/$it") },
                 onButtonUstawieniaClicked = { },
                 onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
             )

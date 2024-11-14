@@ -118,7 +118,7 @@ fun ZaleceniaScreen(
     onButtonHomeClick: (Int) -> Unit,
     onButtonMagazynClicked: (Int) ->Unit,
     onButtonZaleceniaClicked: () ->Unit,
-    onButtonPowiadomieniaClicked: () ->Unit,
+    onButtonPowiadomieniaClicked: (Int) ->Unit,
     onButtonUstawieniaClicked: (Int) ->Unit,
     onButtonPatientClicked: (Int) ->Unit,
     modifier: Modifier = Modifier)
@@ -133,7 +133,7 @@ fun ZaleceniaScreen(
             onButtonMagazynClicked = {onButtonMagazynClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonZaleceniaClicked = onButtonZaleceniaClicked,
             onButtonUstawieniaClicked = {onButtonUstawieniaClicked(viewModel.patientUiState.patientDetails.id)},
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPowiadomieniaClicked = {onButtonPowiadomieniaClicked(viewModel.patientUiState.patientDetails.id)},
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.patientUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName(),
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -163,7 +163,8 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
     val coroutineScope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier.padding(contentPadding)
+            //.verticalScroll(rememberScrollState()),
     ) {
 
         if (viewModel.getPatientsName().isEmpty()) {
@@ -176,8 +177,17 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
 
                 Text(text="przyjmowane leki",
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     )
+
+                ButtonIconRow(
+                    onButtonCLick = {openDialog.value = true
+                        newZalecenie.value =true},
+                    labelTextId =  R.string.add,
+                    isSelected = false,
+                    imageVector = Icons.Filled.Add
+                )
+
                 medicinRemainders(scheduleList =viewModel.patientsSchedule.scheduleDetailsList,//.toMedicinScheduleInfoList(),
                     onScheduleClick = { viewModel.updatetUiState(it)
                     },
@@ -196,13 +206,6 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                     }
                 )
 
-            ButtonIconRow(
-                onButtonCLick = {openDialog.value = true
-                                newZalecenie.value =true},
-                labelTextId =  R.string.add,
-                isSelected = false,
-                imageVector = Icons.Filled.Add
-            )
             }
 
             if(openDialog.value)

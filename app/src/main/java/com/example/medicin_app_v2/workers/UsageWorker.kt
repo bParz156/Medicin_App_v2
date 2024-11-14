@@ -87,6 +87,8 @@ ctx: Context,
                             if (isValidEventDay(scheduleTerm, calendar)) {
                                 calendar.set(Calendar.HOUR_OF_DAY, scheduleTerm.hour)
                                 calendar.set(Calendar.MINUTE, scheduleTerm.minute)
+                                calendar.set(Calendar.SECOND, 0)
+                                calendar.set(Calendar.MILLISECOND, 0)
                                 val eventTime = calendar.time
                                val usage = Usage(
                                     id = 0,
@@ -95,10 +97,21 @@ ctx: Context,
                                     date = eventTime
                                 )
                                 Log.i(TAG, "bylo?")
-                                if(usageDao.getUsage(scheduleTerm_id = scheduleTerm.id, useDate = eventTime).first() ==null) {
+                                val usageFromDB = usageDao.getUsage(scheduleTerm_id = scheduleTerm.id, useDate = eventTime).first()
+                                if(usageFromDB ==null) {
                                     Log.i(TAG, "nie bylo")
                                     val id = usageDao.insert(usage)
                                 }
+                             //   else {
+//                                val calendar = Calendar.getInstance()
+//                                if (usageFromDB != null) {
+//                                    calendar.time = usageFromDB.date
+//                                }
+//                                val day = calendar.get(Calendar.DAY_OF_MONTH)
+//                                val month = calendar.get(Calendar.MONTH)
+//                                val year = calendar.get(Calendar.YEAR)
+//                             //   }
+
                             }
                         }
                     }

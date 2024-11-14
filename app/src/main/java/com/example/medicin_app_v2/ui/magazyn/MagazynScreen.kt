@@ -71,7 +71,7 @@ fun MagazynScreen(
     onButtonHomeClick: (Int) -> Unit,
     onButtonMagazynClicked: () ->Unit,
     onButtonZaleceniaClicked: (Int) ->Unit,
-    onButtonPowiadomieniaClicked: () ->Unit,
+    onButtonPowiadomieniaClicked: (Int) ->Unit,
     onButtonUstawieniaClicked: (Int) ->Unit,
     onButtonPatientClicked: (Int) ->Unit,
     navigateToStorage: (Int) -> Unit,
@@ -87,7 +87,7 @@ fun MagazynScreen(
             onButtonMagazynClicked = onButtonMagazynClicked,
             onButtonZaleceniaClicked = {onButtonZaleceniaClicked(viewModel.magazynUiState.patientDetails.id)},
             onButtonUstawieniaClicked = {onButtonUstawieniaClicked(viewModel.magazynUiState.patientDetails.id)},
-            onButtonPowiadomieniaClicked = onButtonPowiadomieniaClicked,
+            onButtonPowiadomieniaClicked = {onButtonPowiadomieniaClicked(viewModel.magazynUiState.patientDetails.id)},
             onButtonPatientClicked = {onButtonPatientClicked(viewModel.magazynUiState.patientDetails.id)},
             patientsName = viewModel.getPatientsName()
         )},
@@ -227,9 +227,9 @@ fun storageCard(
 {
 
     val lowSupply = storageInfo.daysToEnd<7
-    val color by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.tertiaryContainer
+    val color by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.errorContainer
     else MaterialTheme.colorScheme.primaryContainer)
-    val contentColor by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.onTertiaryContainer
+    val contentColor by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.onErrorContainer
     else MaterialTheme.colorScheme.onPrimaryContainer)
     Log.i("filtr", "in here")
     Card(

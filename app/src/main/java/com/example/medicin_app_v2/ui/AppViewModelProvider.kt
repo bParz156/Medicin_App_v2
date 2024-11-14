@@ -9,6 +9,7 @@ import com.example.medicin_app_v2.MedicinApplication
 import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.ui.home.HomeViewModel
 import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
+import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaViewModel
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaViewModel
 import com.example.medicin_app_v2.ui.zalecenia.ZalecenieViewModel
 
@@ -34,7 +35,9 @@ object AppViewModelProvider {
                 scheduleTermRepository = medicinApplication().container.scheduleTermRepository,
                 usageRepository = medicinApplication().container.usageRepository,
                 userPreferencesRepository = medicinApplication().container.userPreferencesRepository,
-                workerRepository =  medicinApplication().container.workerRepository
+                workerRepository =  medicinApplication().container.workerRepository,
+                firstaidkitRepository = medicinApplication().container.firstaidkitRepository,
+                storageRepository = medicinApplication().container.storageRepository
             )
         }
 
@@ -68,6 +71,14 @@ object AppViewModelProvider {
                 patientsRepository = medicinApplication().container.patientsRepository,
                 userPreferencesRepository = medicinApplication().container.userPreferencesRepository
                 )
+
+        }
+
+        initializer {
+            PowiadomieniaViewModel(
+                savedStateHandle =  this.createSavedStateHandle(),
+                patientsRepository =  medicinApplication().container.patientsRepository,
+            )
         }
 
     }

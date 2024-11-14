@@ -43,6 +43,14 @@ class DeleteUsageWorker(
         }
     }
 
+//    suspend fun deleteAll(usageList: List<Usage>)
+//    {
+//        for(usage in usageList)
+//        {
+//                usageDao.delete(usage)
+//        }
+//    }
+
 
 
 }
