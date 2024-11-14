@@ -159,6 +159,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                   contentPadding: PaddingValues = PaddingValues(0.dp)) {
 
     var openDialog  = remember { mutableStateOf(false)}
+    var newZalecenie  = remember { mutableStateOf(false)} // true - add, false -edit
     val coroutineScope = rememberCoroutineScope()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -188,15 +189,16 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
                         //TODO
                     },
                     onEditClick = {
-//                        coroutineScope.launch {
-//                            viewModel.updatetUiState(i)
-//                        }
-                        //TODO
+
+                        newZalecenie.value = false
+                        openDialog.value = true
+
                     }
                 )
 
             ButtonIconRow(
-                onButtonCLick = {openDialog.value = true},
+                onButtonCLick = {openDialog.value = true
+                                newZalecenie.value =true},
                 labelTextId =  R.string.add,
                 isSelected = false,
                 imageVector = Icons.Filled.Add
@@ -219,358 +221,27 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
 //                    )
 
                 zalecenieDialog(
-                    onConfirm =  {
+                    onConfirm = {
                         coroutineScope.launch {
-                            viewModel.createSchedule()
+                            if(newZalecenie.value)
+                                viewModel.createSchedule()
+                            else
+                                viewModel.updateSchedule()
                         }
                     },
-                    onDismiss = {openDialog.value=false},
+                    onDismiss = {openDialog.value = false},
                     scheduleDetails =  viewModel.scheduleUiState.scheduleDetails,
                     storageDetails = viewModel.storageUiState.storageDetails,
                     onValueStorageChange = viewModel::updatestorageState,
                     onScheduleChange = viewModel::updatetUiState,
-                    viewModel = viewModel
+                    getSuggestions = viewModel::getSuggestions,
+                    onValueMedicinNameChange = viewModel::onValueMedicinNameChange,
+                    getMedicinesStorage = viewModel::getStorage
+                    //viewModel = viewModel
                 )
             }
 
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun addNewMedicin(
-    onAdd: () -> Unit,
-    onDismiss: () -> Unit,
-    scheduleDetails: ScheduleDetails,
-    storageDetails: StorageDetails,
-    onValueStorageChange: (StorageDetails) -> Unit,
-    onScheduleChange: (ScheduleDetails) -> Unit,
-   ) {
-
-    var medicinName by remember { mutableStateOf(scheduleDetails.medicinDetails.name) }
-    var medicinDose by remember { mutableStateOf("") }
-    var medicinStore by remember { mutableStateOf(storageDetails.quantity.toString()) }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedForm by remember { mutableStateOf(scheduleDetails.medicinDetails.form) }
-
-    var selectedRelation by remember { mutableStateOf(scheduleDetails.medicinDetails.relation) }
-    var expandedR by remember { mutableStateOf(false) }
-
-
-    var selectedDays by remember { mutableStateOf(listOf<DayWeek>()) }
-    var expandedDays by remember { mutableStateOf(false) }
-
-    var timeADay by remember { mutableStateOf("") }
-
-    val scheduleTermDetailsListPriv = mutableListOf<ScheduleTermDetails>()
-
-
-    BasicAlertDialog(
-        onDismissRequest = onDismiss,
-        modifier = Modifier
-            .padding(dimensionResource(R.dimen.padding_small))
-    )
-    {
-        Column(modifier = Modifier
-            .wrapContentSize().fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.tertiaryContainer)
-        ) {
-            Text(text = stringResource(R.string.add_medicin_title),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_large)))
-
-            Text(text = stringResource(R.string.requiered_to_add_medicin),
-                textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_medium)))
-
-            TextField( value = medicinName,
-                onValueChange = {medicinName = it
-                    onScheduleChange(scheduleDetails.copy(medicinDetails= MedicinDetails(name =it)))}
-                ,
-                placeholder = { Text("Podaj nazwę leku")})
-
-            Row()
-            {
-                Text(text="Wybierz formę leku")
-                DropdownMenu(expanded = expanded,
-                onDismissRequest = {expanded = false}
-                )
-                {
-                    MedicinForm.values().forEach {
-                        item ->
-                        DropdownMenuItem(
-                            text ={ Text(item.name)},
-                            onClick = {
-                                selectedForm = item
-                                onScheduleChange(scheduleDetails.copy(medicinDetails = MedicinDetails( form = item)))
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-                Button(onClick = {expanded=!expanded})
-                {
-                    Icon(imageVector = if(expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
-                }
-            }
-
-            TextField( value = medicinDose,
-                onValueChange = { input ->
-                    // Tylko liczby będą akceptowane
-                    if (input.all { it.isDigit() }) {
-                        medicinDose = input
-                       // scheduleDetails = scheduleDetails.copy(dose = input.toInt())
-                    }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj dawkę leku")})
-
-            TextField( value = medicinStore,
-                onValueChange = { input ->
-                    // Tylko liczby będą akceptowane
-                    if (input.all { it.isDigit() }) {
-                        medicinStore = input
-                     onValueStorageChange(storageDetails.copy(quantity = input.toInt()))
-                    }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj jakim zapasem leku dysponujesz")})
-
-            Row()
-            {
-                Text(text="Wybierz zależność leku z posiłkiem")
-                DropdownMenu(expanded = expandedR,
-                    onDismissRequest = {expandedR = false}
-                )
-                {
-                    MealRelation.values().forEach {
-                            item ->
-                        DropdownMenuItem(
-                            text ={ Text(item.name)},
-                            onClick = {
-                                selectedRelation = item
-                                onScheduleChange(scheduleDetails.copy(medicinDetails = MedicinDetails( relation = item)))
-                                expandedR = false
-                            }
-                        )
-                    }
-                }
-                Button(onClick = {expandedR=!expandedR})
-                {
-                    Icon(imageVector = if(expandedR) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
-                }
-            }
-
-            Row()
-            {
-                Button(onClick = {expandedDays=!expandedDays})
-                {
-                    Icon(imageVector = if(expandedDays) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
-                }
-                Text(text="Wybierz dni tygodnia" +
-                        ":\n ${if (selectedDays.isEmpty()) "Żaden" else selectedDays.joinToString()}")
-                DropdownMenu(expanded = expandedDays,
-                    onDismissRequest = {expandedDays = false}
-                )
-                {
-                    DayWeek.values().forEach {
-                            option ->
-                        val isSelected = selectedDays.contains(option)
-                        DropdownMenuItem(
-                            text ={
-                                    Text(stringResource(option.title))
-                            },
-                            onClick = {
-                                selectedDays = if(isSelected)
-                                {
-                                    selectedDays - option
-                                }
-                                else
-                                {
-                                    selectedDays + option
-                                }
-                            }
-                        )
-                    }
-                }
-
-            }
-
-            TextField( value = timeADay,
-                onValueChange = { input ->
-                    // Tylko liczby będą akceptowane
-                    if (input.all { it.isDigit() }) {
-                        timeADay = input
-                    }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj ile razy dziennie przymowany ma być lek")})
-
-
-
-            var openDialog by remember { mutableStateOf(false) }
-            var allSet by remember { mutableStateOf(false) }
-            var confirmed by remember { mutableStateOf(false) }
-
-            NavigationBar(modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_small))
-            ) {
-                NavigationBarItem(selected = false, onClick = onDismiss,
-                    icon = {Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )},
-                    label = {Text(text =stringResource(R.string.back),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
-                )
-
-                NavigationBarItem(selected = false, onClick =
-                {
-                    if(medicinName.isNotBlank() && medicinDose.isNotBlank() && medicinStore.isNotBlank() && selectedDays.isNotEmpty() && timeADay.toInt()>=1) {
-
-                        scheduleDetails.medicinDetails =
-                            MedicinDetails(name = medicinName, form = selectedForm, relation =  selectedRelation)
-                       // scheduleDetails.dose = medicinDose.toInt()
-                        scheduleDetails.startDate = Date()
-                        scheduleDetails.endDate = null
-
-                        Log.i("scheduleDialog", "dni: $selectedDays")
-                        Log.i("scheduleDialog", "w ciagu dniua: $timeADay ")
-                        // Wywołanie funkcji
-                        openDialog = true
-
-                    }
-                },
-                    icon = {Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = stringResource(R.string.confirm)
-                    )},
-                    label = {Text(text =stringResource(R.string.confirm),
-                        modifier =Modifier
-                            .wrapContentSize()
-                    )}
-                )
-            }
-
-            var infoScheduleMed by remember { mutableStateOf("") }
-
-            if(openDialog)
-            {
-                showTimePickersForTimesADay(timeADay.toInt()) { selectedTimes ->
-                    // Kiedy wszystkie godziny zostaną wybrane, przypisz je do wybranych dni
-                    for (day in selectedDays) {
-                        for ((hour, minute) in selectedTimes) {
-
-                            // Tutaj możesz utworzyć Schedule dla każdego dnia i każdej godziny
-                            val scheduleTermDetails = ScheduleTermDetails(
-                                day = day,
-                                hour = hour,
-                                minute = minute,
-                                dose = medicinDose.toInt(),
-                            )
-                            scheduleTermDetailsListPriv.add( scheduleTermDetails)
-                            //onScheduleListChange(scheduleDetailsList+scheduleDetails)
-                            Log.i(
-                                "createSchedule",
-                                "scheduleDetailsListPriv: ${scheduleTermDetailsListPriv.size}"
-                            )
-                        }
-                    }
-                    onScheduleChange(
-                        scheduleDetails.copy(
-                            startDate = Date(),
-                            endDate = null,
-                            scheduleTermDetailsList =  scheduleTermDetailsListPriv,
-                            medicinDetails = MedicinDetails(name = medicinName , form = selectedForm, relation =  selectedRelation)
-                            )
-                        )
-                }
-                Log.i("aaaa","${scheduleTermDetailsListPriv.size}")
-                for(schedule in scheduleTermDetailsListPriv)
-                     {
-                    Log.i("aaaa","aaaassdffgafa")
-                        infoScheduleMed += "${stringResource(schedule.day.title)} o ${schedule.hour}:${schedule.minute} w dawce ${schedule.dose} ${stringResource(selectedForm.dopelniacz)} \n"
-                  }
-               // allSet =true
-                openDialog = false
-                allSet =true
-
-            }
-
-            if(allSet)
-            {
-            //    for(schedule in scheduleTermDetailsListPriv)
-           //     {
-            //        infoScheduleMed += "${stringResource(schedule.day.title)} o ${schedule.hour}:${schedule.minute} w dawce ${schedule.dose} ${stringResource(selectedForm.dopelniacz)} \n"
-              //  }
-
-                areYouSureDialog(
-                    onConfirm = {
-                        confirmed = true
-                    },
-                    onDismiss = {
-                        allSet =false
-                        infoScheduleMed = ""
-                    },
-                    info = "Lek o nazwie ${medicinName} jest przyjmowany ${selectedRelation} w formie ${stringResource(selectedForm.dopelniacz)} w:\n" +
-                            infoScheduleMed
-                   // scheduleTermDetailsListPriv.get(0).hour
-                )
-            }
-
-            if(confirmed)
-            {
-                onAdd()
-               // openDialog = false
-                onDismiss()
-            }
-
-        }
-    }
-}
-
-
-
-
-@Composable
-fun showTimePickersForTimesADay(
-timeADay: Int,
-onTimesSelected: (List<Pair<Int, Int>>) -> Unit
-) {
-    val selectedTimes = mutableListOf<Pair<Int, Int>>()
-    val context = LocalContext.current
-    var pickedHour by remember { mutableIntStateOf(0) }
-    var pickedMinute by remember { mutableIntStateOf(0) }
-
-    fun showTimePicker(index: Int) {
-        if (index >= timeADay) {
-            // Kiedy wszystkie czasy zostały wybrane, zwróć listę wybranych czasów
-            onTimesSelected(selectedTimes)
-            return
-        }
-
-        // Pokaż dialog dla wyboru godziny i minuty
-        val timePickerDialog = TimePickerDialog(
-            context,
-            { _: TimePicker, hour: Int, minute: Int ->
-                selectedTimes.add(Pair(hour, minute))
-                // Rekurencyjnie pokazuj kolejne dialogi
-                showTimePicker(index + 1)
-            },
-            pickedHour, pickedMinute, true // true -> 24-hour format
-        )
-
-        timePickerDialog.show()
-    }
-
-    // Rozpocznij proces pokazywania dialogów
-    showTimePicker(0)
 }
 
 
@@ -580,7 +251,7 @@ onTimesSelected: (List<Pair<Int, Int>>) -> Unit
 fun medicinRemainders(
     scheduleList: List<ScheduleDetails>,
     onScheduleClick: (ScheduleDetails) -> Unit,
-    onEditClick: () -> Unit,
+    onEditClick: (ScheduleDetails) -> Unit,
     onDeleteClick: () -> Unit ,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 )
@@ -614,7 +285,7 @@ fun medicinRemainders(
                     expanded = expanded,
                     onEditClick = {
                         onScheduleClick(schedule)
-                        onEditClick()
+                        onEditClick(schedule)
                     },
                     onDeleteClick = {
                         onScheduleClick(schedule)
@@ -716,6 +387,7 @@ fun medicinCard(
                             .background(color = MaterialTheme.colorScheme.secondaryContainer)
                             .clickable {
                                 openDialogEdit = true
+                                onEditClick()
                             }
                             .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
                         ,
@@ -765,7 +437,9 @@ fun zalecenieDialog(
     storageDetails: StorageDetails,
     onValueStorageChange: (StorageDetails) -> Unit,
     onScheduleChange: (ScheduleDetails) -> Unit,
-    viewModel: ZalecenieViewModel
+    getSuggestions: () -> List<MedicinDetails>,
+    onValueMedicinNameChange: (String) -> Unit,
+    getMedicinesStorage: (MedicinDetails) -> MutableMap< StorageDetails, MutableList<String>>,
 )
 {
     var openMedicinDialog by remember { mutableStateOf(true) }
@@ -773,13 +447,17 @@ fun zalecenieDialog(
     var openAreYouSure by remember { mutableStateOf(false) }
     var confirmedMedicine by remember { mutableStateOf(false) }
     var openScheduleDialog by remember { mutableStateOf(false) }
+    onScheduleChange(scheduleDetails)
 
     if(openMedicinDialog)
     {
         addMedicinDialog(
             medicinDetails = medicinDetails,
             storageDetails = storageDetails,
-            viewModel = viewModel,
+            getSuggestions = getSuggestions,
+            onValueMedicinNameChange = onValueMedicinNameChange,
+            getMedicinesStorage = getMedicinesStorage,
+            //viewModel = viewModel,
             onDismiss = {openMedicinDialog = false},
             onConfirm = { medicinDetailsR, storageDetailsR ->
                 medicinDetails = medicinDetailsR
@@ -802,6 +480,8 @@ fun zalecenieDialog(
     if(openScheduleDialog)
     {
         addScheduleDialog(
+            scheduleDetails = scheduleDetails,
+           // viewModel = viewModel,
             onDismiss = {openScheduleDialog = false},
             onConfirm = {
                 onScheduleChange(it)
@@ -821,6 +501,7 @@ fun zalecenieDialog(
             Log.i("scheduleDetils new", "if")
             areYouSureDialog(
                 onConfirm = {
+                    openAreYouSure = false
                     confirmedMedicine = true
                     openMedicinDialog = false
                     openScheduleDialog = true
@@ -853,6 +534,8 @@ fun zalecenieDialog(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun addScheduleDialog(
+    scheduleDetails: ScheduleDetails,
+    //viewModel: ZalecenieViewModel,
     onDismiss: () -> Unit,
     onConfirm: (ScheduleDetails) -> Unit,
     medicinDetails: MedicinDetails
@@ -860,7 +543,10 @@ fun addScheduleDialog(
 {
     var addNewScheduleTerm by remember { mutableStateOf(false) }
     var existed by remember { mutableStateOf(false) }
-    val scheduleDetails by remember { mutableStateOf(ScheduleDetails(medicinDetails = medicinDetails)) }
+    //val scheduleDetails by remember { mutableStateOf(ScheduleDetails(medicinDetails = medicinDetails)) }
+    //val scheduleDetails = viewModel.scheduleUiState.scheduleDetails
+    //val scheduleDetails = scheduleDetails
+    var termDetialsToChange by remember { mutableStateOf(ScheduleTermDetails()) }
     BasicAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier
@@ -947,6 +633,7 @@ fun addScheduleDialog(
             LazyColumn {
                 items(items = scheduleDetails.scheduleTermDetailsList, key = { it.id })
                 {
+                    Log.i("scheduleDetils new", "scheduleTermDetails: $it")
                     Card( modifier = Modifier
                         .background(color = MaterialTheme.colorScheme.tertiaryContainer),
                         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small)))
@@ -960,9 +647,13 @@ fun addScheduleDialog(
                                     .padding(end = dimensionResource(R.dimen.padding_small))
                                     .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                     .clickable {
-                                        scheduleDetails.scheduleTermDetailsList -= it
+                                        Log.i("scheduleDetils new", "on delete click: ${scheduleDetails}")
+                                        scheduleDetails.scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList - it
+                                        Log.i("scheduleDetils new", "on delete click: ${scheduleDetails}")
+
                                     }
                                     .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                                    .weight(1f)
                                 ,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 contentDescription = "Usuń"
@@ -973,7 +664,9 @@ fun addScheduleDialog(
                                         it.minute
                                     )
                                 }  - ${it.dose} ${medicinDetails.form}",
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier
+                                    .weight(3f)
                             )
 
                             Icon(imageVector = Icons.Filled.Edit,
@@ -983,8 +676,10 @@ fun addScheduleDialog(
                                     .clickable {
                                         existed =true
                                         addNewScheduleTerm = true
+                                        termDetialsToChange =it
                                     }
                                     .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                                    .weight(1f)
                                 ,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 contentDescription = "Modyfikuj"
@@ -1025,18 +720,23 @@ fun addScheduleDialog(
 
         if (addNewScheduleTerm) {
             addScheduleTermDialog(
+                scheduleTermDetailsGiven = termDetialsToChange,
                 onDismiss = { addNewScheduleTerm = false
                     existed = false
+                    termDetialsToChange = ScheduleTermDetails()
                             },
                 onConfirm = {
-                    //scheduleDetails.copy(scheduleTermDetailsList = scheduleDetails.scheduleTermDetailsList + it)
-                    //scheduleDetails.scheduleTermDetailsList + it
                     if(!existed) {
+                        it.id = scheduleDetails.scheduleTermDetailsList.size
                         scheduleDetails.scheduleTermDetailsList += it
                     }
-                    Log.i("medicine", "ile juz termow: ${scheduleDetails.scheduleTermDetailsList.size}")
+                    Log.i("scheduleDetils new", "ile juz termow: ${scheduleDetails.scheduleTermDetailsList.size}")
                     addNewScheduleTerm = false
+                    Log.i("scheduleDetils new", "zmieniono addnewScheuleTerm")
                     existed = false
+                    Log.i("scheduleDetils new", "zmieniona existed")
+                    termDetialsToChange = ScheduleTermDetails()
+                    Log.i("scheduleDetils new", "zmieniona termsToChange")
                 }
             )
         }
@@ -1185,13 +885,15 @@ fun addScheduleTermDialog(
 fun addMedicinDialog(
     medicinDetails: MedicinDetails,
     storageDetails: StorageDetails,
-    viewModel: ZalecenieViewModel,
+    getSuggestions: () -> List<MedicinDetails>,
+    onValueMedicinNameChange: (String) -> Unit,
+    getMedicinesStorage: (MedicinDetails) -> MutableMap< StorageDetails, MutableList<String>>,
     onDismiss: () -> Unit,
     onConfirm: (MedicinDetails, StorageDetails) -> Unit
 )
 {
     var medicinName by remember { mutableStateOf(medicinDetails.name)}
-    val suggestions = viewModel.medicinSuggestions
+    val suggestions = getSuggestions()
     var expandedOptions by remember { mutableStateOf(false) }
     var medicinDetails by remember { mutableStateOf(medicinDetails) }
     var expandedForm by remember { mutableStateOf(false) }
@@ -1233,8 +935,9 @@ fun addMedicinDialog(
                     value = medicinName,
                     onValueChange = {
                         Log.i("zalecenia", "zmieniono wartość w textfield")
-                        viewModel.onValueMedicinNameChange(it)
+                        onValueMedicinNameChange(it)
                         medicinName = it
+                        medicinDetails = medicinDetails.copy(name = medicinName)
                         expandedOptions = suggestions.isNotEmpty()
                     },
                     isError = !okey,
@@ -1269,7 +972,7 @@ fun addMedicinDialog(
                             expandedOptions = false
                             //chosenFromExisting = true
                             coroutineScope.launch {
-                                storageMap = viewModel.getMedicinesStorage(item)
+                                storageMap = getMedicinesStorage(item)
                                 Log.i("medicine", "Wielkosc mapy; $storageMap")
                                 chosenFromExisting = true
                             }

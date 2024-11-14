@@ -32,6 +32,7 @@ import com.example.medicin_app_v2.ui.home.toMedicin
 import com.example.medicin_app_v2.ui.home.toMedicinDetails
 import com.example.medicin_app_v2.ui.home.toSchedule
 import com.example.medicin_app_v2.ui.home.toScheduleDetails
+import com.example.medicin_app_v2.ui.home.toScheduleTermDetails
 import com.example.medicin_app_v2.ui.patients.PatientsDestination
 import com.example.medicin_app_v2.ui.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
@@ -192,6 +193,7 @@ class ZalecenieViewModel(
         Log.i("createSchedule", "id scheudle: ${scheduleId}")
         for(scheduleTermDetail in scheduleUiState.scheduleDetails.scheduleTermDetailsList)
         {
+            scheduleTermDetail.id = 0
             scheduleTermRepository.insertScheduleTerm(scheduleTermDetail.toScheduleTerm(scheduleId))
         }
 
@@ -224,9 +226,21 @@ class ZalecenieViewModel(
             allMedicinDetails.filter { it.name.startsWith(text, ignoreCase = true) }
         }
     }
+    fun getSuggestions() : List<MedicinDetails>
+    {
+        return medicinSuggestions
+    }
 
+    fun getStorage(medicinDetails: MedicinDetails) : MutableMap< StorageDetails, MutableList<String>>
+    {
+        var map : MutableMap< StorageDetails, MutableList<String>> = mutableMapOf()
+        viewModelScope.launch {
+            map = getMedicinesStorage(medicinDetails)
+        }
+        return map
+    }
 
-    suspend fun getMedicinesStorage(medicinDetails: MedicinDetails) : MutableMap< StorageDetails, MutableList<String>>
+    suspend private fun getMedicinesStorage(medicinDetails: MedicinDetails) : MutableMap< StorageDetails, MutableList<String>>
     {
         val storageList: List<StorageDetails> = storageRepository.getAllMedicinesStorages(medicine_id = medicinDetails.id)
             .filterNotNull()
@@ -260,6 +274,32 @@ class ZalecenieViewModel(
         return map
     }
 
+    suspend fun updateSchedule() {
+        scheduleRepository.updateSchedule(scheduleUiState.scheduleDetails.toSchedule(patientId))
+        val scheduleId = scheduleUiState.scheduleDetails.id
+
+       // val allterms = scheduleTermRepository.getAllsSchedulesTerms(scheduleId).filterNotNull().first()
+
+        for(scheduleTermDetail in scheduleUiState.scheduleDetails.scheduleTermDetailsList)
+        {
+            scheduleTermRepository.updateScheduleTerm(scheduleTermDetail.toScheduleTerm(scheduleId))
+        }
+
+        val allterms = scheduleTermRepository.getAllsSchedulesTerms(scheduleId).filterNotNull().first().map { it.toScheduleTermDetails() }
+
+        for (scheduleTermDetail in allterms)
+        {
+            if(!scheduleUiState.scheduleDetails.scheduleTermDetailsList.contains(scheduleTermDetail))
+            {
+                scheduleTermRepository.deleteScheduleTerm(scheduleTermDetail.toScheduleTerm(scheduleId))
+            }
+        }
+
+
+        updateSchedulesInfo()
+        //patientsSchedule.scheduleDetailsList + scheduleUiState.scheduleDetailsList
+        scheduleUiState = ScheduleUiState()
+    }
 
 
 }
