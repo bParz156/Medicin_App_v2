@@ -41,17 +41,15 @@ import java.util.Date
 
 class MagazynViewModel (
     savedStateHandle: SavedStateHandle,
- patientsRepository: PatientsRepository,
- scheduleRepository: ScheduleRepository,
- medicinRepository: MedicinRepository,
+    private val patientsRepository: PatientsRepository,
+    private val  scheduleRepository: ScheduleRepository,
+    private val medicinRepository: MedicinRepository,
     private val storageRepository: StorageRepository,
-    firstaidkitRepository: FirstaidkitRepository,
+    private val firstaidkitRepository: FirstaidkitRepository,
     private val scheduleTermRepository: ScheduleTermRepository
 ) : ViewModel()
 {
 
-    var magazynUiState by mutableStateOf(ZaleceniaUiState())
-        private set
 
 
     private val patientId : Int = try{checkNotNull(savedStateHandle[MagazynDestination.patientIdArg])}
@@ -60,27 +58,22 @@ class MagazynViewModel (
         -1
     }
 
+    var magazynUiState by mutableStateOf(ZaleceniaUiState())
+        private set
 
-    private var storageDetailsList: List<StorageDetails> = listOf()
+
+    private var storageDetailsList: List<StorageDetails> = mutableListOf()
 
 
     init {
-        Log.i("magazyn", "czy jest patientId: $patientId")
         viewModelScope.launch {
 
-            magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList,
-                patientDetails =  patientsRepository.getPatientStream(patientId)
+            //magazynUiState = ZaleceniaUiState(
+               val patientDetails =  patientsRepository.getPatientStream(patientId)
                     .filterNotNull()
                     .first()
                     .toPatientDetails()
-            )
-            Log.i("magazyn", "w funkcji init: ${magazynUiState.patientDetails.name}")
-
-
-
-            val Schedules = scheduleRepository.getAllPatientsSchedules(patientId)
-                .first() // Poczekaj na pierwszy wynik z Flow
-                .let { PatientScheduleInfo(it) } // Zmapuj wynik na PatientScheduleInfo
+          //  )
 
             val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
                 .first()
@@ -89,26 +82,59 @@ class MagazynViewModel (
             for(kit in firstAidKits)
             {
                 val storage = storageRepository.getStorageStream(kit.Storage_id).filterNotNull().first()
-                storageDetailsList = storageDetailsList + StorageDetails(
+                //magazynUiState.
+                storageDetailsList += StorageDetails(
                     storageId = storage.id,
-                    medicinId =  storage.Medicineid,
+                    medicinId = storage.Medicineid,
                     quantity = storage.quantity,
-                    medName = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().name,
-                   // daysToEnd = 0,
-                    daysToEnd = calculateDaysToEnd(
-                        scheduleTermDetailsList =  scheduleTermRepository.getAllsSchedulesTerms(
-                            scheduleId = scheduleRepository.getPatientMedicineSchedule(patient_id = patientId , medicine_id = storage.Medicineid ).filterNotNull().first().id
-                        ).filterNotNull().first().map { it.toScheduleTermDetails() }
-                        ,
-                        quantity = storage.quantity
-                    ),
-                    medicinForm = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().form
+                    medName = medicinRepository.getMedicineStream(storage.Medicineid)
+                        .filterNotNull().first().name,
+                     daysToEnd = 0,
+//                    daysToEnd = calculateDaysToEnd(
+//                        scheduleTermDetailsList = scheduleTermRepository.getAllsSchedulesTerms(
+//                            scheduleId = scheduleRepository.getPatientMedicineSchedule(
+//                                patient_id = patientId,
+//                                medicine_id = storage.Medicineid
+//                            ).filterNotNull().first().id
+//                        ).filterNotNull().first().map { it.toScheduleTermDetails() },
+//                        quantity = storage.quantity
+//                    ),
+                    medicinForm = medicinRepository.getMedicineStream(storage.Medicineid)
+                        .filterNotNull().first().form
                 )
+              //  Log.i("magazyn", "${ magazynUiState.storageDetailsList.size}")
+                Log.i("magazyn", "$storage")
             }
 
 
+            magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList, patientDetails = patientDetails)
+           // )
+          //  Log.i("magazyn", "w funkcji init: ${magazynUiState.patientDetails.name}")
+
         }
     }
+
+//
+//    private suspend fun storageDetailsList() : List<StorageDetails>
+//    {
+//        val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
+//            .first()
+//
+//
+//        for(kit in firstAidKits)
+//        {
+//            val storage = storageRepository.getStorageStream(kit.Storage_id).filterNotNull().first()
+//            storageDetailsList = storageDetailsList + StorageDetails(
+//                storageId = storage.id,
+//                medicinId =  storage.Medicineid,
+//                quantity = storage.quantity,
+//                medName = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().name,
+//                // daysToEnd = 0,
+//                daysToEnd = 0,
+//                medicinForm = medicinRepository.getMedicineStream(storage.Medicineid).filterNotNull().first().form
+//            )
+//        }
+//    }
 
     private fun calculateDaysToEnd(scheduleTermDetailsList: List<ScheduleTermDetails>, quantity: Int) : Int
     {
@@ -166,7 +192,7 @@ class MagazynViewModel (
 
 
     fun getPatientsName(): String{
-        Log.i("magazyn", "name: ${magazynUiState.patientDetails.name} a id to: ${magazynUiState.patientDetails.id}  <---to z uiState, a w wartroci: $patientId")
+       // Log.i("magazyn", "name: ${magazynUiState.patientDetails.name} a id to: ${magazynUiState.patientDetails.id}  <---to z uiState, a w wartroci: $patientId")
         return magazynUiState.patientDetails.name
     }
 
@@ -195,7 +221,7 @@ class MagazynViewModel (
 
 
 data class ZaleceniaUiState(
-    val storageDetailsList: List<StorageDetails> = listOf(),
+    var storageDetailsList: List<StorageDetails> = mutableListOf(),
     val patientDetails: PatientDetails = PatientDetails(),
     var changingStoragDetails: StorageDetails = StorageDetails()
 )

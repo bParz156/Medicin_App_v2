@@ -1,6 +1,10 @@
 package com.example.medicin_app_v2.ui.magazyn
 
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -221,14 +225,26 @@ fun storageCard(
     modifier: Modifier = Modifier
 )
 {
+
+    val lowSupply = storageInfo.daysToEnd<7
+    val color by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.tertiaryContainer
+    else MaterialTheme.colorScheme.primaryContainer)
+    val contentColor by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.onTertiaryContainer
+    else MaterialTheme.colorScheme.onPrimaryContainer)
     Log.i("filtr", "in here")
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .background(color = color),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .animateContentSize(animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMedium)
+                )
+                .background(color = color),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
 
@@ -237,13 +253,13 @@ fun storageCard(
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.wrapContentSize().fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = contentColor
             )
 
             Text(
                 text="Przewidywany czas wyczerpania zapasów: ${storageInfo.daysToEnd} dni",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = contentColor
                 )
 
         }
