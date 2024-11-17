@@ -27,10 +27,18 @@ import com.example.medicin_app_v2.data.usage.UsageRepository
 import com.example.medicin_app_v2.ui.PatientUiState
 import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
 import com.example.medicin_app_v2.ui.toPatientUiState
+import com.google.firebase.dataconnect.serializers.DateSerializer
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.util.Calendar
 import java.util.Date
 
@@ -168,6 +176,7 @@ class HomeViewModel (
 
             workerRepository.deleteAncient()
             workerRepository.generateUsages()
+            workerRepository.generateNotifications(homeUiState.usageMapDay.values.first())
 
         }
         }
@@ -250,17 +259,23 @@ data class ScheduleTermDetails(
 }
 
 
-
+@Serializable
 data class UsageDetails(
     val id : Int = 0,
     var confirmed : Boolean = false,
+    //@Serializable(with = DateAsLongSerializer::class)
     val date: Date,
     val dose: Int = 0,
     val medicinDetails: MedicinDetails = MedicinDetails(),
     val scheduleTermId : Int =0,
     val storageId : Int =0
-
 )
+object DateAsLongSerializer : KSerializer<Date> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Date", PrimitiveKind.LONG)
+    override fun serialize(encoder: Encoder, value: Date) = encoder.encodeLong(value.time)
+    override fun deserialize(decoder: Decoder): Date = Date(decoder.decodeLong())
+}
+
 
 fun UsageDetails.toUsage() : Usage = Usage(
     id= id,
@@ -289,7 +304,7 @@ fun Schedule.toScheduleDetails(medicinDetails: MedicinDetails, scheduleTermList:
     }
 )
 
-
+@Serializable
 data class MedicinDetails(
     var id: Int=0,
     var name: String ="",

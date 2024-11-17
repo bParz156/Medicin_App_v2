@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "1.9.20-1.0.14"
+
 }
 
 android {
@@ -41,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -70,6 +71,9 @@ dependencies {
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.ui.test.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation(libs.firebase.dataconnect)
+    implementation ("com.google.code.gson:gson:2.8.8")
 
     testImplementation(libs.junit)
 

@@ -70,4 +70,8 @@
     <string name="czas">Wybierz godzinę</string>
 
 
+    <string name="chanel_name">Powiadomienia_push</string>
+    <string name="chanel_description">Powiadomienia o kończących się zapasach leków będą wyświetlane, aby przypomnieć o konieczności uzupełnienia zapasów</string>
+
+
 </resources>

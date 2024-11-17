@@ -1,7 +1,11 @@
 package com.example.medicin_app_v2
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -20,8 +24,22 @@ class MedicinApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppDataContainer(this)
+        createNotificationChannel()
       //  userPreferencesRepository = UserPreferencesRepository(dataStore)
 
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "example_channel_id"
+            val channelName = "Powiadomienia_push"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(channelId, channelName, importance)
+            channel.description = "Powiadomienia o kończących się zapasach leków będą wyświetlane, aby przypomnieć o konieczności uzupełnienia zapasów"
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(channel)
+        }
     }
 }
 
