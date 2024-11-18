@@ -6,27 +6,21 @@ import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.example.medicin_app_v2.ui.home.DateAsLongSerializer
 import com.example.medicin_app_v2.ui.home.UsageDetails
+import com.example.medicin_app_v2.ui.magazyn.StorageDetails
 import com.example.medicin_app_v2.workers.DeleteUsageWorker
+import com.example.medicin_app_v2.workers.NotificationCreatorWorker
 import com.example.medicin_app_v2.workers.NotificationWorker
+import com.example.medicin_app_v2.workers.StorageNotificationsWorker
 import com.example.medicin_app_v2.workers.UsageWorker
-import com.google.firebase.dataconnect.serializers.DateSerializer
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import com.google.gson.Gson
 
 //private const val TAG = "UsageWorker"
 private const val TAG = "NotificationWorker"
 const val USAGE_DETAILS_LIST_KEY = "usageDetailsList"
+const val STORAGE_DETAILS_LIST_KEY = "storageDetailsList"
 class WorkManagerRepository(context: Context,
     ) : WorkerRepository {
 
@@ -59,13 +53,30 @@ class WorkManagerRepository(context: Context,
 
     }
 
-    override fun generateNotifications(usageDetailsList: List<UsageDetails>) {
+    override fun createNotificationsFromUsages(usageDetailsList: List<UsageDetails>) {
         Log.i(TAG, "generateNotifications")
-        val notificationBuilder = OneTimeWorkRequestBuilder<NotificationWorker>()
+        val notificationBuilder = OneTimeWorkRequestBuilder<NotificationCreatorWorker>()
         Log.i(TAG, "przed setInpit")
         notificationBuilder.setInputData(createInputDataForNotificationWorker(usageDetailsList))
         Log.i(TAG, "po setInpit")
         workManager.enqueue(notificationBuilder.build())
+    }
+
+    override fun generateNotifications() {
+        val notificationAlarmBuilder = OneTimeWorkRequestBuilder<NotificationWorker>()
+        workManager.enqueue(notificationAlarmBuilder.build())
+
+    }
+
+    override fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>) {
+        val notificationStorageBuilder = OneTimeWorkRequestBuilder<StorageNotificationsWorker>()
+        notificationStorageBuilder.setInputData(
+            createInputDataForWorker(storageDetailsList)
+        )
+
+        workManager.enqueue(
+            notificationStorageBuilder.build()
+        )
     }
 
     private fun createInputDataForNotificationWorker(usageDetailsList: List<UsageDetails>) : Data {
@@ -88,10 +99,18 @@ class WorkManagerRepository(context: Context,
         Log.i(TAG, "ustawienie stringArray")
         return builder.build()
     }
+    private fun createInputDataForWorker(storageDetailsList: List<StorageDetails>) : Data {
+        val builder = Data.Builder()
+
+        Log.i(TAG, "przed zamiana na json: $storageDetailsList")
+
+        val gson = Gson()
+        val jsonList = storageDetailsList.map { gson.toJson(it) }
+        Log.i(TAG, "po json")
+
+        builder.putStringArray(STORAGE_DETAILS_LIST_KEY, jsonList.toTypedArray())
+        Log.i(TAG, "ustawienie stringArray")
+        return builder.build()
+    }
 }
 
-//@kotlinx.serialization.Serializable
-//class ProgrammingLanguage(
-//    val name: String,
-//    val releaseDates: List<@Serializable(DateAsLongSerializer::class) Date>
-//)

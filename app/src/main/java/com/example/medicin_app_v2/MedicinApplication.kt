@@ -4,7 +4,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -25,6 +27,7 @@ class MedicinApplication : Application() {
         super.onCreate()
         container = AppDataContainer(this)
         createNotificationChannel()
+        createChanelForAlarms(this)
       //  userPreferencesRepository = UserPreferencesRepository(dataStore)
 
     }
@@ -40,6 +43,25 @@ class MedicinApplication : Application() {
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
+    }
+
+    private fun createChanelForAlarms(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  // Adjusted to Android 8.0 and above
+            val channelId = "alarm_id"
+            val channelName = "Alarm Notifications"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
+                description = "Channel for Alarm Notifications"
+                enableLights(true)
+                lightColor = Color.RED
+                enableVibration(true)
+            }
+
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(channel)
+        }
+
+
     }
 }
 

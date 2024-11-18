@@ -22,9 +22,9 @@ import java.util.Date
 data class Notification(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0, // Auto-generowane ID
-    val Usageid: Int, // Odniesienie do Usage
+    val Usageid: Int?, // Odniesienie do Usage
     val title: String,
     val info: String,
     val seen: Boolean,
-    val date : Date
+    val date: Date
 )

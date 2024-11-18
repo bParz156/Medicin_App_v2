@@ -36,20 +36,21 @@ class DeleteUsageWorker(
         val currentDate = calendar.time
         for(usage in usageList)
         {
-            if(usage.confirmed || usage.date < currentDate)
+            if(usage.confirmed) // usage.date < currentDate)
             {
                 usageDao.delete(usage)
             }
+            else
+            {
+                calendar.time = usage.date
+                calendar.add(Calendar.MINUTE, 10) //daj pacjentowi dodatkowe 10 minut na zażycie leku
+                if(calendar.time < currentDate)
+                    usageDao.delete(usage)
+            }
+
         }
     }
 
-//    suspend fun deleteAll(usageList: List<Usage>)
-//    {
-//        for(usage in usageList)
-//        {
-//                usageDao.delete(usage)
-//        }
-//    }
 
 
 

@@ -1,12 +1,13 @@
 package com.example.medicin_app_v2.data
 
-import androidx.work.WorkInfo
 import com.example.medicin_app_v2.ui.home.UsageDetails
-import kotlinx.coroutines.flow.Flow
+import com.example.medicin_app_v2.ui.magazyn.StorageDetails
 
 interface WorkerRepository {
    // val outputWorkInfo: Flow<WorkInfo?>
     fun generateUsages()
     fun deleteAncient()
-    fun generateNotifications(usageDetailsList: List<UsageDetails>)
+    fun createNotificationsFromUsages(usageDetailsList: List<UsageDetails>)
+    fun generateNotifications()
+    fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>)
 }

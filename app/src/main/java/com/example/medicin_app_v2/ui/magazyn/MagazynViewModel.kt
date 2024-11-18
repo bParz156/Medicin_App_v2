@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MedicinForm
+import com.example.medicin_app_v2.data.WorkerRepository
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
@@ -46,7 +47,8 @@ class MagazynViewModel (
     private val medicinRepository: MedicinRepository,
     private val storageRepository: StorageRepository,
     private val firstaidkitRepository: FirstaidkitRepository,
-    private val scheduleTermRepository: ScheduleTermRepository
+    private val scheduleTermRepository: ScheduleTermRepository,
+    workerRepository: WorkerRepository
 ) : ViewModel()
 {
 
@@ -127,6 +129,7 @@ class MagazynViewModel (
 
 
             magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList, patientDetails = patientDetails)
+            workerRepository.notificationsAboutStorage(storageDetailsList.filter { it.daysToEnd < 7 })
 //        for(storageDetail in magazynUiState.storageDetailsList)
 //        {
 //            storageDetail.daysToEnd = calculateDaysToEnd(

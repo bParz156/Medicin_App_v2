@@ -90,19 +90,23 @@ ctx: Context,
                                 calendar.set(Calendar.SECOND, 0)
                                 calendar.set(Calendar.MILLISECOND, 0)
                                 val eventTime = calendar.time
-                               val usage = Usage(
-                                    id = 0,
-                                    ScheduleTerm_id = scheduleTerm.id,
-                                    confirmed = false,
-                                    date = eventTime
-                                )
-                                Log.i(TAG, "bylo?")
-                                val usageFromDB = usageDao.getUsage(scheduleTerm_id = scheduleTerm.id, useDate = eventTime).first()
-                                if(usageFromDB ==null) {
-                                    Log.i(TAG, "nie bylo")
-                                    val id = usageDao.insert(usage)
-                                }
-                             //   else {
+                                if(eventTime >= eventDate) {
+                                    val usage = Usage(
+                                        id = 0,
+                                        ScheduleTerm_id = scheduleTerm.id,
+                                        confirmed = false,
+                                        date = eventTime
+                                    )
+                                    Log.i(TAG, "bylo?")
+                                    val usageFromDB = usageDao.getUsage(
+                                        scheduleTerm_id = scheduleTerm.id,
+                                        useDate = eventTime
+                                    ).first()
+                                    if (usageFromDB == null) {
+                                        Log.i(TAG, "nie bylo")
+                                        val id = usageDao.insert(usage)
+                                    }
+                                    //   else {
 //                                val calendar = Calendar.getInstance()
 //                                if (usageFromDB != null) {
 //                                    calendar.time = usageFromDB.date
@@ -111,7 +115,7 @@ ctx: Context,
 //                                val month = calendar.get(Calendar.MONTH)
 //                                val year = calendar.get(Calendar.YEAR)
 //                             //   }
-
+                                }
                             }
                         }
                     }

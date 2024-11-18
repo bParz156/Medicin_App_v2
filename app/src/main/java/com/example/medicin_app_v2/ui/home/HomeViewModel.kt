@@ -25,10 +25,7 @@ import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageRepository
 import com.example.medicin_app_v2.ui.PatientUiState
-import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
 import com.example.medicin_app_v2.ui.toPatientUiState
-import com.google.firebase.dataconnect.serializers.DateSerializer
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -176,7 +173,9 @@ class HomeViewModel (
 
             workerRepository.deleteAncient()
             workerRepository.generateUsages()
-            workerRepository.generateNotifications(homeUiState.usageMapDay.values.first())
+            if(homeUiState.usageMapDay.isNotEmpty()) {
+                workerRepository.createNotificationsFromUsages(homeUiState.usageMapDay.values.first())
+            }
 
         }
         }
