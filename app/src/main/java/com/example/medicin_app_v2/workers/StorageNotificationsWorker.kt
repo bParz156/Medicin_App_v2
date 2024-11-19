@@ -5,7 +5,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.util.Log
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -129,21 +133,22 @@ class StorageNotificationsWorker(
                 seen = false,
                 date = today
             )
+            Log.i(TAG, "creating nots from $notification")
            // if (shouldCreateNew(notification)) {
             //TODO nie powinno tworzyć za każdym razem - tylko gdy minęło min 5 minut od poprezdniuego wejścia
            val id = notificationDao.insert(notification)
+            Log.i(TAG, "inserted to db : $id")
             val CHANNEL_ID = "alarm_id"
 
             val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle(notification.title)
                 .setContentText(notification.info)
-//                .setStyle(
-//                    NotificationCompat.BigTextStyle()
-//                    .bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setWhen(notification.date.time)
-          //      Log.i(TAG, "stworzono notification $notification")
+                .setColor(Color.GREEN)
+                .setColorized(true)
+                .setCategory(NotificationCompat.CATEGORY_EVENT)
          //   }
             val intent = Intent(context, AlertDetails::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -171,6 +176,7 @@ class StorageNotificationsWorker(
                     return@with
                 }
                 notify(id.toInt(), builder.build())
+                Log.i(TAG, "po notify")
             }
         }
     }

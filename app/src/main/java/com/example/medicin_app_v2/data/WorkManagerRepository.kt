@@ -1,7 +1,11 @@
 package com.example.medicin_app_v2.data
 
 import android.content.Context
+import android.content.Intent
+import android.os.PowerManager
+import android.provider.Settings
 import android.util.Log
+import androidx.core.content.ContextCompat.startActivity
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -27,11 +31,12 @@ class WorkManagerRepository(context: Context,
     ) : WorkerRepository {
 
     private val workManager = WorkManager.getInstance(context)
+    private val context = context
     //override val outputWorkInfo: Flow<WorkInfo?> = MutableStateFlow(null)
 
     override fun generateUsages() {
         Log.i(TAG, "in repositori")
-       val usageBuilder = PeriodicWorkRequestBuilder<UsageWorker>(2, TimeUnit.MINUTES).build()
+       val usageBuilder = PeriodicWorkRequestBuilder<UsageWorker>(1, TimeUnit.HOURS).build()
      //  val usageBuilder = OneTimeWorkRequestBuilder<UsageWorker>()
 
 //     workManager.enqueue(usageBuilder.build())
@@ -83,17 +88,29 @@ class WorkManagerRepository(context: Context,
 
     override fun notificationStorage() {
         Log.i("StoaregCreatorWorker", "w workManagerRepositorii")
+
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val isIgnoring = powerManager.isIgnoringBatteryOptimizations(context.packageName)
+
+        if (!isIgnoring) {
+            // Poproś o wyłączenie optymalizacji
+            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            startActivity(context, intent, null)
+        }
         val constraints = Constraints.Builder()
             .setRequiresBatteryNotLow(true)  // Wymaga, aby urządzenie miało wystarczający poziom baterii
             .setRequiresDeviceIdle(false)    // Może działać, gdy urządzenie jest aktywne
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresCharging(false)
             .build()
         val notificationStorageBuilder = PeriodicWorkRequestBuilder<StorageNotificationsWorker>(
-            2, TimeUnit.DAYS)
+            15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
+        //workManager.
         workManager.enqueueUniquePeriodicWork(
             "NotificationStorageWorker",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             notificationStorageBuilder
         )
 

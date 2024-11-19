@@ -4,8 +4,10 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
+import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.core.DataStore
@@ -55,10 +57,13 @@ class MedicinApplication : Application() {
                 enableLights(true)
                 lightColor = Color.RED
                 enableVibration(true)
+                setShowBadge(true)
             }
 
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
+//            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+//            startActivity(intent)
         }
 
 
