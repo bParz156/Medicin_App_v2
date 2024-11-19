@@ -169,7 +169,7 @@ fun MedicinRemainders(
                 item  {
                     Text(
                         text = "${dayWeek?.let { stringResource(it) }} $dayOfMonth.$month",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.headlineLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -289,17 +289,19 @@ fun medicinCard(
                 )
             }
 
-            VerticalDivider()
+            if(isSoon) {
+                VerticalDivider()
 
-            Checkbox(
-                modifier = modifier.weight(1f),
-                checked = confirmed,
-                enabled = !confirmed,
-                onCheckedChange =
-                {
-                    onConfirmClick()
-                }
-            )
+                Checkbox(
+                    modifier = modifier.weight(1f),
+                    checked = confirmed,
+                    enabled = !confirmed,
+                    onCheckedChange =
+                    {
+                        onConfirmClick()
+                    }
+                )
+            }
 
         }
     }

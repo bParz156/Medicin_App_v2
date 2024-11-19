@@ -74,6 +74,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation(libs.firebase.dataconnect)
     implementation ("com.google.code.gson:gson:2.8.8")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
 
     testImplementation(libs.junit)
 

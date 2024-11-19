@@ -116,6 +116,7 @@ fun notificationBuild()
         .setStyle(NotificationCompat.BigTextStyle()
             .bigText("Much longer text that cannot fit one line..."))
         .setPriority(NotificationCompat.PRIORITY_MAX)
+
        // .setSound("android.resource://"+context.packageName+"/"+R.raw.FILE_NAME)
 
     with(NotificationManagerCompat.from(context)) {

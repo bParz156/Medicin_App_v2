@@ -10,4 +10,5 @@ interface WorkerRepository {
     fun createNotificationsFromUsages(usageDetailsList: List<UsageDetails>)
     fun generateNotifications()
     fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>)
+    fun notificationStorage()
 }

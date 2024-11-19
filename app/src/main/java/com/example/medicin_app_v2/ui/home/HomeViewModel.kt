@@ -174,6 +174,7 @@ class HomeViewModel (
             workerRepository.deleteAncient()
             workerRepository.generateUsages()
             if(homeUiState.usageMapDay.isNotEmpty()) {
+                workerRepository.notificationStorage()
                 workerRepository.createNotificationsFromUsages(homeUiState.usageMapDay.values.first())
             }
 

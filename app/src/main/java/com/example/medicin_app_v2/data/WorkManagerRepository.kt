@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.medicin_app_v2.ui.home.UsageDetails
@@ -16,6 +17,7 @@ import com.example.medicin_app_v2.workers.StorageNotificationsWorker
 import com.example.medicin_app_v2.workers.UsageWorker
 import java.util.concurrent.TimeUnit
 import com.google.gson.Gson
+import androidx.work.*
 
 //private const val TAG = "UsageWorker"
 private const val TAG = "NotificationWorker"
@@ -78,6 +80,25 @@ class WorkManagerRepository(context: Context,
             notificationStorageBuilder.build()
         )
     }
+
+    override fun notificationStorage() {
+        Log.i("StoaregCreatorWorker", "w workManagerRepositorii")
+        val constraints = Constraints.Builder()
+            .setRequiresBatteryNotLow(true)  // Wymaga, aby urządzenie miało wystarczający poziom baterii
+            .setRequiresDeviceIdle(false)    // Może działać, gdy urządzenie jest aktywne
+            .build()
+        val notificationStorageBuilder = PeriodicWorkRequestBuilder<StorageNotificationsWorker>(
+            2, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .build()
+        workManager.enqueueUniquePeriodicWork(
+            "NotificationStorageWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            notificationStorageBuilder
+        )
+
+    }
+
 
     private fun createInputDataForNotificationWorker(usageDetailsList: List<UsageDetails>) : Data {
         val builder = Data.Builder()
