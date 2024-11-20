@@ -69,7 +69,7 @@ class NotificationCreatorWorker(appContext: Context, workerParams: WorkerParamet
             val notification = Notification(
                 Usageid = usage.id,
                 title = "Nadchodzące zażycie leku ${usage.medicinDetails.name}",
-                info = "Pacjent powinien zażyć ${usage.dose} x ${usage.medicinDetails.form} leku ${usage.medicinDetails.name}" +
+                info = "${if(usage.patientsName.isBlank()) "Pacjent" else usage.patientsName} powinien/powinna zażyć ${usage.dose} x ${usage.medicinDetails.form} leku ${usage.medicinDetails.name}" +
                         "UWAGA: relacja z posiłkiem: ${usage.medicinDetails.relation}",
                 seen = false,
                 date = calendar.time

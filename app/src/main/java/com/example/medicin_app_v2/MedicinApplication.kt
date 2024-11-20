@@ -38,7 +38,7 @@ class MedicinApplication : Application() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "example_channel_id"
             val channelName = "Powiadomienia_push"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, channelName, importance)
             channel.description = "Powiadomienia o kończących się zapasach leków będą wyświetlane, aby przypomnieć o konieczności uzupełnienia zapasów"
 

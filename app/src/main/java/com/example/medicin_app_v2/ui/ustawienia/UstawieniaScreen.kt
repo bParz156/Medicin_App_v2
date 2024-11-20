@@ -2,17 +2,29 @@ package com.example.medicin_app_v2.ui.ustawienia
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,15 +88,19 @@ fun UstawieniaBody (
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 
+    val scale = viewModel.ustawieniaUiState.scale
+    val context = LocalContext.current
 
-   // val themeMode = viewModel.ustawieniaUiState.themeMode
-
-    Column {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(contentPadding)
+    ) {
         Text(text= stringResource(R.string.Ustawienia),
-            modifier= modifier.padding(contentPadding))
+            style = MaterialTheme.typography.headlineLarge
+        )
 
-        Text(text= "Wybierz mode",
-            modifier= modifier.padding(contentPadding))
+        Text(text= "Wybierz kontrast ekranu")
 
         // Display buttons to select the theme mode
         ThemeMode.entries.forEach { mode ->
@@ -94,6 +110,28 @@ fun UstawieniaBody (
             ) {
                 Text(text = mode.name)
             }
+        }
+
+        Text("Wybierz wielkość czciconki")
+        Row()
+        {
+            Button(onClick = {viewModel.setScale(-5, context)})
+            {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Zmniejsz czcionkę"
+                )
+            }
+            Text(text = scale.toString())
+
+            Button(onClick = {viewModel.setScale(+5, context)})
+            {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "Zwiększ czcionkę"
+                )
+            }
+
         }
     }
 

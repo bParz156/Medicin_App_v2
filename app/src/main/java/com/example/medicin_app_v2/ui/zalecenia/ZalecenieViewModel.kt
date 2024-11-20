@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.DayWeek
 import com.example.medicin_app_v2.data.MealRelation
 import com.example.medicin_app_v2.data.MedicinForm
+import com.example.medicin_app_v2.data.WorkerRepository
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
 import com.example.medicin_app_v2.data.medicine.MedicinRepository
@@ -48,7 +49,8 @@ class ZalecenieViewModel(
     private val patientsRepository: PatientsRepository,
     private val scheduleRepository: ScheduleRepository,
     private val firstaidkitRepository: FirstaidkitRepository,
-    private val scheduleTermRepository: ScheduleTermRepository
+    private val scheduleTermRepository: ScheduleTermRepository,
+    private val workerRepository: WorkerRepository
 ) : ViewModel()
 {
 
@@ -120,6 +122,7 @@ class ZalecenieViewModel(
                     )
                 })
         }
+        workerRepository.generateUsages()
 
     }
 

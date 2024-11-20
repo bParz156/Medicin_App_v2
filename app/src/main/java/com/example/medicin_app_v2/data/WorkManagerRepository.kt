@@ -37,9 +37,9 @@ class WorkManagerRepository(context: Context,
     override fun generateUsages() {
         Log.i(TAG, "in repositori")
        val usageBuilder = PeriodicWorkRequestBuilder<UsageWorker>(1, TimeUnit.HOURS).build()
-     //  val usageBuilder = OneTimeWorkRequestBuilder<UsageWorker>()
+       val usageBuilderOnce = OneTimeWorkRequestBuilder<UsageWorker>()
 
-//     workManager.enqueue(usageBuilder.build())
+     workManager.enqueue(usageBuilderOnce.build())
         workManager.enqueueUniquePeriodicWork(
             "UsageWorker",
             ExistingPeriodicWorkPolicy.KEEP,
@@ -75,16 +75,16 @@ class WorkManagerRepository(context: Context,
 
     }
 
-    override fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>) {
-        val notificationStorageBuilder = OneTimeWorkRequestBuilder<StorageNotificationsWorker>()
-        notificationStorageBuilder.setInputData(
-            createInputDataForWorker(storageDetailsList)
-        )
-
-        workManager.enqueue(
-            notificationStorageBuilder.build()
-        )
-    }
+//    override fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>) {
+//        val notificationStorageBuilder = OneTimeWorkRequestBuilder<StorageNotificationsWorker>()
+//        notificationStorageBuilder.setInputData(
+//            createInputDataForWorker(storageDetailsList)
+//        )
+//
+//        workManager.enqueue(
+//            notificationStorageBuilder.build()
+//        )
+//    }
 
     override fun notificationStorage() {
         Log.i("StoaregCreatorWorker", "w workManagerRepositorii")
@@ -104,7 +104,7 @@ class WorkManagerRepository(context: Context,
             .setRequiresCharging(false)
             .build()
         val notificationStorageBuilder = PeriodicWorkRequestBuilder<StorageNotificationsWorker>(
-            15, TimeUnit.MINUTES)
+            3, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
         //workManager.

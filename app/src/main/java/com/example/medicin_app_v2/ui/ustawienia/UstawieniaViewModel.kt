@@ -1,11 +1,14 @@
 package com.example.medicin_app_v2.ui.ustawienia
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.ThemeMode
 import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.data.firstAidKit.FirstaidkitRepository
@@ -50,6 +53,7 @@ class UstawieniaViewModel(
                 .toPatientDetails()
 
             ustawieniaUiState.themeMode = userPreferencesRepository.themeMode.first()
+            ustawieniaUiState.scale = (userPreferencesRepository.fontScale.first()*100f).toInt()
         }
     }
 
@@ -64,10 +68,22 @@ class UstawieniaViewModel(
         ustawieniaUiState.themeMode = newThemeMode
     }
 
+
+    fun setScale(change : Int, context: Context)
+    {
+        ustawieniaUiState.scale +=change
+        val newScale = ustawieniaUiState.scale/100f
+        viewModelScope.launch {
+            userPreferencesRepository.saveFontScale(newScale)
+            userPreferencesRepository.updateFontScale(context, newScale)
+          //  userPreferencesRepository.updateFontScaleAndRecreate(LocalContext.current, newScale, this@MainActivity)
+        }
+    }
 }
 
 
 data class UstawieniaUiState(
     var patientDetails: PatientDetails = PatientDetails(),
-    var themeMode: ThemeMode = ThemeMode.DAY_MODE
+    var themeMode: ThemeMode = ThemeMode.DAY_MODE,
+    var scale : Int = 100
 )

@@ -9,6 +9,6 @@ interface WorkerRepository {
     fun deleteAncient()
     fun createNotificationsFromUsages(usageDetailsList: List<UsageDetails>)
     fun generateNotifications()
-    fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>)
+    //fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>)
     fun notificationStorage()
 }

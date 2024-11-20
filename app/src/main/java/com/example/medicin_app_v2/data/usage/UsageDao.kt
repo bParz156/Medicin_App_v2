@@ -30,7 +30,7 @@ interface UsageDao {
     @Query("SELECT * from usage WHERE ScheduleTerm_id = :scheduleTerm_id")
     fun getAllSchedulesTermUsage(scheduleTerm_id: Int): Flow<List<Usage>>
 
-    @Query("DELETE from usage WHERE date< :expiryDate")
+    @Query("DELETE from usage WHERE date< :expiryDate or confirmed = 1")
     fun deleteOldEvents(expiryDate: Date)
 
     @Query("Select * from usage")

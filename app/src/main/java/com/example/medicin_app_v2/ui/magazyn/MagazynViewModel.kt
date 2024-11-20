@@ -129,7 +129,7 @@ class MagazynViewModel (
 
 
             magazynUiState = ZaleceniaUiState(storageDetailsList = storageDetailsList, patientDetails = patientDetails)
-            workerRepository.notificationsAboutStorage(storageDetailsList.filter { it.daysToEnd < 7 })
+        //    workerRepository.notificationsAboutStorage(storageDetailsList.filter { it.daysToEnd < 7 })
 //        for(storageDetail in magazynUiState.storageDetailsList)
 //        {
 //            storageDetail.daysToEnd = calculateDaysToEnd(

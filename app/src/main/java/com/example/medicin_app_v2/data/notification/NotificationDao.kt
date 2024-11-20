@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface NotificationDao {
@@ -28,4 +29,7 @@ interface NotificationDao {
 
     @Query("SELECT * from notification  order by date DESC")
     fun getAllnotification(): Flow<List<Notification>>
+
+    @Query("DELETE from notification WHERE date< :expiryDate or seen = 1")
+    fun deleteOldNotifications(expiryDate: Date)
 }

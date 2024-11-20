@@ -4,6 +4,9 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -83,24 +86,33 @@ fun PowiadomieniaScreen(
 fun PowiadomieniaBody (modifier: Modifier = Modifier,
                        contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    var showNot by remember { mutableStateOf(false) }
+    var hasNotificationPermission by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { hasNotificationPermission = it }
+    )
 
     Column(modifier = modifier.padding(contentPadding)) {
-    Text(text= stringResource(R.string.Powiadomienia),
-        modifier = Modifier.padding(contentPadding))
+        Text(text= stringResource(R.string.Powiadomienia),
+            modifier = Modifier.padding(contentPadding))
 
-    Button(
-        onClick = { showNot = !showNot }
-    )
-    {
-        Text(text = "Kliknij")
-    }
+        Button(
+            onClick = {
+                if (!hasNotificationPermission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+        ) {
+            Text(text = "Request permission")
         }
-
-    if(showNot)
-    {
-        notificationBuild()
     }
+//
+//    if(showNot)
+//    {
+//        notificationBuild()
+//    }
 
 }
 @Composable

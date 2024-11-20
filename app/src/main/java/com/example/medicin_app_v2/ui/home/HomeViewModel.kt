@@ -159,7 +159,8 @@ class HomeViewModel (
                             medicinDetails = scheduleDetail.medicinDetails,
                             confirmed = usage.confirmed,
                             scheduleTermId = scheduleTerm.id,
-                            storageId = medicinStorage[scheduleDetail.medicinDetails.id]?.id ?: 0
+                            storageId = medicinStorage[scheduleDetail.medicinDetails.id]?.id ?: 0,
+                            patientsName = getPatientsName()
                         ))
 
                     }
@@ -238,7 +239,8 @@ data class ScheduleDetails(
     var medicinDetails: MedicinDetails = MedicinDetails(),
     var startDate: Date = Date(),
     var endDate: Date? = null,
-    var scheduleTermDetailsList: List<ScheduleTermDetails> = listOf()
+    var scheduleTermDetailsList: List<ScheduleTermDetails> = listOf(),
+    var patiendId: Int = 0
 )
 
 data class ScheduleTermDetails(
@@ -268,13 +270,9 @@ data class UsageDetails(
     val dose: Int = 0,
     val medicinDetails: MedicinDetails = MedicinDetails(),
     val scheduleTermId : Int =0,
-    val storageId : Int =0
+    val storageId : Int =0,
+    val patientsName : String =""
 )
-object DateAsLongSerializer : KSerializer<Date> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Date", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: Date) = encoder.encodeLong(value.time)
-    override fun deserialize(decoder: Decoder): Date = Date(decoder.decodeLong())
-}
 
 
 fun UsageDetails.toUsage() : Usage = Usage(
@@ -301,7 +299,8 @@ fun Schedule.toScheduleDetails(medicinDetails: MedicinDetails, scheduleTermList:
     endDate = endDate,
     scheduleTermDetailsList = scheduleTermList.map {
         it.toScheduleTermDetails()
-    }
+    },
+    patiendId = Patient_id
 )
 
 @Serializable

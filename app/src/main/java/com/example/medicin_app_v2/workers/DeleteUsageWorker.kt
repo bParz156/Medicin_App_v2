@@ -16,12 +16,14 @@ class DeleteUsageWorker(
 ): CoroutineWorker(ctx, params) {
 
     private val usageDao  = AppDatabase.getDatabase(ctx).usageDao()
+    private val notificationDao  = AppDatabase.getDatabase(ctx).notificationDao()
+
 
     override suspend fun doWork(): Result {
-        val allUsages = usageDao.getAllUsages().first()
 
         return try{
-            deleteArchivals(allUsages)
+            deleteArchivals()
+            deleteNotifications()
             Result.success()
         }catch (e: Exception) {
             Log.e(TAG, "failed due to :", e)
@@ -30,25 +32,22 @@ class DeleteUsageWorker(
     }
 
 
-    suspend fun deleteArchivals(usageList: List<Usage>)
+    fun deleteArchivals()
     {
         val calendar = Calendar.getInstance() // Bieżąca data
+        calendar.add(Calendar.MINUTE, 10) //danie marginesu 10 minut
         val currentDate = calendar.time
-        for(usage in usageList)
-        {
-            if(usage.confirmed) // usage.date < currentDate)
-            {
-                usageDao.delete(usage)
-            }
-            else
-            {
-                calendar.time = usage.date
-                calendar.add(Calendar.MINUTE, 10) //daj pacjentowi dodatkowe 10 minut na zażycie leku
-                if(calendar.time < currentDate)
-                    usageDao.delete(usage)
-            }
 
-        }
+        usageDao.deleteOldEvents(expiryDate = currentDate)
+    }
+
+    fun deleteNotifications()
+    {
+        val calendar = Calendar.getInstance() // Bieżąca data
+        calendar.add(Calendar.MINUTE, 10) //danie marginesu 10 minut
+        val currentDate = calendar.time
+        notificationDao.deleteOldNotifications(expiryDate = currentDate)
+
     }
 
 
