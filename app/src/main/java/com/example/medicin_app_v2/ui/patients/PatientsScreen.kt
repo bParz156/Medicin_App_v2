@@ -400,7 +400,7 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
                 {
                     missingFieldsDialog(
                         onDismiss = {openDialog.value = false},
-                        missingValues = "Imię pacjenta"
+                        missingValues = stringResource(R.string.imie_pacjenta)
                     )
                 }
 
@@ -526,7 +526,7 @@ fun missingFieldsDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            Text(text="Uzupełnij brakujące informacje:",
+            Text(text= stringResource(R.string.fill_fields),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
@@ -555,36 +555,3 @@ fun missingFieldsDialog(
         }
     }
 }
-
-
-/*
-
-@Composable
-@Preview
-fun PatientEmptyListPreview()
-{
-    PatientsListScreen(
-        onAddPatient = {},
-        onBack = {},
-        onPatientClick = {} ,
-        onDeleteClicked = {},
-        currentPatientIdx = -1,
-        patientsList = listOf(),
-        )
-}
-
-@Composable
-@Preview
-fun PatientListPreview()
-{
-    PatientsListScreen(
-        onAddPatient = {},
-        onBack = {},
-        onPatientClick = {} ,
-        onDeleteClicked = {},
-        currentPatientIdx = 1,
-        patientsList = listOf(Patient(1, "Ania"), Patient(2,"Jan")),
-        )
-}
-
- */

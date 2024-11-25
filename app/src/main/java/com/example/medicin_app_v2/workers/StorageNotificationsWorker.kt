@@ -109,7 +109,7 @@ class StorageNotificationsWorker(
                 )
             )
             Log.i(TAG, "dni do końca leku ${medicinDetails.name} == ${storageDetails.daysToEnd}")
-            if(storageDetails.daysToEnd<7)
+            if(storageDetails.daysToEnd in 0..6)
             {
                 list +=storageDetails
             }
@@ -207,6 +207,10 @@ class StorageNotificationsWorker(
 
             }
             Log.i("calday", "nie wychodzi z while")
+        }
+        else
+        {
+            toEnd = -1
         }
         return toEnd
     }

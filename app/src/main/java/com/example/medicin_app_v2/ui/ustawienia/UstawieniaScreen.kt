@@ -100,7 +100,7 @@ fun UstawieniaBody (
             style = MaterialTheme.typography.headlineLarge
         )
 
-        Text(text= "Wybierz kontrast ekranu")
+        Text(text= stringResource(R.string.pick_contrast))
 
         // Display buttons to select the theme mode
         ThemeMode.entries.forEach { mode ->
@@ -112,14 +112,14 @@ fun UstawieniaBody (
             }
         }
 
-        Text("Wybierz wielkość czciconki")
+        Text(text = stringResource(R.string.pick_font_size))
         Row()
         {
             Button(onClick = {viewModel.setScale(-5, context)})
             {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
-                    contentDescription = "Zmniejsz czcionkę"
+                    contentDescription = stringResource(R.string.dec_font_size)
                 )
             }
             Text(text = scale.toString())
@@ -128,7 +128,7 @@ fun UstawieniaBody (
             {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Zwiększ czcionkę"
+                    contentDescription = stringResource(R.string.inc_font_size)
                 )
             }
 

@@ -175,7 +175,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
             )
         } else {
 
-                Text(text="przyjmowane leki",
+                Text(text= stringResource(R.string.medicins),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineMedium,
                     )
@@ -353,7 +353,7 @@ fun medicinCard(
 
                 Icon(
                     imageVector = if(!expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
-                    contentDescription = "Rozwinięcie",
+                    contentDescription = stringResource(R.string.rozwion),
                     tint = contentColor
                 )
 
@@ -381,7 +381,7 @@ fun medicinCard(
                             .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
                         ,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        contentDescription = "Usuń"
+                        contentDescription = stringResource(R.string.usun)
                     )
 
                     Icon(imageVector = Icons.Filled.Edit,
@@ -395,7 +395,7 @@ fun medicinCard(
                             .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
                         ,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        contentDescription = "Modyfikuj"
+                        contentDescription = stringResource(R.string.change)
                     )
                 }
 
@@ -408,7 +408,8 @@ fun medicinCard(
                     Spacer(Modifier.weight(1f))
 
                     for (scheduleInfo in medicinScheduleInfo.scheduleTermDetailsList) {
-                        Text(text="${stringResource(scheduleInfo.day.title)} ${"%02d".format(scheduleInfo.hour)}:${"%02d".format(scheduleInfo.minute)}  - ${scheduleInfo.dose} ${medicinScheduleInfo.medicinDetails.form}",
+                        Text(text=stringResource(scheduleInfo.day.title) + stringResource(R.string.czas_zazycia, scheduleInfo.hour, scheduleInfo.minute) +
+                                stringResource(R.string.dawka, scheduleInfo.dose, medicinScheduleInfo.medicinDetails.form),
                             color = contentColor)
                     }
 
@@ -420,7 +421,7 @@ fun medicinCard(
                 areYouSureDialog(
                     onConfirm = {onDeleteClick()},
                     onDismiss = {openDialogDelete = false},
-                    info = "Czy na pewno chcesz usunąć zalecenia zażywania leku ${medicinScheduleInfo.medicinDetails.name}"
+                    info = stringResource(R.string.are_you_sure_zalecenie)
                 )
             }
 
@@ -510,8 +511,7 @@ fun zalecenieDialog(
                     openScheduleDialog = true
                 },
                 onDismiss = { openAreYouSure = false },
-                info = "Lek, dla którego wprowadzane jest nowe zlecenie to: ${medicinDetails.name} przyjmowany jest w formie: ${medicinDetails.form}" +
-                        ". Zależność leku z posiłkiem: ${medicinDetails.relation}"
+                info = stringResource(R.string.add_zalecenie_medicin, medicinDetails.name, medicinDetails.form, medicinDetails.relation)
             )
         }
 
@@ -562,7 +562,7 @@ fun addScheduleDialog(
                 .background(color = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Text(
-                text = "Uzupełnij informacje na temat dawkowania leku ${medicinDetails.name}",
+                text = stringResource( R.string.fill_info_dosing ,medicinDetails.name),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
@@ -584,7 +584,7 @@ fun addScheduleDialog(
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                Text(text = "Początek kuracji: $startDate")
+                Text(text = stringResource(R.string.poczatek_kuracji, startDate) )
                 Button(onClick = {
                     android.app.DatePickerDialog(
                         context,
@@ -597,7 +597,7 @@ fun addScheduleDialog(
                 }){
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Data początku kuracji"
+                        contentDescription = stringResource(R.string.poczatek_kuracji)
                     )
                 }
             }
@@ -607,7 +607,7 @@ fun addScheduleDialog(
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                Text(text = "Data kuracji: ${if(endDate.isBlank()) "nieznana" else endDate}")
+                Text(text =  stringResource(R.string.koniec_kuracji ,if(endDate.isBlank()) stringResource(R.string.nieznany) else endDate))
                 Button(onClick = {
                     android.app.DatePickerDialog(
                         context,
@@ -620,14 +620,14 @@ fun addScheduleDialog(
                 }){
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Data końca kuracji"
+                        contentDescription = stringResource(R.string.koniec_kuracji)
                     )
                 }
             }
 
             ButtonIconColumn(
                 onButtonCLick = { addNewScheduleTerm = true },
-                labelTextId = R.string.add_medicin_title,
+                labelTextId = R.string.add_new_scheduleTerm,
                 imageVector = Icons.Filled.Add,
                 isSelected = false,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -659,14 +659,11 @@ fun addScheduleDialog(
                                     .weight(1f)
                                 ,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                contentDescription = "Usuń"
+                                contentDescription = stringResource(R.string.usun)
                             )
                             Text(
-                                text = "${stringResource(it.day.title)} ${"%02d".format(it.hour)}:${
-                                    "%02d".format(
-                                        it.minute
-                                    )
-                                }  - ${it.dose} ${medicinDetails.form}",
+                                text = stringResource(it.day.title) + stringResource(R.string.czas_zazycia, it.hour, it.minute) + "-" +
+                                        stringResource(R.string.dawka, it.dose, medicinDetails.form.name) ,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier
                                     .weight(3f)
@@ -685,7 +682,7 @@ fun addScheduleDialog(
                                     .weight(1f)
                                 ,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                contentDescription = "Modyfikuj"
+                                contentDescription = stringResource(R.string.change)
                             )
 
                         }
@@ -772,7 +769,7 @@ fun addScheduleTermDialog(
             .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Text(
-                text = "Uzupełnij infomacje na temat termin zażycia",
+                text = stringResource(R.string.fill_info_schedule) ,
                 textAlign = TextAlign.Justify,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier
@@ -788,7 +785,7 @@ fun addScheduleTermDialog(
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj dawkę leku") },
+                placeholder = { Text(text = stringResource(R.string.fill_dose)) },
                 isError = dose.isBlank() || dose.equals("0")
             )
 
@@ -804,7 +801,7 @@ fun addScheduleTermDialog(
                         )
                     }
                     Text(
-                        text = "Wybrany dzień tygodnia: " + stringResource(scheduleTermDetails.day.title)
+                        text = stringResource(R.string.dayWeekchosen,stringResource(scheduleTermDetails.day.title))
                     )
                 }
                 DropdownMenu(expanded = expandedDays,
@@ -843,7 +840,7 @@ fun addScheduleTermDialog(
                 }, pickedHour, pickedMinute, true
             )
 
-            Text("Czas zażycia: ${scheduleHour}:${scheduleMinute}")
+            Text( text = stringResource(R.string.czas_zazycia, scheduleHour, scheduleMinute))
             ButtonIconRow(
                 onButtonCLick = { timePickerDialog.show() },
                 isSelected = false,
@@ -945,7 +942,7 @@ fun addMedicinDialog(
                     },
                     isError = !okey,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Podaj nazwę leku")}
+                    placeholder = { Text(text = stringResource(R.string.medicinName))}
                 )
 
             DropdownMenu(
@@ -953,7 +950,7 @@ fun addMedicinDialog(
                 onDismissRequest = { expandedOptions = false },
                 modifier = Modifier.background(MaterialTheme.colorScheme.tertiaryContainer)
             ) {
-                Text(text= "Wybierz lek z istniejących",
+                Text(text= stringResource(R.string.pick_medicin_existing),
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.wrapContentSize().fillMaxWidth(),
@@ -1025,7 +1022,7 @@ fun addMedicinDialog(
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
-                    Text(text = "Zależność od posiłku ${medicinDetails.relation}")
+                    Text(text = stringResource(R.string.mealRelation,medicinDetails.relation))
                     Button(onClick = { expandedRelations = !expandedRelations })
                     {
                         Icon(
@@ -1038,7 +1035,7 @@ fun addMedicinDialog(
                     onDismissRequest = { expandedRelations = false }
                 )
                 {
-                    MealRelation.values().forEach { item ->
+                    MealRelation.entries.forEach { item ->
                         DropdownMenuItem(
                             text = { Text(item.name) },
                             onClick = {
@@ -1062,13 +1059,14 @@ fun addMedicinDialog(
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = { Text("Podaj jakim zapasem leku dysponujesz") })
+                label = { Text(text = stringResource(R.string.zapas_leku)) }
+            )
 
             DropdownMenu(expanded = chosenFromExisting && expandedStorage ,
                 onDismissRequest = { expandedStorage = false }
             )
             {
-                Text(text ="Lek jest już przyjmowany przez innych pacjentów. Wybierz jeśli chcesz dzielić apteczkę z innym pacjentem",
+                Text(text = stringResource(R.string.medicin_existing_pick_partner),
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.wrapContentSize().fillMaxWidth(),

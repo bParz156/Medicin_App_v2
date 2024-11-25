@@ -44,7 +44,7 @@ class DeleteUsageWorker(
     fun deleteNotifications()
     {
         val calendar = Calendar.getInstance() // Bieżąca data
-        calendar.add(Calendar.MINUTE, 10) //danie marginesu 10 minut
+        calendar.add(Calendar.HOUR, 6) //danie marginesu 10 minut
         val currentDate = calendar.time
         notificationDao.deleteOldNotifications(expiryDate = currentDate)
 

@@ -3,10 +3,10 @@ package com.example.medicin_app_v2.data
 import androidx.annotation.StringRes
 import com.example.medicin_app_v2.R
 
-enum class MealRelation {
-    Przed,
-    Po,
-    Nie
+enum class MealRelation(@StringRes val title: Int) {
+    Przed(title = R.string.przed),
+    Po(title = R.string.po),
+    Nie(title = R.string.nie)
 }
 
 enum class DayWeek(@StringRes val title: Int, val weekDay: Int) {

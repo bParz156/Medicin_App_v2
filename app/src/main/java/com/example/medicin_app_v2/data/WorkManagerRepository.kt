@@ -98,7 +98,7 @@ class WorkManagerRepository(context: Context,
             startActivity(context, intent, null)
         }
         val constraints = Constraints.Builder()
-            .setRequiresBatteryNotLow(true)  // Wymaga, aby urządzenie miało wystarczający poziom baterii
+            .setRequiresBatteryNotLow(false)  // Wymaga, aby urządzenie miało wystarczający poziom baterii
             .setRequiresDeviceIdle(false)    // Może działać, gdy urządzenie jest aktywne
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .setRequiresCharging(false)

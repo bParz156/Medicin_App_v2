@@ -274,15 +274,15 @@ fun medicinCard(
                 )
 
                 Text(
-                    text = "Dawka: $dose x ${medicinForm.name} \n" +
-                            "Zależność od posiłku: $mealRelation",
+                    text = stringResource(R.string.dawka, dose, medicinForm.name) + "\n" +
+                            stringResource(R.string.mealRelation, stringResource(mealRelation.title)),
                     style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Center,
                     color = cardColors.contentColor
                 )
 
                 Text(
-                    text = "Godzina: ${"%02d".format(hour)}:${"%02d".format(minute)}",
+                    text = stringResource(R.string.czas_zazycia, hour, minute),
                     style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Center,
                     color = cardColors.contentColor

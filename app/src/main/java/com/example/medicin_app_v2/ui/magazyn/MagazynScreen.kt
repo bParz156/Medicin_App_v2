@@ -131,7 +131,7 @@ fun MagazynBody (
         }
         else {
             Text(
-                text = "Status apteczki",
+                text = stringResource(R.string.aptecznka_stan),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
               //  modifier = modifier.padding(contentPadding)
@@ -257,7 +257,7 @@ fun storageCard(
             )
 
             Text(
-                text="Przewidywany czas wyczerpania zapasów: ${storageInfo.daysToEnd} dni",
+                text= stringResource(R.string.koniec_zapasow, storageInfo.daysToEnd),
                 style = MaterialTheme.typography.labelMedium,
                 color = contentColor
                 )
@@ -293,14 +293,14 @@ fun magazynDialog(
     {
         Column {
             Text(
-                text = "Zapasy leku ${storageDetails.medName}",
+                text = stringResource(R.string.zapas, storageDetails.medName) ,
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.wrapContentSize().fillMaxWidth()
             )
 
             Text(
-                text = "Wpisz w pole zakupioną ilość leku. Wpisz tylko liczbę, przyjęte jednostka to: ${storageDetails.medicinForm.name}",
+                text = stringResource (R.string.dialog_zakupiono, storageDetails.medicinForm.name),
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Justify,
                 modifier = Modifier.wrapContentSize().fillMaxWidth()
@@ -350,7 +350,7 @@ fun magazynDialog(
         {
             missingFieldsDialog(
                 onDismiss = {openDialog = false},
-                missingValues = "kupiona ilość (ilość musi być liczbę naturalnąi musi być większa od zera)"
+                missingValues = stringResource(R.string.ostrzezenie_zapas)
             )
 
         }
@@ -377,7 +377,7 @@ fun magazynDialog(
                             onConfirm()
                             onDismiss()
                         },
-            info = "Dokupiono ${medQuantity} ${stringResource(storageDetails.medicinForm.dopelniacz)} leku o nazwie ${storageDetails.medName}"
+            info = stringResource(R.string.summary_increase_storage, storageDetails.medName, medQuantity, storageDetails.medicinForm.name)
         )
     }
 
@@ -403,7 +403,7 @@ fun areYouSureDialog(
             .wrapContentSize()
             .padding(dimensionResource(R.dimen.padding_small))
         ) {
-            Text(text= "Sprawdź poprawność informacji",
+            Text(text= stringResource(R.string.check_info),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier

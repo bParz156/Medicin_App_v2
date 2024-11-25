@@ -1,31 +1,16 @@
 <resources>
     <string name="app_name">Medicin_App</string>
 
-    <!--
-    Poniżej przed enterem są z innnego projektu, wywal niepotrzebne
-    -->
 
     <string name="add">Dodaj</string>
-    <string name="back_button">Wróc</string>
-    <string name="delete">Usuń</string>
-    <string name="delete_question">Czy na pewno chcesz usunąć?</string>
-    <string name="no_item_description">Oops!\nNo items in the inventory.\nTap + to add.</string>
-    <string name="edit_item_title">Edit Item</string>
-    <string name="item">Item</string>
-    <string name="item_detail_title">Item Details</string>
-    <string name="item_entry_title">Add Item</string>
-    <string name="item_name_req">Item Name*</string>
-    <string name="item_price_req">Item Price*</string>
-    <string name="no">No</string>
-    <string name="price">Price</string>
-    <string name="quantity_in_stock">Quantity in stock</string>
-    <string name="in_stock">%d in stock</string>
-    <string name="quantity_req">Quantity in Stock*</string>
-    <string name="save_action">Save</string>
-    <string name="sell">Sell</string>
-    <string name="yes">Yes</string>
-    <string name="required_fields">*required fields</string>
-
+    <string name="back">"Wróć"</string>
+    <string name="confirm">Potwierdź</string>
+    <string name="rozwion">Rozwiń</string>
+    <string name="zwin">Zwiń</string>
+    <string name="check_info">Sprawdź poprawność informacji</string>
+    <string name="fill_fields">Uzupełnij brakujące informacje:</string>
+    <string name="usun">Usuń</string>
+    <string name="change">Modyfikuj</string>
 
     <!--Location -->
     <string name="home">Home</string>
@@ -35,26 +20,25 @@
     <string name="Powiadomienia">Powiadomienia</string>
     <string name="Pacjenci">Pacjenci</string>
 
+    <!-- patients  -->
+
     <string name="PatientsListDialog">Wszyscy pacjenci</string>
     <string name="PatientsListDialogText">Wybierz pacjenta, którego opieką chcesz się zająć klikając w jego imię</string>
     <string name="new_patient">Dodaj </string>
-    <string name="back">"Wróć"</string>
     <string name="no_patient">Wygląda na to, że nie dodano jeszcze żadnego pacjenta, aby móc zacząć korzystać z aplikaci należy dodać pacjenta</string>
     <string name="delete_patient">Usuń pacjenta</string>
-
     <string name="add_pateint_title">Dodawanie nowego pacjenta</string>
     <string name="requiered_to_add">Podaj imię pacjenta</string>
-    <string name="confirm">Potwierdź</string>
-
     <string name="delete_patient_title">Usuwanie pacjenta</string>
     <string name="are_you_sure">Czy na pewno chcesz usunąć pacjenta %s? Spowoduje to usunięcie wszystkich informacji na temat jego zażywań leków</string>
-
     <string name="no_medicin">Wygląda na to, że nie dodano jeszcze żadnych lekarstw. Kiknij przycisk, aby dodać leki</string>
+    <string name="imie_pacjenta">Imię pacjenta</string>
 
     <string name="add_medicin_title">Dodawanie nowego leku</string>
     <string name="requiered_to_add_medicin">Podaj informacje na temat nowego leku</string>
 
 
+    <!--Dni tygodnia-->
     <string name="pon">Poniedziałek</string>
     <string name="wt">Wtorek</string>
     <string name="sr">Środa</string>
@@ -63,15 +47,60 @@
     <string name="sb">Sobota</string>
     <string name="nd">Niedziela</string>
 
-    <string name="tabletka_dop">Tabletek</string>
+    <!-- MealRelation-->
+    <string name="przed">Przed posiłiem</string>
+    <string name="po">Po posiłku</string>
+    <string name="nie">Brak zależnośći od posiłku</string>
+
+    <!-- MedicinForm -->
+    <string name="tabletka_dop">Tabletka</string>
     <string name="ciecz_dop">ml</string>
-    <string name="rozwion">Rozwiń</string>
-    <string name="zwin">Zwiń</string>
     <string name="czas">Wybierz godzinę</string>
 
 
     <string name="chanel_name">Powiadomienia_push</string>
     <string name="chanel_description">Powiadomienia o kończących się zapasach leków będą wyświetlane, aby przypomnieć o konieczności uzupełnienia zapasów</string>
+
+    <!--HomeScreen-->
+    <string name="dawka">Dawka: %d x %s</string>
+    <string name="mealRelation">Zależność od posiłku: %s</string>
+    <string name="czas_zazycia">Godzina: %02d:$%02d</string>
+
+    <!-- Magazyn -->
+    <string name="aptecznka_stan">Stan apteczki</string>
+    <string name="koniec_zapasow">Przewidywany czas wyczerpania zapasów: %d dni</string>
+    <string name="zapas">Zapasy leku %s</string>
+    <string name="dialog_zakupiono">"Wpisz w pole zakupioną ilość leku. Wpisz tylko liczbę, przyjęte jednostka to: %s</string>
+    <string name="ostrzezenie_zapas">Wprowadzona wartość musi być większa od 0</string>
+    <string name="summary_increase_storage">Uzupełniono zapasy leku %s o %d x %s</string>
+
+
+    <!-- Ustawienia -->
+    <string name="pick_contrast">Wybierz kontrast ekranu</string>
+    <string name="pick_font_size">Wybierz wielkość czcionki</string>
+    <string name="inc_font_size">Zwiększ czcionkę</string>
+    <string name="dec_font_size">Zmniejsz czcionkę</string>
+
+    <!-- Zalecenia -->
+    <string name="medicins">Przyjmowane leki</string>
+    <string name="are_you_sure_zalecenie">Czy na pewno chcesz usunąć zalecenia zażywania leku: %s</string>
+    <string name="add_zalecenie_medicin">Lek, dla którego wprowadzane jest nowe zlecenie to: %s przyjmowany jest w formie: %s. \n Zależność leku z posiłkiem: %s</string>
+    <string name="fill_info_dosing">Uzupełnij informacje na temat dawkowania leku: %s</string>
+    <string name="poczatek_kuracji">Początek kuracji: %s</string>
+    <string name="koniec_kuracji">Koniec kuracji: %s</string>
+    <string name="nieznany">nieznana</string>
+    <string name="fill_info_schedule">Uzupełnij infomacje na temat termin zażycia</string>
+    <string name="fill_dose">Podaj dawkę leku</string>
+    <string name="dayWeekchosen">Wybrany dzień tygdonia %s</string>
+    <string name="medicinName">Podaj nazwę leku</string>
+    <string name="pick_medicin_existing">Wybierz lek z istniejących</string>
+    <string name="medicin_existing_pick_partner">Lek jest już przyjmowany przez innych pacjentów. Wybierz jeśli chcesz dzielić apteczkę z innym pacjentem</string>
+    <string name="zapas_leku">Podaj zapas leku jakim dysponujesz</string>
+    <string name="add_new_scheduleTerm">Dodaj nowy termin</string>
+
+    <!-- NotificationCreatorWorker -->
+    <string name="title_notification_usage">Nadchodzący termin zażycia leku %s</string>
+    <string name="details_notification_usage"></string>
 
 
 </resources>
