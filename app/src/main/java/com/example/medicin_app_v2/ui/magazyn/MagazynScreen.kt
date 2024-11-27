@@ -259,21 +259,25 @@ fun storageCard(
     ) {
 
         Row(horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically)
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =  Modifier
+                .background(color = color)
+        )
         {
-            Icon(imageVector = Icons.Filled.Delete,
-                modifier = Modifier
-                    .padding(end = dimensionResource(R.dimen.padding_small))
-                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                    .clickable {
-                        openDialogDelete = true
-                    }
-                    .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
-                    .weight(1f)
-                ,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                contentDescription = stringResource(R.string.usun)
-            )
+            if(storageInfo.daysToEnd ==-1) {
+                Icon(imageVector = Icons.Filled.Delete,
+                    modifier = Modifier
+                        .padding(end = dimensionResource(R.dimen.padding_small))
+                        .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                        .clickable {
+                            openDialogDelete = true
+                        }
+                        .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                        .weight(1f),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                    contentDescription = stringResource(R.string.usun)
+                )
+            }
 
 
             Column(
@@ -285,6 +289,7 @@ fun storageCard(
                             stiffness = Spring.StiffnessMedium
                         )
                     )
+                    .weight(3f)
                     .background(color = color),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
@@ -331,14 +336,11 @@ fun storageCard(
 
     if(openDialogDelete)
     {
-        if(storageInfo.daysToEnd >-1) {
-
-            areYouSureDialog(
-                onConfirm = { onDeleteClick() },
-                onDismiss = { openDialogDelete = false },
-                info = stringResource(R.string.deletSure)
-            )
-        }
+        areYouSureDialog(
+            onConfirm = { onDeleteClick() },
+            onDismiss = { openDialogDelete = false },
+            info = stringResource(R.string.deletSure)
+        )
     }
 }
 

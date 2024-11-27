@@ -5,39 +5,32 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.medicin_app_v2.data.AppDatabase
-import com.example.medicin_app_v2.data.usage.Usage
-import kotlinx.coroutines.flow.first
 import java.util.Calendar
 
-private const val TAG = "UsageWorker"
-class DeleteUsageWorker(
+class DeleteNotificationWorker(
     ctx: Context,
     params: WorkerParameters
 ): CoroutineWorker(ctx, params) {
 
-    private val usageDao  = AppDatabase.getDatabase(ctx).usageDao()
-
-
+    private val notificationDao  = AppDatabase.getDatabase(ctx).notificationDao()
     override suspend fun doWork(): Result {
 
         return try{
-            deleteArchivals()
+            deleteNotifications()
             Result.success()
         }catch (e: Exception) {
-            Log.e(TAG, "failed due to :", e)
             Result.failure()
         }
     }
 
 
-    fun deleteArchivals()
+
+    fun deleteNotifications()
     {
         val calendar = Calendar.getInstance() // Bieżąca data
-        calendar.add(Calendar.MINUTE, 10) //danie marginesu 10 minut
+        calendar.add(Calendar.DAY_OF_YEAR, 7) //margines tygodnia
         val currentDate = calendar.time
+        notificationDao.deleteOldNotifications(expiryDate = currentDate)
 
-        usageDao.deleteOldEvents(expiryDate = currentDate)
     }
-
-
 }

@@ -11,4 +11,6 @@ interface WorkerRepository {
     fun generateNotifications()
     //fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>)
     fun notificationStorage()
+    fun deleteNotifications()
+    fun deleteStorages()
 }

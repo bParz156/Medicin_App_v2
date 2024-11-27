@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.medicin_app_v2.data.patient.Patient
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 
 @Dao
@@ -35,5 +36,8 @@ interface ScheduleDao {
 
     @Query("Select * from schedule")
     fun getAllSchedules(): Flow<List<Schedule>>
+
+    @Query("Select * from schedule where endDate!= null and endDate<:today and Medicine_id = :medicine_id")
+    fun getActiveSchedulesByMedicine(today: Date, medicine_id: Int): Flow<List<Schedule>>
 
 }

@@ -430,7 +430,7 @@ fun medicinCard(
                 areYouSureDialog(
                     onConfirm = {onDeleteClick()},
                     onDismiss = {openDialogDelete = false},
-                    info = stringResource(R.string.are_you_sure_zalecenie)
+                    info = stringResource(R.string.are_you_sure_zalecenie, medicinScheduleInfo.medicinDetails.name)
                 )
             }
 

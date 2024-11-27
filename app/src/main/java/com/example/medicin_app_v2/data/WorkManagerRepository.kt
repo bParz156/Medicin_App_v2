@@ -22,6 +22,8 @@ import com.example.medicin_app_v2.workers.UsageWorker
 import java.util.concurrent.TimeUnit
 import com.google.gson.Gson
 import androidx.work.*
+import com.example.medicin_app_v2.workers.DeleteNotificationWorker
+import com.example.medicin_app_v2.workers.DeleteStorageWorker
 
 //private const val TAG = "UsageWorker"
 private const val TAG = "NotificationWorker"
@@ -116,38 +118,43 @@ class WorkManagerRepository(context: Context,
 
     }
 
+    override fun deleteNotifications() {
+        val notificationDeleteBuilder = PeriodicWorkRequestBuilder<DeleteNotificationWorker>(
+            1, TimeUnit.DAYS)
+            .build()
+        //workManager.
+        workManager.enqueueUniquePeriodicWork(
+            "DeleteNotificationWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            notificationDeleteBuilder
+        )
+    }
+
+    override fun deleteStorages() {
+        val storageDeleteBuilder = PeriodicWorkRequestBuilder<DeleteStorageWorker>(
+            1, TimeUnit.DAYS
+        ).build()
+
+        workManager.enqueueUniquePeriodicWork(
+            "DeleteStorageWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            storageDeleteBuilder
+        )
+    }
+
 
     private fun createInputDataForNotificationWorker(usageDetailsList: List<UsageDetails>) : Data {
         val builder = Data.Builder()
-
-        Log.i(TAG, "przed zamiana na json: $usageDetailsList")
-       // Log.i(TAG, "zamian daty: ${Json.encodeToString(Date(1029,5,1))}")
-
-//        val df = SimpleDateFormat("yyyy-MM-ddX")
-//        val data = ProgrammingLanguage("Kotlin", listOf(df.parse("2023-07-06+00"), df.parse("2023-04-25+00"), df.parse("2022-12-28+00")))
-//        println(Json.encodeToString(data))
-        //Log.i(TAG, "opierwszy: ${Json.encodeToString(usageDetailsList[0])}")
         val gson = Gson()
-
-        //val jsonList = usageDetailsList.map { Json.encodeToString(it) }
         val jsonList = usageDetailsList.map { gson.toJson(it) }
-        Log.i(TAG, "po json")
-
         builder.putStringArray(USAGE_DETAILS_LIST_KEY, jsonList.toTypedArray())
-        Log.i(TAG, "ustawienie stringArray")
         return builder.build()
     }
     private fun createInputDataForWorker(storageDetailsList: List<StorageDetails>) : Data {
         val builder = Data.Builder()
-
-        Log.i(TAG, "przed zamiana na json: $storageDetailsList")
-
         val gson = Gson()
         val jsonList = storageDetailsList.map { gson.toJson(it) }
-        Log.i(TAG, "po json")
-
         builder.putStringArray(STORAGE_DETAILS_LIST_KEY, jsonList.toTypedArray())
-        Log.i(TAG, "ustawienie stringArray")
         return builder.build()
     }
 }

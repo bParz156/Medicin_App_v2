@@ -173,7 +173,9 @@ class HomeViewModel (
                 } as MutableMap<Date, MutableList<UsageDetails>>
 
             workerRepository.deleteAncient()
+            workerRepository.deleteNotifications()
             workerRepository.generateUsages()
+            workerRepository.deleteStorages()
             if(homeUiState.usageMapDay.isNotEmpty()) {
                 workerRepository.notificationStorage()
                 workerRepository.createNotificationsFromUsages(homeUiState.usageMapDay.values.first())
