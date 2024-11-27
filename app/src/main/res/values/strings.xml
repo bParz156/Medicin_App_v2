@@ -18,7 +18,7 @@
     <string name="magazyn">Magazyn</string>
     <string name="zalecenia">Zalecenia</string>
     <string name="Ustawienia">Ustawienia</string>
-    <string name="Powiadomienia">Powiadomienia</string>
+    <string name="Powiadomienia">Badania</string>
     <string name="Pacjenci">Pacjenci</string>
 
     <!-- patients  -->
@@ -57,6 +57,13 @@
     <string name="tabletka_dop">Tabletka</string>
     <string name="ciecz_dop">ml</string>
     <string name="czas">Wybierz godzinę</string>
+
+    <!-- ExaminationType -->
+    <string name="cukier">Poziom cukru we krwi</string>
+    <string name="temp">Temperatura</string>
+    <string name="cisnienie_s">Ciśnienie Skurczowe</string>
+    <string name="cisnienie_r">Ciśnienie rozkurczowe</string>
+    <string name="puls">Puls</string>
 
 
     <string name="chanel_name">Powiadomienia_push</string>
@@ -104,6 +111,15 @@
     <!-- CommunUI -->
     <string name="noPatient">Nie wybrano pacjenta</string>
     <string name="pickPatient">Wybierz pacjenta</string>
+
+    <!-- Powiadomienia -->
+    <string name="brakExamination">Wygląda na to, że nie wykonano jeszcze żadnego badania</string>
+    <string name="deleteExamination">Czy na pewno chcesz usunąć badanie?</string>
+    <string name="addExaminationTitle">Dodawanie nowego wyniku badania</string>
+    <string name="addExaminationHeadline">Uzupełnij poniższe informacje na temat zażycia leku</string>
+    <string name="value">Podaj wynik badania</string>
+    <string name="notANumber">Wynik powinien być liczbą</string>
+    <string name="Typ">Typ</string>
 
 
 

@@ -80,6 +80,7 @@ object AppViewModelProvider {
             PowiadomieniaViewModel(
                 savedStateHandle =  this.createSavedStateHandle(),
                 patientsRepository =  medicinApplication().container.patientsRepository,
+                examinationRepository = medicinApplication().container.examinationRepository
             )
         }
 

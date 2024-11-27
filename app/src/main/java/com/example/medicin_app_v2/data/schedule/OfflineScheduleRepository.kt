@@ -37,7 +37,4 @@ class OfflineScheduleRepository(private val scheduleDao: ScheduleDao) : Schedule
         scheduleDao.update(schedule)
     }
 
-    override suspend fun getSizeId(): Int {
-        return scheduleDao.getAllSchedules().filterNotNull().first().size
-    }
 }

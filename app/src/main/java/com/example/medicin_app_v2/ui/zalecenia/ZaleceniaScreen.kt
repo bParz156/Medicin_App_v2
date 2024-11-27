@@ -164,7 +164,7 @@ fun ZaleceniaBody(modifier: Modifier = Modifier,
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(contentPadding)
-            //.verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState()),
     ) {
 
         if (viewModel.getPatientsName().isEmpty()) {

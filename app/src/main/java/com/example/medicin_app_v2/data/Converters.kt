@@ -1,6 +1,7 @@
 package com.example.medicin_app_v2.data
 
 import androidx.room.TypeConverter
+import com.example.medicin_app_v2.data.examination.ExaminationType
 import java.util.Date
 
 class Converters {
@@ -43,6 +44,16 @@ class Converters {
     @TypeConverter
     fun toDayWeek(value:String): DayWeek {
         return DayWeek.valueOf(value)
+    }
+
+    @TypeConverter
+    fun fromExaminationType(value: ExaminationType): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toExaminationType(value:String): ExaminationType {
+        return ExaminationType.valueOf(value)
     }
 
 

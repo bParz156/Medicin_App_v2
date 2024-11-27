@@ -18,6 +18,5 @@ interface ScheduleRepository {
 
     suspend fun updateSchedule(schedule: Schedule)
 
-    suspend fun getSizeId(): Int
 
 }

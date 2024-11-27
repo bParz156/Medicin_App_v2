@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.medicin_app_v2.data.examination.Examination
+import com.example.medicin_app_v2.data.examination.ExaminationDao
 import com.example.medicin_app_v2.data.scheduleTerms.ScheduleTerm
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKit
 import com.example.medicin_app_v2.data.firstAidKit.FirstAidKitDao
@@ -22,8 +24,9 @@ import com.example.medicin_app_v2.data.storage.StorageDao
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageDao
 
-@Database(entities= [Patient::class, Medicine::class, Storage::class, FirstAidKit::class, Schedule::class, Usage::class, Notification::class , ScheduleTerm::class],
-    version=5, exportSchema = false)
+@Database(entities= [Patient::class, Medicine::class, Storage::class, FirstAidKit::class,
+    Schedule::class, Usage::class, Notification::class , ScheduleTerm::class, Examination::class],
+    version=6, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -35,6 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun usageDao(): UsageDao
     abstract fun notificationDao(): NotificationDao
     abstract fun scheduleTermDao(): ScheduleTermDao
+    abstract fun examinationDao() : ExaminationDao
     companion object
     {
         @Volatile
