@@ -11,6 +11,7 @@
     <string name="fill_fields">Uzupełnij brakujące informacje:</string>
     <string name="usun">Usuń</string>
     <string name="change">Modyfikuj</string>
+    <string name="Attention">UWAGA!</string>
 
     <!--Location -->
     <string name="home">Home</string>
@@ -64,15 +65,16 @@
     <!--HomeScreen-->
     <string name="dawka">Dawka: %d x %s</string>
     <string name="mealRelation">Zależność od posiłku: %s</string>
-    <string name="czas_zazycia">Godzina: %02d:$%02d</string>
+    <string name="czas_zazycia">Godzina: %02d:%02d</string>
 
     <!-- Magazyn -->
     <string name="aptecznka_stan">Stan apteczki</string>
-    <string name="koniec_zapasow">Przewidywany czas wyczerpania zapasów: %d dni</string>
+    <string name="koniec_zapasow">Przewidywany czas wyczerpania zapasów: %s dni</string>
     <string name="zapas">Zapasy leku %s</string>
     <string name="dialog_zakupiono">"Wpisz w pole zakupioną ilość leku. Wpisz tylko liczbę, przyjęte jednostka to: %s</string>
     <string name="ostrzezenie_zapas">Wprowadzona wartość musi być większa od 0</string>
     <string name="summary_increase_storage">Uzupełniono zapasy leku %s o %d x %s</string>
+    <string name="deletSure">Czy na pewno chcesz usunąć lek %s ze swojej apteczki?</string>
 
 
     <!-- Ustawienia -->
@@ -80,6 +82,7 @@
     <string name="pick_font_size">Wybierz wielkość czcionki</string>
     <string name="inc_font_size">Zwiększ czcionkę</string>
     <string name="dec_font_size">Zmniejsz czcionkę</string>
+    <string name="permision">Pozwól na powiadomienia</string>
 
     <!-- Zalecenia -->
     <string name="medicins">Przyjmowane leki</string>
@@ -98,9 +101,10 @@
     <string name="zapas_leku">Podaj zapas leku jakim dysponujesz</string>
     <string name="add_new_scheduleTerm">Dodaj nowy termin</string>
 
-    <!-- NotificationCreatorWorker -->
-    <string name="title_notification_usage">Nadchodzący termin zażycia leku %s</string>
-    <string name="details_notification_usage"></string>
+    <!-- CommunUI -->
+    <string name="noPatient">Nie wybrano pacjenta</string>
+    <string name="pickPatient">Wybierz pacjenta</string>
+
 
 
 </resources>

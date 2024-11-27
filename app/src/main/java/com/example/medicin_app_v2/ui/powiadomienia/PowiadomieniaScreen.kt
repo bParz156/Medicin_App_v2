@@ -86,67 +86,6 @@ fun PowiadomieniaScreen(
 fun PowiadomieniaBody (modifier: Modifier = Modifier,
                        contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    var hasNotificationPermission by remember { mutableStateOf(false) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { hasNotificationPermission = it }
-    )
 
-    Column(modifier = modifier.padding(contentPadding)) {
-        Text(text= stringResource(R.string.Powiadomienia),
-            modifier = Modifier.padding(contentPadding))
 
-        Button(
-            onClick = {
-                if (!hasNotificationPermission) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-            },
-        ) {
-            Text(text = "Request permission")
-        }
-    }
-//
-//    if(showNot)
-//    {
-//        notificationBuild()
-//    }
-
-}
-@Composable
-fun notificationBuild()
-{
-    val context = LocalContext.current
-    val CHANNEL_ID = "alarm_id"
-
-    var builder = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_background)
-        .setContentTitle("My notification")
-        .setContentText("Much longer text that cannot fit one line...")
-        .setStyle(NotificationCompat.BigTextStyle()
-            .bigText("Much longer text that cannot fit one line..."))
-        .setPriority(NotificationCompat.PRIORITY_MAX)
-
-       // .setSound("android.resource://"+context.packageName+"/"+R.raw.FILE_NAME)
-
-    with(NotificationManagerCompat.from(context)) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            // ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            // public fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-            //                                        grantResults: IntArray)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-            return@with
-        }
-        notify(0, builder.build())
-    }
 }

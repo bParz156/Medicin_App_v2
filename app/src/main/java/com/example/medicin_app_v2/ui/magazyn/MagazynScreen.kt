@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -21,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +58,8 @@ import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.CommunUI
 import com.example.medicin_app_v2.ui.patients.missingFieldsDialog
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 object MagazynDestination : NavigationDestination {
@@ -111,6 +117,7 @@ fun MagazynBody (
     onStorageClick: (Int) -> Unit
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -144,6 +151,11 @@ fun MagazynBody (
                 //onStorageClick = {onStorageClick(it.storageId)},
                 // changingStorageDetails = viewModel.magazynUiState.changingStoragDetails,
                 onStorageClick = { viewModel.increaseStorageQuantity() },
+                onDeleteClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteStorage()
+                    }
+                },
                 contentPadding = contentPadding,
                 onValueChange = viewModel::updateUiState,
                 modifier = modifier.padding(contentPadding)
@@ -159,6 +171,7 @@ fun MagazynList(
    // changingStorageDetails: StorageDetails,
     onValueChange: (StorageDetails) -> Unit,
     onStorageClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     modifier: Modifier = Modifier
 )
@@ -192,13 +205,17 @@ fun MagazynList(
                         storageInfo = storage,
                         modifier = Modifier
                             .padding(dimensionResource(id = R.dimen.padding_small))
-                            .clickable {
-                                // onStorageClick(storage)
-                                openDialog.value = true
-                                onValueChange(storage)
-                                changingStorageDetails.value = storage
-                            }
-                            .background(color = MaterialTheme.colorScheme.primaryContainer)
+                            .background(color = MaterialTheme.colorScheme.primaryContainer),
+                        onEditClick = {
+                            openDialog.value = true
+                            onValueChange(storage)
+                            changingStorageDetails.value = storage
+                        },
+                        onDeleteClick = {
+                            onValueChange(storage)
+                            onDeleteClick()
+                        }
+
                     )
                 }
 
@@ -222,48 +239,106 @@ fun MagazynList(
 @Composable
 fun storageCard(
     storageInfo : StorageDetails,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 )
 {
 
-    val lowSupply = storageInfo.daysToEnd<7
+    val lowSupply = storageInfo.daysToEnd in 0..6
     val color by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.errorContainer
     else MaterialTheme.colorScheme.primaryContainer)
     val contentColor by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.onErrorContainer
     else MaterialTheme.colorScheme.onPrimaryContainer)
-    Log.i("filtr", "in here")
+
+    var openDialogDelete by remember { mutableStateOf(false) }
     Card(
         modifier = modifier
             .background(color = color),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
-                .fillMaxWidth()
-                .animateContentSize(animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMedium)
-                )
-                .background(color = color),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
-        ) {
 
-            Text(
-                text = "${storageInfo.medName} - ${storageInfo.quantity} ${stringResource(storageInfo.medicinForm.dopelniacz)}",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.wrapContentSize().fillMaxWidth(),
-                color = contentColor
+        Row(horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Icon(imageVector = Icons.Filled.Delete,
+                modifier = Modifier
+                    .padding(end = dimensionResource(R.dimen.padding_small))
+                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                    .clickable {
+                        openDialogDelete = true
+                    }
+                    .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                    .weight(1f)
+                ,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                contentDescription = stringResource(R.string.usun)
             )
 
-            Text(
-                text= stringResource(R.string.koniec_zapasow, storageInfo.daysToEnd),
-                style = MaterialTheme.typography.labelMedium,
-                color = contentColor
+
+            Column(
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                    .fillMaxWidth()
+                    .animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                    )
+                    .background(color = color),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+            ) {
+
+                Text(
+                    text = "${storageInfo.medName} - ${storageInfo.quantity} ${
+                        stringResource(
+                            storageInfo.medicinForm.dopelniacz
+                        )
+                    }",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.wrapContentSize().fillMaxWidth(),
+                    color = contentColor
                 )
 
+                Text(
+                    text = stringResource(
+                        R.string.koniec_zapasow,
+                        if (storageInfo.daysToEnd == -1) stringResource(R.string.nieznany) else storageInfo.daysToEnd.toString()
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = contentColor
+                )
+
+            }
+
+            Icon(imageVector = Icons.Filled.Edit,
+                modifier = Modifier
+                    .padding(end = dimensionResource(R.dimen.padding_small))
+                    .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                    .clickable {
+                        onEditClick()
+                    }
+                    .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                    .weight(1f)
+                ,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                contentDescription = stringResource(R.string.change)
+            )
         }
 
+    }
+
+    if(openDialogDelete)
+    {
+        if(storageInfo.daysToEnd >-1) {
+
+            areYouSureDialog(
+                onConfirm = { onDeleteClick() },
+                onDismiss = { openDialogDelete = false },
+                info = stringResource(R.string.deletSure)
+            )
+        }
     }
 }
 

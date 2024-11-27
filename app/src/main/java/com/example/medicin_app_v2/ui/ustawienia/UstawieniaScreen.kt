@@ -1,5 +1,9 @@
 package com.example.medicin_app_v2.ui.ustawienia
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,7 +25,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -90,6 +96,11 @@ fun UstawieniaBody (
 
     val scale = viewModel.ustawieniaUiState.scale
     val context = LocalContext.current
+    var hasNotificationPermission by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { hasNotificationPermission = it }
+    )
 
     Column(
         modifier = modifier
@@ -132,6 +143,18 @@ fun UstawieniaBody (
                 )
             }
 
+        }
+
+        Button(
+            onClick = {
+                if (!hasNotificationPermission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+        ) {
+            Text(text = stringResource(R.string.permision))
         }
     }
 

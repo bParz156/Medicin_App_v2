@@ -320,7 +320,6 @@ fun medicinCard(
     val contentColor by animateColorAsState(targetValue = if (expanded) MaterialTheme.colorScheme.onTertiaryContainer
     else MaterialTheme.colorScheme.onPrimaryContainer)
 
-    var openDialogEdit by remember { mutableStateOf(false) }
     var openDialogDelete by remember { mutableStateOf(false) }
 
     Card(
@@ -379,9 +378,19 @@ fun medicinCard(
                                 openDialogDelete = true
                             }
                             .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                            .weight(1f)
                         ,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentDescription = stringResource(R.string.usun)
+                    )
+
+                    Text (
+                        text = stringResource(R.string.poczatek_kuracji, medicinScheduleInfo.startDate) + '\n'+
+                                stringResource(R.string.koniec_kuracji, medicinScheduleInfo.endDate?: stringResource(R.string.nieznany))+ '\n' +
+                        stringResource(R.string.mealRelation,  stringResource(medicinScheduleInfo.medicinDetails.relation.title)),
+                        color = contentColor,
+                        modifier = Modifier
+                             .weight(2f)
                     )
 
                     Icon(imageVector = Icons.Filled.Edit,
@@ -389,10 +398,10 @@ fun medicinCard(
                             .padding(end = dimensionResource(R.dimen.padding_small))
                             .background(color = MaterialTheme.colorScheme.secondaryContainer)
                             .clickable {
-                                openDialogEdit = true
                                 onEditClick()
                             }
                             .defaultMinSize(minHeight = 36.dp, minWidth = 36.dp)
+                            .weight(1f)
                         ,
                         tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentDescription = stringResource(R.string.change)
@@ -408,7 +417,7 @@ fun medicinCard(
                     Spacer(Modifier.weight(1f))
 
                     for (scheduleInfo in medicinScheduleInfo.scheduleTermDetailsList) {
-                        Text(text=stringResource(scheduleInfo.day.title) + stringResource(R.string.czas_zazycia, scheduleInfo.hour, scheduleInfo.minute) +
+                        Text(text=stringResource(scheduleInfo.day.title) +' '+ stringResource(R.string.czas_zazycia, scheduleInfo.hour, scheduleInfo.minute) + ' '+
                                 stringResource(R.string.dawka, scheduleInfo.dose, medicinScheduleInfo.medicinDetails.form),
                             color = contentColor)
                     }
@@ -511,7 +520,7 @@ fun zalecenieDialog(
                     openScheduleDialog = true
                 },
                 onDismiss = { openAreYouSure = false },
-                info = stringResource(R.string.add_zalecenie_medicin, medicinDetails.name, medicinDetails.form, medicinDetails.relation)
+                info = stringResource(R.string.add_zalecenie_medicin, medicinDetails.name, medicinDetails.form, stringResource(medicinDetails.relation.title))
             )
         }
 
@@ -1022,7 +1031,7 @@ fun addMedicinDialog(
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
-                    Text(text = stringResource(R.string.mealRelation,medicinDetails.relation))
+                    Text(text = stringResource(R.string.mealRelation, stringResource(medicinDetails.relation.title)))
                     Button(onClick = { expandedRelations = !expandedRelations })
                     {
                         Icon(
@@ -1037,7 +1046,7 @@ fun addMedicinDialog(
                 {
                     MealRelation.entries.forEach { item ->
                         DropdownMenuItem(
-                            text = { Text(item.name) },
+                            text = { Text( stringResource(item.title) ) },
                             onClick = {
                                 medicinDetails = medicinDetails.copy(
                                     relation = item

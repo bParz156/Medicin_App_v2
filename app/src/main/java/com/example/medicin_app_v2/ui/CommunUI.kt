@@ -109,52 +109,13 @@ fun MedicinTopAppBar(
                 .weight(3f),
         )
     }
-
-//    CenterAlignedTopAppBar(
-//        title = {Text(text =stringResource(R.string.app_name),
-//            style = MaterialTheme.typography.titleLarge,
-//            color = MaterialTheme.colorScheme.onPrimary,
-//            modifier= modifier
-//                .wrapContentSize().fillMaxWidth()
-//                .background(color = MaterialTheme.colorScheme.primary),
-//        )},
-//        modifier= modifier
-//            .wrapContentSize().fillMaxWidth()
-//            .background(color = MaterialTheme.colorScheme.primaryContainer),
-//        scrollBehavior = scrollBehavior,
-//        navigationIcon = {
-//            ButtonIcon(
-//                onButtonCLick = onButtonHomeClick,
-//                isSelected = location == Location.HOME,
-//                labelTextId = Location.HOME.title,
-//                imageVector = Icons.Filled.Home,
-//                showLabel = false
-//            )
-//
-//            IconButton(onClick = onButtonHomeClick,
-//                enabled = location!=Location.HOME,
-//                modifier = Modifier
-//                    .background(color = if(location==Location.HOME) MaterialTheme.colorScheme.primaryContainer
-//                    else MaterialTheme.colorScheme.secondaryContainer,
-//                    shape =MaterialTheme.shapes.small)
-//            )
-//            {
-//                Icon(
-//                    imageVector = Icons.Filled.Home,
-//                    contentDescription = "Home",
-//                    tint = if(location==Location.HOME) MaterialTheme.colorScheme.onPrimaryContainer
-//                    else MaterialTheme.colorScheme.onSecondaryContainer
-//                )
-//            }
- //       }
-//    )
 }
 
 @Composable
 fun PatientBar(
     onPatientsButtonCLick : () -> Unit,
     onButtonUstawieniaClicked: () -> Unit,
-    patientsName : String = "Nie wybrano pacjenta",
+    patientsName : String = stringResource(R.string.no_patient),
     isAtUstawienie: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -187,7 +148,7 @@ fun PatientBar(
 
          */
 
-        Text(text=if(patientsName.isNotBlank()) patientsName else "Wybierz pacjenta",
+        Text(text=if(patientsName.isNotBlank()) patientsName else stringResource(R.string.pickPatient),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleLarge,

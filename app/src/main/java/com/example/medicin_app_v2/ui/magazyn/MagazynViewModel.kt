@@ -168,6 +168,10 @@ class MagazynViewModel (
             }
             Log.i("calday", "nie wychodzi z while")
         }
+        else
+        {
+            toEnd = -1
+        }
         return toEnd
     }
 
@@ -221,6 +225,11 @@ class MagazynViewModel (
         magazynUiState.changingStoragDetails = storageDetails
         Log.i("magazyn", "in updateUI : ${magazynUiState.changingStoragDetails.medName}")
 
+    }
+
+    suspend fun deleteStorage()
+    {
+        storageRepository.deleteStorage(magazynUiState.changingStoragDetails.toStorage())
     }
 
 
