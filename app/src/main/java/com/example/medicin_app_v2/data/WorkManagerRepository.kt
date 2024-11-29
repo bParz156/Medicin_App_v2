@@ -71,21 +71,10 @@ class WorkManagerRepository(context: Context,
         workManager.enqueue(notificationBuilder.build())
     }
 
-    override fun generateNotifications() {
-        val notificationAlarmBuilder = OneTimeWorkRequestBuilder<NotificationWorker>()
-        workManager.enqueue(notificationAlarmBuilder.build())
-
-    }
-
-//    override fun notificationsAboutStorage(storageDetailsList: List<StorageDetails>) {
-//        val notificationStorageBuilder = OneTimeWorkRequestBuilder<StorageNotificationsWorker>()
-//        notificationStorageBuilder.setInputData(
-//            createInputDataForWorker(storageDetailsList)
-//        )
+//    override fun generateNotifications() {
+//        val notificationAlarmBuilder = OneTimeWorkRequestBuilder<NotificationWorker>()
+//        workManager.enqueue(notificationAlarmBuilder.build())
 //
-//        workManager.enqueue(
-//            notificationStorageBuilder.build()
-//        )
 //    }
 
     override fun notificationStorage() {

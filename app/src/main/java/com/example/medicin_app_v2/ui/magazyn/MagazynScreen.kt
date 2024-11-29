@@ -524,8 +524,7 @@ fun areYouSureDialog(
                     Row()
                     {
                         Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = stringResource(R.string.confirm)
+                            imageVector = Icons.Filled.Check, contentDescription = stringResource(R.string.confirm)
                         )
 
                         Text(text=stringResource(R.string.confirm))

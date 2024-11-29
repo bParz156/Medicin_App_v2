@@ -247,7 +247,7 @@ fun ExaminationCard(
     onDeleteClick: () -> Unit,
 )
 {
-    val lowSupply = examination.value in examination.type.dolna .. examination.type.gorna
+    val lowSupply = examination.value < examination.type.dolna || examination.value > examination.type.gorna
     val color by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.errorContainer
     else MaterialTheme.colorScheme.primaryContainer)
     val contentColor by animateColorAsState(targetValue = if (lowSupply) MaterialTheme.colorScheme.onErrorContainer
@@ -257,7 +257,8 @@ fun ExaminationCard(
 
     Card(
         modifier = modifier
-            .background(color = color),
+            .background(color = color)
+            .padding(dimensionResource(R.dimen.padding_small)),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.padding_very_small))
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween,
