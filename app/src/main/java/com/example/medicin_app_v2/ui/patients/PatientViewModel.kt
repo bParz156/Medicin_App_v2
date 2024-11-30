@@ -1,21 +1,16 @@
-package com.example.medicin_app_v2.ui
+package com.example.medicin_app_v2.ui.patients
 
 import android.util.Log
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.data.patient.Patient
 import com.example.medicin_app_v2.data.patient.PatientsRepository
-import com.example.medicin_app_v2.ui.home.HomeDestination
-import com.example.medicin_app_v2.ui.patients.PatientsDestination
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -51,7 +46,7 @@ class PatientViewModel(
 
     val uiState: StateFlow<PatientUiState> = patientsRepository.getPatientStream(patientId)
         .filterNotNull()
-        .map {  PatientUiState(patientDetails = it.toPatientDetails())}
+        .map {  PatientUiState(patientDetails = it.toPatientDetails()) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -78,13 +73,21 @@ class PatientViewModel(
         patientsRepository.deletePatient(patientUiState.patientDetails.toPatient())
     }
 
-    suspend fun createPatient()
+    suspend fun createPatient() : Boolean
     {
-        if(patientUiState.patientDetails.name.isNotBlank())
+        if(patientUiState.patientDetails.name.isNotBlank() && canCreatePatient())
         {
             patientsRepository.insertPatient(patientUiState.patientDetails.toPatient())
+            return true
         }
+        return false
 
+    }
+
+    suspend fun canCreatePatient() : Boolean
+    {
+        val patient = patientsRepository.getPatientByName(patientUiState.patientDetails.name).first()
+        return patient==null
     }
 
     suspend fun changePatientId(id: Int)
@@ -130,7 +133,7 @@ fun PatientDetails.toPatient() : Patient =Patient(
     name = name
 )
 
-fun Patient.toPatientDetails() :PatientDetails = PatientDetails(
+fun Patient.toPatientDetails() : PatientDetails = PatientDetails(
     id=id,
     name=name
 )

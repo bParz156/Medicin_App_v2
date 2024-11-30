@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -50,10 +49,6 @@ import com.example.medicin_app_v2.navigation.NavigationDestination
 import com.example.medicin_app_v2.ui.AppViewModelProvider
 import com.example.medicin_app_v2.ui.ButtonIconColumn
 import com.example.medicin_app_v2.ui.ButtonIconRow
-import com.example.medicin_app_v2.ui.PatientDetails
-import com.example.medicin_app_v2.ui.PatientViewModel
-import com.example.medicin_app_v2.ui.toPatient
-import com.example.medicin_app_v2.ui.toPatientDetails
 import kotlinx.coroutines.launch
 
 
@@ -117,15 +112,31 @@ fun PatientsListScreen(
 
             if(openDialog.value)
             {
+                var dialogOpenException by remember {  mutableStateOf(false) }
                 PatientAddDialog(onAdd =
                 {
                     coroutineScope.launch {
-                        viewModel.createPatient()
+                       if( viewModel.createPatient())
+                       {
+                           openDialog.value = false
+                       }
+                        else
+                       {
+                           dialogOpenException = true
+                       }
                     }
                 }, onDismiss = {openDialog.value = false},
                 patientsDetails = viewModel.uiState.value.patientDetails,
                     onValueChange = viewModel::updatePatientUiState
                 )
+
+                if(dialogOpenException)
+                {
+                    missingFieldsDialog(
+                        onDismiss = {dialogOpenException =  false},
+                        missingValues = stringResource(R.string.cantCreate)
+                    )
+                }
             }
         }
 }
@@ -223,7 +234,7 @@ private fun PatientsList(
                // .background(color  =MaterialTheme.colorScheme.secondary),
             contentPadding = contentPadding
         ) {
-            items(items = patientsList, key = { it.name }) { patient ->
+            items(items = patientsList, key = { it.id }) { patient ->
                 Row(
                     modifier = Modifier
                         .wrapContentSize().fillMaxWidth()
@@ -339,13 +350,6 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
                 color = MaterialTheme.colorScheme.onTertiary
             )
 
-//            Text(text = stringResource(R.string.requiered_to_add),
-//                textAlign = TextAlign.Start,
-//                style = MaterialTheme.typography.titleMedium,
-//                modifier = Modifier
-//                    .padding(dimensionResource(R.dimen.padding_medium)),
-//                color = MaterialTheme.colorScheme.onTertiaryContainer
-//            )
 
             TextField( value = patientName,
                 onValueChange = {patientName = it
@@ -384,7 +388,7 @@ private fun PatientAddDialog(onAdd: () ->  Unit, onDismiss: () -> Unit, patients
                         {
                             onAdd()
                             Log.i("in Add, after ADD","patinetDetails ${patientsDetails.name}")
-                            onDismiss()
+                          //  onDismiss()
                         }
                         else
                         {
@@ -473,32 +477,6 @@ private fun DeletePatientDialog(patient: Patient, onDeleteClicked: () -> Unit, o
                     showLabel = true
                 )
 
-//                Button(onClick = onDismiss)
-//                {
-//                    Row()
-//                    {
-//                        Icon(
-//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                            contentDescription = stringResource(R.string.back)
-//                        )
-//
-//                        Text(text=stringResource(R.string.back))
-//                    }
-//                }
-
-//                Button(onClick = {onDeleteClicked()
-//                    onDismiss()})
-//                {
-//                    Row()
-//                    {
-//                        Icon(
-//                            imageVector = Icons.Filled.Delete,
-//                            contentDescription = stringResource(R.string.delete_patient)
-//                        )
-//
-//                        Text(text=stringResource(R.string.delete_patient))
-//                    }
-//                }
 
             }
 

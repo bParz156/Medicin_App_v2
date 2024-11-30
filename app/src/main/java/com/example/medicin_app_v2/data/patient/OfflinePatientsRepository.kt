@@ -11,6 +11,10 @@ class OfflinePatientsRepository(private val patientDao: PatientDao) : PatientsRe
         return  patientDao.getpatient(id)
     }
 
+    override fun getPatientByName(name: String): Flow<Patient?> {
+        return patientDao.getPatientByName(name)
+    }
+
     override suspend fun insertPatient(patient: Patient) : Long {
         return patientDao.insert(patient = patient)
     }

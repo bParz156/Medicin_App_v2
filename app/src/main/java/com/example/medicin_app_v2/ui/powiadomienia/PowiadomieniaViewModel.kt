@@ -11,8 +11,8 @@ import com.example.medicin_app_v2.data.examination.Examination
 import com.example.medicin_app_v2.data.examination.ExaminationRepository
 import com.example.medicin_app_v2.data.examination.ExaminationType
 import com.example.medicin_app_v2.data.patient.PatientsRepository
-import com.example.medicin_app_v2.ui.PatientUiState
-import com.example.medicin_app_v2.ui.toPatientUiState
+import com.example.medicin_app_v2.ui.patients.PatientUiState
+import com.example.medicin_app_v2.ui.patients.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

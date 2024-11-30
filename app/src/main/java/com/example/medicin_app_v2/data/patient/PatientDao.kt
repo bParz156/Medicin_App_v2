@@ -26,4 +26,7 @@ interface PatientDao {
     @Query("SELECT * from patients ORDER BY name ASC")
     fun getAllpatients(): Flow<List<Patient>>
 
+    @Query("SELECT * from patients WHERE name = :name")
+    fun getPatientByName(name: String) : Flow<Patient>
+
 }

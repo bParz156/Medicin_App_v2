@@ -454,7 +454,7 @@ fun magazynDialog(
                             onConfirm()
                             onDismiss()
                         },
-            info = stringResource(R.string.summary_increase_storage, storageDetails.medName, medQuantity, storageDetails.medicinForm.name)
+            info = stringResource(R.string.summary_increase_storage, storageDetails.medName, medQuantity, storageDetails.medicinForm)
         )
     }
 

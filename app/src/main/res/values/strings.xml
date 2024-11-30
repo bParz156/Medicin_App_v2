@@ -35,6 +35,7 @@
     <string name="no_medicin">Wygląda na to, że nie dodano jeszcze żadnych lekarstw. Kiknij przycisk, aby dodać leki</string>
     <string name="imie_pacjenta">Imię pacjenta</string>
 
+    <string name="cantCreate">Pacjent o podanym imieniu już istnieje</string>
     <string name="add_medicin_title">Dodawanie nowego leku</string>
     <string name="requiered_to_add_medicin">Podaj informacje na temat nowego leku</string>
 
@@ -80,7 +81,7 @@
     <string name="zapas">Zapasy leku %s</string>
     <string name="dialog_zakupiono">"Wpisz w pole zakupioną ilość leku. Wpisz tylko liczbę, przyjęte jednostka to: %s</string>
     <string name="ostrzezenie_zapas">Wprowadzona wartość musi być większa od 0</string>
-    <string name="summary_increase_storage">Uzupełniono zapasy leku %s o %d x %s</string>
+    <string name="summary_increase_storage">Uzupełniono zapasy leku %s o %s\item x %s</string>
     <string name="deletSure">Czy na pewno chcesz usunąć lek %s ze swojej apteczki?</string>
 
 

@@ -6,9 +6,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.medicin_app_v2.MedicinApplication
-import com.example.medicin_app_v2.data.UserPreferencesRepository
 import com.example.medicin_app_v2.ui.home.HomeViewModel
 import com.example.medicin_app_v2.ui.magazyn.MagazynViewModel
+import com.example.medicin_app_v2.ui.patients.PatientViewModel
 import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaViewModel
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaViewModel
 import com.example.medicin_app_v2.ui.zalecenia.ZalecenieViewModel

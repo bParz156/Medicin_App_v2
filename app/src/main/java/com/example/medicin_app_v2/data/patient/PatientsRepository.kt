@@ -9,6 +9,8 @@ interface PatientsRepository {
 
     fun getPatientStream(id: Int): Flow<Patient?>
 
+    fun getPatientByName(name: String): Flow<Patient?>
+
     /**
      * Insert Patient in the data source
      */

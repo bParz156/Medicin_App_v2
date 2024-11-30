@@ -24,18 +24,12 @@ import com.example.medicin_app_v2.data.storage.Storage
 import com.example.medicin_app_v2.data.storage.StorageRepository
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageRepository
-import com.example.medicin_app_v2.ui.PatientUiState
-import com.example.medicin_app_v2.ui.toPatientUiState
+import com.example.medicin_app_v2.ui.patients.PatientUiState
+import com.example.medicin_app_v2.ui.patients.toPatientUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import java.util.Calendar
 import java.util.Date
 
