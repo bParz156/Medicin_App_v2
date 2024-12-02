@@ -17,6 +17,7 @@ uiTestAndroid = "1.7.4"
 firebaseDataconnect = "16.0.0-beta03"
 appcompat = "1.7.0"
 foundationLayoutAndroid = "1.7.2"
+media3TestUtils = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-andr
 firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect", version.ref = "firebaseDataconnect" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
+androidx-media3-test-utils = { group = "androidx.media3", name = "media3-test-utils", version.ref = "media3TestUtils" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

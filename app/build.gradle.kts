@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.medicin_app_v2"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.medicin_app_v2"
@@ -53,6 +53,12 @@ android {
 
 dependencies {
 
+    configurations.all {
+        resolutionStrategy {
+            force ("androidx.test.ext:junit:1.2.1")
+        }
+    }
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -77,13 +83,22 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.media3.test.utils)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("androidx.room:room-testing:2.5.2")
+
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation ("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.room:room-testing:2.5.2")
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
