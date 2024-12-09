@@ -1,0 +1,2 @@
+Aplikacja mobilna na Android powstała jako projekt pracy inżynierskiej <b>Projekt i realizacja aplikacji mobilnej wspomagającej terapię farmakologiczną pacjenta</b> realizowanej na <b>Polietchnice Wrocławskiej</b> na kierunku Informatyka techniczna Wydziału Informatyki i Telekomunikacji.
+Aplikacja bazodanowana (SQLite) przypominająca pacjentowi o konieczności zażywania leków oraz pozwalająca mu na kontrolę ogólnego stanu zdrowia. Jeden użytkownik może mieć pod swoją opieką wielu pacjentów. 
