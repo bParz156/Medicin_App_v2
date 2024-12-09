@@ -137,6 +137,9 @@ class ZalecenieViewModel(
 //    }
 
 
+    /**
+     * Tworzenie leku, gdy nie istniał
+     */
     suspend fun createMedicine()
     {
         Log.i("createSchedule", "createMedicine")
@@ -150,6 +153,11 @@ class ZalecenieViewModel(
         }
     }
 
+    /**
+     * Tworzenie magazynu, jeśli lek nie istniał, po wpisaniu id leku tworzony jest nowy magayzn i powiązana z nim nowa apteczka,
+     * jeśli lek istniał, a magazyn nie, to tworzony jest nowy magayzn i powiązana z nim nowa apteczka (sytuacaj gdy pacjent nie chce współdzielić magazynu)
+     * w przeciwnym wypadku tworzona jest apteczka połączaona z istniejącym magazynem.
+     */
     suspend fun createStorage()
     {
         Log.i("createSchedule", "createStorage")
@@ -175,6 +183,9 @@ class ZalecenieViewModel(
         }
     }
 
+    /**
+     * Tworzenie harmonogramu  oraz powiązane z tym tworzenie Harmonogramu dni
+     */
     suspend fun createSchedule()
     {
       //  Log.i("createSchedule", "start, listSize: ${scheduleUiState.scheduleDetailsList.size}")
@@ -208,6 +219,9 @@ class ZalecenieViewModel(
     }
     var medicinSuggestions by mutableStateOf(listOf<MedicinDetails>())
 
+    /**
+     * Podpowiadanie użytkownikowi istniejących leków na podstawie wpisanego tekstu
+     */
     fun onValueMedicinNameChange(text: String)
     {
         medicinSuggestions = if(text.isEmpty())
@@ -233,6 +247,9 @@ class ZalecenieViewModel(
         return map
     }
 
+    /**
+     * Zebranie listy istniejących magazynów leków oraz informajci i tym, którzy pacjenci z nich korzystają
+     */
     suspend private fun getMedicinesStorage(medicinDetails: MedicinDetails) : MutableMap< StorageDetails, MutableList<String>>
     {
         val storageList: List<StorageDetails> = storageRepository.getAllMedicinesStorages(medicine_id = medicinDetails.id)
@@ -296,42 +313,6 @@ class ZalecenieViewModel(
 
 
 }
-
-
-//fun PatientScheduleDetailsInfo.toMedicinScheduleInfoList() : List<ScheduleDetails>
-//{
-//    Log.i("listManipulation: ", "start conversion")
-//    Log.i("listManipulation: ", "size list details=  ${this.scheduleDetailsList.size}")
-//
-//    var medicinScheduleInfoList : List<ScheduleDetails> =listOf()
-//   // return medicinScheduleInfoList
-//    if(this.scheduleDetailsList.isNotEmpty()) {
-//        Log.i("listManipulation: ", "nie jest empty ale jakos dalej nie widzie")
-//        for (scheduleDetail in this.scheduleDetailsList) {
-//            Log.i("listManipulation: ", "wywala przez fora")
-//            var medicinScheduleInfo =
-//                medicinScheduleInfoList.find { it.medicinDetails.id == scheduleDetail.medicinDetails.id }
-//            if (medicinScheduleInfo == null) {
-//
-//                medicinScheduleInfo = ScheduleDetails(
-//                    id = scheduleDetail.id,
-//                    medicinDetails = scheduleDetail.medicinDetails ,
-//                    startDate = scheduleDetail.startDate,
-//                    endDate = scheduleDetail.endDate,
-//                    scheduleTermDetailsList = scheduleDetail.scheduleTermDetailsList
-//                )
-//
-//                medicinScheduleInfoList =medicinScheduleInfoList+ medicinScheduleInfo
-//            }
-//
-//        }
-//    }
-//
-//    Log.i("listManipulation: ", "wielkosc nowego ${medicinScheduleInfoList.size}")
-//
-//    return medicinScheduleInfoList
-//}
-//
 
 
 

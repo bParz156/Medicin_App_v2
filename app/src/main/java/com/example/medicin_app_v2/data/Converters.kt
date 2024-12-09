@@ -4,6 +4,9 @@ import androidx.room.TypeConverter
 import com.example.medicin_app_v2.data.examination.ExaminationType
 import java.util.Date
 
+/**
+ * Konwertery typów dla bazy danych
+ */
 class Converters {
 
     @TypeConverter

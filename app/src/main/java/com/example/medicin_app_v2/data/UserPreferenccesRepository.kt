@@ -22,6 +22,9 @@ enum class ThemeMode {
     DARK_MODE, DAY_MODE, HIGH_CONTRAST
 }
 
+/**
+ * Preferencje użytkownika (kontarst, wybrany pacjent (jego id) oraz wielkość czcionki)
+ */
 class UserPreferencesRepository(
     private val dataStore: DataStore<Preferences>
 ) {

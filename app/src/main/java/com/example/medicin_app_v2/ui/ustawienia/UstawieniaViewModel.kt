@@ -48,7 +48,10 @@ class UstawieniaViewModel(
     fun getPatientsName(): String{
         return ustawieniaUiState.patientDetails.name
     }
-    // Update theme mode
+
+    /**
+     * Zmiana kontrastu
+     */
     fun setThemeMode(newThemeMode: ThemeMode) {
         viewModelScope.launch {
             userPreferencesRepository.saveThemeMode(newThemeMode)
@@ -57,6 +60,9 @@ class UstawieniaViewModel(
     }
 
 
+    /**
+     * Zmiana wielkości czcionki
+     */
     fun setScale(change : Int, context: Context)
     {
         ustawieniaUiState.scale +=change

@@ -40,6 +40,9 @@ interface AppContainer {
 }
 
 
+/**
+ * Klasa odpowiedzialan za kontrolę repozytoriów związanych z zadniami, preferencjami użytkownika i bazą danych aplikacji
+ */
 class AppDataContainer(private val context: Context) : AppContainer {
 
     override val patientsRepository: PatientsRepository by lazy {

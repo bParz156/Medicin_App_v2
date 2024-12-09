@@ -17,6 +17,10 @@ import com.example.medicin_app_v2.data.AppContainer
 import com.example.medicin_app_v2.data.AppDataContainer
 
 private const val TAG = "UsageWorker"
+
+/**
+ * Aplikcacja
+ */
 class MedicinApplication : Application() {
 
     /**
@@ -25,6 +29,9 @@ class MedicinApplication : Application() {
     lateinit var container: AppContainer
   //  lateinit var userPreferencesRepository: UserPreferencesRepository
 
+    /**
+     * W momencie tworzenia aplikacji zapełniany jest kontener aplikacji - dostęp do repozytoriów z bazą danych, preferencjami użytkownika oraz zarządzaniem zadaniami w tle
+     */
     override fun onCreate() {
         super.onCreate()
         container = AppDataContainer(this)
@@ -34,6 +41,9 @@ class MedicinApplication : Application() {
 
     }
 
+    /**
+     * Tworzenie kaznłu powiadomień
+     */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "example_channel_id"
@@ -47,6 +57,9 @@ class MedicinApplication : Application() {
         }
     }
 
+    /**
+     * Tworzenie kanału dla alarmów - na przyszłość
+     */
     private fun createChanelForAlarms(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {  // Adjusted to Android 8.0 and above
             val channelId = "alarm_id"

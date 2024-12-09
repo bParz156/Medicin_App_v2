@@ -129,6 +129,12 @@ class MagazynViewModel (
     }
 
 
+    /**
+     * Obliczanie dni do zużycia leku
+     * @param scheduleTermDetailsList jeśli lista jest pusta, lek nie jest zażywany, w przeciwnym wypadku obliczane jest tygodniowe zyużycie i sprawdzane jest po ilu dniach zapacy się wyczerią
+     * @return -1, wartość oznaczająca że dni do końca nie mają znaczenia lub wartość >=0 jeśli obliczono liczbę dni do wyczerpania zapasów
+     *
+     */
     private fun calculateDaysToEnd(scheduleTermDetailsList: List<ScheduleTermDetails>, quantity: Int) : Int
     {
         //DO POPRAWYYY
@@ -161,6 +167,10 @@ class MagazynViewModel (
         return toEnd
     }
 
+    /**
+     * Obliczenie zażycia w ciągu tygodnia na podstawie harmonogramu
+     * @return 7-elementową listę ile leku jest zażywane w kolejne dni tygodnia
+     */
     private fun calculateWeeklyUsage(scheduleTermDetailsList: List<ScheduleTermDetails>): List<Int>
     {
         val list = MutableList(7) { 0 }
@@ -172,6 +182,9 @@ class MagazynViewModel (
         return list
     }
 
+    /**
+     * Wyliczanie dziennego zużycia leku
+     */
     private fun calculateDayUsage(scheduleTermDetailsList: List<ScheduleTermDetails>, dayWeek: DayWeek): Int
     {
         var uasage: Int =0
@@ -194,6 +207,9 @@ class MagazynViewModel (
     }
 
 
+    /**
+     * Zwiększenie ilości leku w magazynie
+     */
     fun increaseStorageQuantity()
     {
         storageDetailsList - magazynUiState.changingStoragDetails

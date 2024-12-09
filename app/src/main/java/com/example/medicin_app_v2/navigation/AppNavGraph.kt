@@ -24,6 +24,9 @@ import com.example.medicin_app_v2.ui.ustawienia.UstawieniaScreen
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaDestination
 import com.example.medicin_app_v2.ui.zalecenia.ZaleceniaScreen
 
+/**
+ * Funkcja odpowiedzialna za nawigację aplikacji, nawigowanie ma prametr, których jest id pacjenta
+ */
 @Composable
 fun MedicinNavHost(
     patientId: Int,
@@ -39,19 +42,6 @@ fun MedicinNavHost(
       //  startDestination = HomeDestination.route,
         modifier = modifier
     ) {
-
-//        composable(route = HomeDestination.route ) {
-//            Log.i("przekierowanie", "zly home")
-//           HomeScreen(
-//                onButtonHomeClick = {},
-//                onButtonMagazynClicked = {navController.navigate("${MagazynDestination.route}/$it")},
-//                onButtonZaleceniaClicked = { navController.navigate("${ZaleceniaDestination.route}/$it") },
-//                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-//                onButtonUstawieniaClicked = { navController.navigate("${UstawieniaDestination.route}/$it") },
-//                onButtonPatientClicked = {navController.navigate("${PatientsDestination.route}/$it")}
-//            )
-//        }
-
 
 
         composable(route = HomeDestination.routeWithArgs, arguments = listOf(navArgument(HomeDestination.patientIdArg){
@@ -138,71 +128,6 @@ fun MedicinNavHost(
                 navigateToPatientHome={navController.navigate("${HomeDestination.route}/${it}")},
             )
         }
-
-
-        /*
-        composable(route = Location.HOME.name) {
-            HomeScreen(
-                    onButtonHomeClick = {},
-                    onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                    onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
-                    onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                    onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                    onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
-                )
-        }
-
-        composable(route = Location.MAGAZYN.name) {
-            MagazynScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
-            )
-        }
-
-        composable(route = Location.ZALECENIA.name) {
-            ZaleceniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { },
-                onButtonPowiadomieniaClicked = { navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
-            )
-        }
-
-        composable(route = Location.POWIADOMIENIA.name) {
-            PowiadomieniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
-                onButtonPowiadomieniaClicked = {  },
-                onButtonUstawieniaClicked = { navController.navigate(Location.USTAWIENIA.name) },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
-            )
-        }
-
-        composable(route = Location.USTAWIENIA.name) {
-            UstawieniaScreen(
-                onButtonHomeClick = {navController.navigate(Location.HOME.name)},
-                onButtonMagazynClicked = { navController.navigate(Location.MAGAZYN.name) },
-                onButtonZaleceniaClicked = { navController.navigate(Location.ZALECENIA.name) },
-                onButtonPowiadomieniaClicked = {  navController.navigate(Location.POWIADOMIENIA.name) },
-                onButtonUstawieniaClicked = { },
-                onButtonPatientClicked = {navController.navigate(Location.PACJENCI.name)}
-            )
-        }
-        composable(route=Location.PACJENCI.name) {
-            PatientsListScreen(
-                onBack={ navController.popBackStack() },
-                onPatientClick={},
-            )
-        }
-
-         */
 
     }
 

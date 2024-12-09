@@ -24,6 +24,9 @@ import com.example.medicin_app_v2.data.storage.StorageDao
 import com.example.medicin_app_v2.data.usage.Usage
 import com.example.medicin_app_v2.data.usage.UsageDao
 
+/**
+ * Baza danych aplikacji
+ */
 @Database(entities= [Patient::class, Medicine::class, Storage::class, FirstAidKit::class,
     Schedule::class, Usage::class, Notification::class , ScheduleTerm::class, Examination::class],
     version=6, exportSchema = false)

@@ -52,15 +52,14 @@ class HomeViewModel (
     var homeUiState by mutableStateOf(HomeUiState())
         private set
 
+    // harmonogram zażywania leków pacjenta
     private var patientsSchedule by mutableStateOf(PatientScheduleDetailsInfo())
         private set
 
+    // aptecznik pacjenta - przyporządkowanie w mapie id leku do magazynu pacjenta
     private val medicinStorage : MutableMap<Int, Storage> = mutableMapOf()
 
-//    val patientId: Int = viewModelScope.launch {
-//        userPreferencesRepository.patient_id.first()
-//            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), -1)
-//    }
+
 
 
     private var patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
@@ -75,14 +74,7 @@ class HomeViewModel (
     }
 
 
-//    private var patientId : Int = try{checkNotNull(savedStateHandle[HomeDestination.patientIdArg])}
-//    catch (e:IllegalStateException)
-//    {
-//        viewModelScope.launch {
-//           userPreferencesRepository.patient_id.first()
-//       }
-//    }
-
+// pobranie pacjenta z bazy, jego harmonogramu zażywania leku oraz magazynów
     init {
 
         viewModelScope.launch {
@@ -123,11 +115,13 @@ class HomeViewModel (
                 })
             val calendar = Calendar.getInstance()
 
+            //aptecnzki pacjeta
             val firstAidKits = firstaidkitRepository.getAllFirstAidKitsStream(patientId)
                 .first()
             //val storages : MutableList<Storage> = mutableListOf()
             for(kit in firstAidKits)
             {
+                //na podsrtawie apteczki znalezeinei magazynu
                 val storage = storageRepository.getStorageStream(kit.Storage_id).filterNotNull().first()
                 medicinStorage[storage.Medicineid] = storage
             }
@@ -146,6 +140,7 @@ class HomeViewModel (
                         val month = calendar.get(Calendar.MONTH)
                         val year = calendar.get(Calendar.YEAR)
                         val eventDate = Date(year - 1900, month, day)
+                        //umiesc w mapie zażywania leków w dni zażycie - jeśli ten dzień już istniał dodaj zażycie do listy, w przeciwnym wypadku uwtorz nową parę klucz-wartość w mapie
                         homeUiState.usageMapDay.getOrPut(eventDate) { mutableListOf() }.add(UsageDetails(
                             id = usage.id,
                             date = usage.date,
@@ -161,11 +156,13 @@ class HomeViewModel (
 
                 }
             }
+            //posortuj mapę według dnii
             homeUiState.usageMapDay = homeUiState.usageMapDay.toSortedMap()
                 .mapValues { entry ->
                     entry.value.sortedBy { it.date }
                 } as MutableMap<Date, MutableList<UsageDetails>>
 
+            ///uruchom zadania - usun archiwalne zażycia, powiadomienia, wygeneruj nowe powiadomienia, usuń magazyny
             workerRepository.deleteAncient()
             workerRepository.deleteNotifications()
             workerRepository.generateUsages()
@@ -187,6 +184,9 @@ class HomeViewModel (
         return homeUiState.patientUiState.patientDetails.name
     }
 
+    /**
+     * Potwierdzenie zażycia leku
+     */
     fun realizeUsage(usageDetails: UsageDetails)
     {
         usageDetails.confirmed = true
@@ -329,96 +329,3 @@ fun ScheduleTerm.toScheduleTermDetails(): ScheduleTermDetails = ScheduleTermDeta
     day = day,
     dose = dose
 )
-
-
-/*
-class HomeViewModel(private val patient: Flow<Patient?>) : ViewModel()
-{
-    private val _homeUiState = MutableStateFlow(HomeUiState(patient))
-    val homeUiState: StateFlow<HomeUiState> = _homeUiState.asStateFlow()
-
-    fun getPatientsName() : String
-    {
-        return patient.toString()
-    }
-}
-
-/**
- * Ui State for HomeScreen
- */
-data class HomeUiState(val patient: Flow<Patient?>? = null)
-
-/*
-To jest bardziej odpowiednie do PatientsScreenAdd
-
-class HomeViewModel (private val patientsRepository: PatientsRepository) : ViewModel() {
-
-    var patientUiState by mutableStateOf(PatientUiState())
-        private set
-
-
-    fun updateUiState(patientDetails: PatientDetails) {
-        patientUiState =
-            PatientUiState(patientDetails = patientDetails, isEntryValid = validateInput(patientDetails))
-    }
-
-    private fun validateInput(uiState: PatientDetails = patientUiState.patientDetails): Boolean {
-        return with(uiState) {
-            name.isNotBlank()
-        }
-    }
-
-    suspend fun savePatient() {
-        if (validateInput()) {
-            patientsRepository.insertPatient(patientUiState.patientDetails.toPatient())
-        }
-    }
-
-}
-
-data class PatientUiState(
-    val patientDetails : PatientDetails = PatientDetails(),
-    val isEntryValid : Boolean = false
-)
-
-data class PatientDetails(
-    val id: Int = 0,
-    val name: String =""
-)
-
-fun PatientDetails.toPatient() : Patient =Patient(
-    id=id,
-    name = name
-)
-
-fun Patient.toPatientDetails() :PatientDetails = PatientDetails(
-    id=id,
-    name=name
-)
-
-fun Patient.toPatientUiState(isEntryValid: Boolean = false): PatientUiState = PatientUiState(
-    patientDetails = this.toPatientDetails(),
-    isEntryValid = isEntryValid
-)
-
-
-/*
-To jest bardziej odpowiednie do PatientsScreen
-
-class HomeViewModel (patientsRepository: PatientsRepository) : ViewModel() {
-    val homeUiState : StateFlow<HomeUiState> = patientsRepository.getAllPatientsStream().map { HomeUiState(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = HomeUiState()
-        )
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
-}
-
-data class HomeUiState(val patientsList: List<Patient> = listOf())
-
- */

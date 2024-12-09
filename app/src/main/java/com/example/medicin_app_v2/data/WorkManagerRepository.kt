@@ -25,6 +25,9 @@ import androidx.work.*
 import com.example.medicin_app_v2.workers.DeleteNotificationWorker
 import com.example.medicin_app_v2.workers.DeleteStorageWorker
 
+/**
+ * Menadżer zadań w tle
+ */
 //private const val TAG = "UsageWorker"
 private const val TAG = "NotificationWorker"
 const val USAGE_DETAILS_LIST_KEY = "usageDetailsList"
@@ -36,6 +39,9 @@ class WorkManagerRepository(context: Context,
     private val context = context
     //override val outputWorkInfo: Flow<WorkInfo?> = MutableStateFlow(null)
 
+    /**
+     * Zadanie generowania zażyć leku - wykonywane periodycznie co 1 godzinę oraz jednorazowo w momencie wywołania
+     */
     override fun generateUsages() {
         Log.i(TAG, "in repositori")
        val usageBuilder = PeriodicWorkRequestBuilder<UsageWorker>(1, TimeUnit.HOURS).build()
@@ -48,7 +54,9 @@ class WorkManagerRepository(context: Context,
             usageBuilder
         )
     }
-
+    /**
+     * Zadanie usuwania historycznych zażyć leku - wykonywane periodycznie co 1 dzień oraz jednorazowo w momencie wywołania
+     */
     override fun deleteAncient() {
         val deleteBuilder = OneTimeWorkRequestBuilder<DeleteUsageWorker>()
         workManager.enqueue(deleteBuilder.build())
@@ -61,7 +69,9 @@ class WorkManagerRepository(context: Context,
         )
 
     }
-
+    /**
+     * Zadanie generowania powiadomień na podstawie liosty zażyć - wykonywane jedynie w momencie wywołania
+     */
     override fun createNotificationsFromUsages(usageDetailsList: List<UsageDetails>) {
         Log.i(TAG, "generateNotifications")
         val notificationBuilder = OneTimeWorkRequestBuilder<NotificationCreatorWorker>()
@@ -77,6 +87,9 @@ class WorkManagerRepository(context: Context,
 //
 //    }
 
+    /**
+     * Zadanie generowania powiadomień o stanie magazynu - wykonywane okresowo co 3 godziny, jeśli spełnia wymagania: urządzenie nie musi być ładowane ani w trybie uruchomienia
+     */
     override fun notificationStorage() {
         Log.i("StoaregCreatorWorker", "w workManagerRepositorii")
 
@@ -107,6 +120,9 @@ class WorkManagerRepository(context: Context,
 
     }
 
+    /**
+     * Zadanie usuwania archaicznych powiadomień - wykonywane raz dziennie
+     */
     override fun deleteNotifications() {
         val notificationDeleteBuilder = PeriodicWorkRequestBuilder<DeleteNotificationWorker>(
             1, TimeUnit.DAYS)
@@ -119,6 +135,9 @@ class WorkManagerRepository(context: Context,
         )
     }
 
+    /**
+     * Zadanie usuwania nieużywanych magazynów - raz dziennie
+     */
     override fun deleteStorages() {
         val storageDeleteBuilder = PeriodicWorkRequestBuilder<DeleteStorageWorker>(
             1, TimeUnit.DAYS
@@ -132,6 +151,9 @@ class WorkManagerRepository(context: Context,
     }
 
 
+    /**
+     * Tworzenie datnych do wysłania dla NotificationWorker - konwertowanie danych do json a następnie do typu Data
+     */
     private fun createInputDataForNotificationWorker(usageDetailsList: List<UsageDetails>) : Data {
         val builder = Data.Builder()
         val gson = Gson()

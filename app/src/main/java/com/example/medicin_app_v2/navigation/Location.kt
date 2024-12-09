@@ -11,7 +11,10 @@ interface NavigationDestination
 }
 
 
-
+/**
+ * Enumaracja lokalizacji - każda lokalizacja ma atrybut
+ * @param title StringRes zawierająćy nazwę lokalizacji
+ */
 enum class Location(@StringRes val title: Int) {
     HOME(title = R.string.home ),
     MAGAZYN(title = R.string.magazyn),

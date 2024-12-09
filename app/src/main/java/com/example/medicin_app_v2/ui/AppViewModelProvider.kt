@@ -13,6 +13,9 @@ import com.example.medicin_app_v2.ui.powiadomienia.PowiadomieniaViewModel
 import com.example.medicin_app_v2.ui.ustawienia.UstawieniaViewModel
 import com.example.medicin_app_v2.ui.zalecenia.ZalecenieViewModel
 
+/**
+ * Wszczepianie zależności do odpowiednich ViewModel
+ */
 object AppViewModelProvider {
 
     val Factory = viewModelFactory {

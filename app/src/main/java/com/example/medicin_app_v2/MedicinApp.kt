@@ -14,13 +14,7 @@ fun MedicinApp(
     navController: NavHostController = rememberNavController(),
     //viewModel : PatientViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    //val coroutineScope = rememberCoroutineScope()
-    //val patient_id by viewModel.patientUPR.collectAsState()
-   // coroutineScope.launch {
-   //    patient_id = viewModel.getPatientIdFromPreferences()
-  //  }
-    Log.i("patientId", "MedicinApp 27: $id")
     MedicinNavHost( patientId = id,
         navController = navController)
-    //HomeScreen()
+
 }

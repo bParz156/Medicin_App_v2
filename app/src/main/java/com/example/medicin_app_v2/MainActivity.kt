@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
+/**
+ * Główna aktywność aplikacji
+ */
 class MainActivity : ComponentActivity() {
 
     private lateinit var userPreferencesRepository: UserPreferencesRepository
@@ -27,9 +30,11 @@ class MainActivity : ComponentActivity() {
         userPreferencesRepository = UserPreferencesRepository(dataStore)
         enableEdgeToEdge()
         setContent {
+            // pobranie preferencji użytkownika
             val themeMode by userPreferencesRepository.themeMode.collectAsState(initial = ThemeMode.DAY_MODE)
             val id by userPreferencesRepository.patient_id.collectAsState(initial = 0)
             val fontScale by userPreferencesRepository.fontScale.collectAsState(initial = 1f)
+            // tworzenie interfejsu zgodnie z preferencjami użytkownika
             Medicin_App_v2Theme(themeMode = themeMode, fontScale = fontScale) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

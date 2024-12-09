@@ -84,12 +84,18 @@ class PatientViewModel(
 
     }
 
+    /**
+     * Pacjenta można stworzyć tylko jeśli nie istnieje pacjent o takim samym imieniu
+     */
     suspend fun canCreatePatient() : Boolean
     {
         val patient = patientsRepository.getPatientByName(patientUiState.patientDetails.name).first()
         return patient==null
     }
 
+    /**
+     * Zmiana wybranego pacjenta i zapisanie zmiany w preferencjach
+     */
     suspend fun changePatientId(id: Int)
     {
         viewModelScope.launch {
@@ -103,8 +109,6 @@ class PatientViewModel(
         patientId =id
 
     }
-
-
 
     companion object {
         const val TIMEOUT_MILLIS = 5_000L

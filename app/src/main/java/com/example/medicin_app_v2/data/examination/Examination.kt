@@ -34,6 +34,12 @@ data class Examination(
 
     )
 
+/**
+ * Enumeracja typu badania, jej atrybuty to:
+ * @param title tytuł badania zapisany w StringResources
+ * @param dolna dolna granica poprawnego wyniku
+ * @param gorna gorna granica poprawnego wyniku
+ */
 enum class ExaminationType(@StringRes val title: Int, val dolna : Float, val gorna: Float) {
     CUKIER (title = R.string.cukier, dolna = 70f, gorna = 99f),
     TEMPERATURA(title = R.string.temp, dolna = 35.5f, gorna = 37.5f),
